@@ -88,7 +88,7 @@ Install Rust's **MSVC** toolchain, Visual Studio C++ Build Tools with a Windows 
 ./scripts/package-windows.ps1 -Cloud
 ```
 
-This produces the setup executable and portable ZIP under `dist/`. The package uses a static C runtime, embeds its icon/version information, and supports per-monitor DPI and long paths.
+This produces the setup executable and portable ZIP under `dist/`. The package uses a static C runtime, embeds its icon/version information, and uses GPUI's per-monitor DPI manifest.
 
 ## macOS
 

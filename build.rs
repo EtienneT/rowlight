@@ -4,12 +4,12 @@ fn main() -> std::io::Result<()> {
     #[cfg(windows)]
     {
         println!("cargo:rerun-if-changed=packaging/windows/icon.ico");
-        println!("cargo:rerun-if-changed=packaging/windows/app.manifest");
+        // GPUI's Windows platform already embeds the execution/DPI manifest.
+        // A second manifest with resource ID 1 fails to link with MSVC.
         winresource::WindowsResource::new()
             .set_icon("packaging/windows/icon.ico")
             .set("ProductName", "Parquet Viewer")
             .set("FileDescription", "Parquet Viewer")
-            .set_manifest(include_str!("packaging/windows/app.manifest"))
             .compile()?;
     }
     Ok(())
