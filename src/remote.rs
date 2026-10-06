@@ -430,9 +430,14 @@ mod tests {
                     let mut request = String::new();
                     let mut range = None;
                     let mut conditional = false;
+                    let mut headers_complete = false;
                     loop {
                         request.clear();
-                        if input.read_line(&mut request).unwrap_or(0) == 0 || request == "\r\n" {
+                        if input.read_line(&mut request).unwrap_or(0) == 0 {
+                            break;
+                        }
+                        if request == "\r\n" {
+                            headers_complete = true;
                             break;
                         }
                         let lower = request.to_lowercase();
@@ -445,6 +450,10 @@ mod tests {
                         if lower.starts_with("if-match:") {
                             conditional = true;
                         }
+                    }
+                    // Clients can open pooled connections and close them unused.
+                    if !headers_complete {
+                        continue;
                     }
                     if worker_changed.load(Ordering::Acquire) && conditional {
                         let _ = write!(
@@ -461,7 +470,13 @@ mod tests {
                         );
                         continue;
                     }
-                    let range = range.unwrap();
+                    let Some(range) = range else {
+                        let _ = write!(
+                            stream,
+                            "HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
+                        );
+                        continue;
+                    };
                     worker_ranges.lock().unwrap().push(range.clone());
                     let _ = write!(
                         stream,
@@ -488,6 +503,38 @@ mod tests {
             self.stop.store(true, Ordering::Release);
             self.thread.take().unwrap().join().unwrap();
         }
+    }
+
+    #[test]
+    fn range_server_handles_abandoned_and_missing_range_requests() -> Result<()> {
+        use std::net::{Shutdown, TcpStream};
+
+        let server = Server::start(vec![0; 1024], true);
+        let address = url::Url::parse(&server.url)?.socket_addrs(|| None)?[0];
+        for request in ["", "GET /data.parquet HTTP/1.1\r\nRange: bytes=0-0"] {
+            let mut stream = TcpStream::connect(address)?;
+            stream.write_all(request.as_bytes())?;
+            stream.shutdown(Shutdown::Write)?;
+        }
+        for (request, status) in [
+            (
+                "GET /data.parquet HTTP/1.1\r\nHost: localhost\r\n\r\n",
+                "HTTP/1.1 400 Bad Request\r\n",
+            ),
+            (
+                "GET /data.parquet HTTP/1.1\r\nHost: localhost\r\nRange: bytes=0-0\r\n\r\n",
+                "HTTP/1.1 206 Partial Content\r\n",
+            ),
+        ] {
+            let mut stream = TcpStream::connect(address)?;
+            stream.set_read_timeout(Some(Duration::from_secs(2)))?;
+            stream.write_all(request.as_bytes())?;
+            let mut response = String::new();
+            BufReader::new(stream).read_line(&mut response)?;
+            assert_eq!(response, status);
+        }
+        assert_eq!(*server.ranges.lock().unwrap(), vec![0..1]);
+        Ok(())
     }
 
     #[test]
