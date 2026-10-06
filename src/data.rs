@@ -746,7 +746,6 @@ fn write_nested(output: &mut impl fmt::Write, value: &AnyValue<'_>, depth: usize
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs::File;
 
     #[test]
     fn inspector_formats_complete_nested_binary_values_and_bounds_large_text() -> Result<()> {
@@ -1001,7 +1000,7 @@ mod tests {
     #[cfg(target_os = "linux")]
     #[test]
     fn non_utf8_paths_are_supported() -> Result<()> {
-        use std::os::unix::ffi::OsStringExt;
+        use std::{fs::File, os::unix::ffi::OsStringExt};
         let dir = tempfile::tempdir()?;
         let path = dir
             .path()
