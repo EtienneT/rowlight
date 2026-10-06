@@ -9,10 +9,11 @@ cloud=false
 for argument in "$@"; do
   case "$argument" in --skip-build) skip_build=true ;; --cloud) cloud=true ;; *) printf 'Unknown option: %s\n' "$argument" >&2; exit 1 ;; esac
 done
-features=()
+build_arguments=(--locked --release --bin parquetviewer)
 suffix=""
-if $cloud; then features=(--features cloud); suffix="-cloud"; fi
-if ! $skip_build; then cargo build --locked --release --bin parquetviewer "${features[@]}"; fi
+# Bash 3.2 (bundled with macOS) treats an empty array as unset under `set -u`.
+if $cloud; then build_arguments+=(--features cloud); suffix="-cloud"; fi
+if ! $skip_build; then cargo build "${build_arguments[@]}"; fi
 version=$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -1)
 case $(uname -m) in arm64) architecture=arm64 ;; x86_64) architecture=x64 ;; *) exit 1 ;; esac
 bundle="$project_root/dist/Parquet Viewer.app"
