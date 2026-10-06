@@ -54,5 +54,3 @@ cargo dev -- /path/to/file.parquet
 ```
 
 [Build and install](docs/user-guide.md#double-click-opening-on-linux) · [Windows](docs/user-guide.md#windows) · [macOS](docs/user-guide.md#macos) · [All features and shortcuts](docs/user-guide.md#use)
-
-Inspired by the concise project introductions in [Lapce](https://github.com/lapce/lapce) and [Zed](https://github.com/zed-industries/zed). Media uses synthetic data; [capture details](docs/media.md).
