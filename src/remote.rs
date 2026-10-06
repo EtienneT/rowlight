@@ -423,6 +423,9 @@ mod tests {
                         }
                         Err(_) => break,
                     };
+                    // Winsock inherits the listener's nonblocking mode on accept.
+                    // Request/response I/O below uses blocking reads with a timeout.
+                    stream.set_nonblocking(false).unwrap();
                     stream
                         .set_read_timeout(Some(Duration::from_secs(2)))
                         .unwrap();
@@ -506,7 +509,7 @@ mod tests {
     }
 
     #[test]
-    fn range_server_handles_abandoned_and_missing_range_requests() -> Result<()> {
+    fn range_server_handles_abandoned_delayed_and_missing_range_requests() -> Result<()> {
         use std::net::{Shutdown, TcpStream};
 
         let server = Server::start(vec![0; 1024], true);
@@ -528,6 +531,8 @@ mod tests {
         ] {
             let mut stream = TcpStream::connect(address)?;
             stream.set_read_timeout(Some(Duration::from_secs(2)))?;
+            // Accept can run before a client sends any HTTP headers.
+            thread::sleep(Duration::from_millis(25));
             stream.write_all(request.as_bytes())?;
             let mut response = String::new();
             BufReader::new(stream).read_line(&mut response)?;

@@ -38,7 +38,12 @@ jobs:
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: cargo clippy --locked --all-targets --features cloud -- -D warnings
       - run: cargo test --locked --all-targets
-      - run: cargo test --locked --features "ui-tests cloud" --lib --bin parquetviewer
+      - name: Data and remote-file tests
+        run: cargo test --locked --features "ui-tests cloud" --lib
+      - name: Viewer UI tests
+        # Report UI failures independently of the data test result.
+        if: ${{ !cancelled() }}
+        run: cargo test --locked --features "ui-tests cloud" --bin parquetviewer
       - name: Development runner checks
         run: |
           cargo clippy --locked --package xtask --all-targets -- -D warnings
