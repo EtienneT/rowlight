@@ -866,10 +866,6 @@ mod tests {
             window.press("home", cx);
             window.press("end", cx);
             window.press(&shortcut("a"), cx);
-            window.press("alt-right", cx);
-            window.press(&shortcut("pagedown"), cx);
-            assert!(!content.read(cx).loading);
-            assert_eq!(content.read(cx).selection.as_ref().unwrap().head, (0, 0));
             assert_eq!(
                 content
                     .read(cx)
@@ -879,6 +875,13 @@ mod tests {
                     .as_str(),
                 "4"
             );
+            // Option+Right is native word navigation on macOS and can collapse selection.
+            window.press("alt-right", cx);
+            window.press(&shortcut("pagedown"), cx);
+            assert!(!content.read(cx).loading);
+            assert_eq!(content.read(cx).page.as_ref().unwrap().offset, 0);
+            assert_eq!(content.read(cx).selection.as_ref().unwrap().head, (0, 0));
+            assert_eq!(content.read(cx).page_input.read(cx).value().as_str(), "4");
             window.press("enter", cx);
         })
         .unwrap();
