@@ -40,6 +40,18 @@ fn main() -> anyhow::Result<()> {
     application.on_reopen(|cx| cx.activate(true));
     application.run(move |cx| {
         gpui_omarchy::init(cx);
+        // Documentation captures can preview a palette without changing the desktop.
+        #[cfg(debug_assertions)]
+        if let Some(directory) = std::env::var_os("ROWLIGHT_PREVIEW_THEME") {
+            match gpui_omarchy::Theme::from_current_dir(directory) {
+                Ok(theme) => theme.apply(cx),
+                Err(error) => {
+                    eprintln!("Cannot load preview theme: {error}");
+                    cx.quit();
+                    return;
+                }
+            }
+        }
         #[cfg(target_os = "macos")]
         cx.set_menus(vec![
             Menu::new("Parquet Viewer").items([MenuItem::action("Quit Parquet Viewer", Quit)]),

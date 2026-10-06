@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="144" viewBox="0 0 480 144" role="img" aria-labelledby="title">
+  <title id="title">Rowlight</title>
+  <g transform="translate(0 8)"><defs>
+    <linearGradient id="light" x1="28" y1="64" x2="104" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3B85A"/>
+      <stop offset="1" stop-color="#FFE6B6"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="#182334"/>
+  <rect x="28" y="36" width="72" height="9" rx="4.5" fill="#586B85"/>
+  <rect x="28" y="59" width="72" height="10" rx="5" fill="url(#light)"/>
+  <rect x="28" y="83" width="52" height="9" rx="4.5" fill="#586B85"/>
+  <circle cx="100" cy="64" r="10" fill="#FFE6B6"/>
+</g>
+  <text x="151" y="94" fill="#182334" font-family="DejaVu Sans, Arial, sans-serif" font-size="64" font-weight="600" letter-spacing="-2.5">Rowlight</text>
+</svg>
