@@ -79,7 +79,18 @@ For native desktop validation, follow [the release checklist](../packaging/TESTI
 
 The [Native builds workflow](https://github.com/EtienneT/rowlight/actions/workflows/ci.yml) uses standard GitHub-hosted runners for Linux x64, Windows x64, and Apple Silicon/Intel macOS. These runner minutes are [free for public repositories](https://docs.github.com/en/actions/reference/runners/github-hosted-runners). The workflow skips every job while the repository is private, even if enabled. A maintainer must enable the workflow in GitHub after publishing before these checks can run.
 
-Once public and enabled, source pushes to `main` and pull requests run development-profile checks. README/guide-only pushes skip the matrix, and new commits cancel superseded runs. Core lint still checks code without cloud features; cloud/UI lint and all workspace tests use one feature set. Native dependency caches are kept after failures and saved only from `main`, so pull requests reuse them without creating a cache for every branch. Compilation remains bounded to two jobs per runner.
+Once public and enabled, source pushes to `main` and pull requests run development-profile checks. README/guide-only pushes skip the matrix, and new commits cancel superseded runs. Core lint still checks code without cloud features; cloud/UI lint and all workspace tests use one feature set. Native dependency caches are kept after failures and saved only from `main`, so pull requests reuse them without creating a cache for every branch.
+
+Cargo parallelism is bounded for the [public runner hardware](https://docs.github.com/en/actions/reference/runners/github-hosted-runners):
+
+| Platform | Cargo build jobs | Runner RAM |
+| --- | ---: | ---: |
+| Linux x64 | 4 | 16 GB |
+| Windows x64 | 4 | 16 GB |
+| macOS Intel | 3 | 14 GB |
+| macOS Apple Silicon | 2 | 7 GB |
+
+These are starting limits, not measured speedups. Check the first public runs for time and memory pressure before raising them further. Local builds retain the four-job default; `CARGO_BUILD_JOBS` can override it for a particular machine.
 
 Optimized packages are built only when a maintainer chooses **Run workflow → packages**. Leave that checkbox off for checks alone. To request packages with the GitHub CLI:
 
@@ -90,6 +101,10 @@ gh workflow run ci.yml --ref main -f packages=true
 Package runs check the code first, then build both core and cloud variants on each platform. Uploaded packages expire after seven days. Routine checks have a 30-minute timeout per platform; package runs allow 90 minutes. The size-optimized release profile is unchanged.
 
 Cold builds compile GPUI, Polars and their native dependencies separately on each OS/CPU. Caches reuse dependencies, but the application still needs compilation/linking after source changes. Thin LTO and single-codegen-unit release optimization also add time. Building two release variants on all four platforms for every push was the main avoidable cost of the original workflow.
+
+For further tuning, measure a build with `cargo build --locked --bin parquetviewer --features cloud --timings`. Rust 1.99 already selects bundled LLD on Linux x64; the local linker probe confirmed it. macOS uses Apple's [modern linker](https://developer.apple.com/documentation/xcode-release-notes/xcode-15-release-notes). Benchmark `lld-link` on Windows before changing its linker, including executable resources and static-CRT packages. Linker changes should be tested on the target OS.
+
+A compiler cache such as [sccache](https://github.com/mozilla/sccache/blob/main/docs/Rust.md) can reuse dependency compilation when Cargo's target cache misses. It cannot cache final application linking or Rust incremental builds, so keep local incremental development enabled and evaluate it separately for CI. Avoid adding a second cache until timings show dependency compilation is still the bottleneck.
 
 To reproduce the routine lint/test commands locally:
 
