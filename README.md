@@ -53,4 +53,4 @@ With Rust and the [native prerequisites](https://gpui-kit.com/docs/installation/
 cargo dev -- /path/to/file.parquet
 ```
 
-[Build and install](docs/user-guide.md#double-click-opening-on-linux) · [Windows](docs/user-guide.md#windows) · [macOS](docs/user-guide.md#macos) · [All features and shortcuts](docs/user-guide.md#use)
+[Build and install](docs/installation.md) · [Windows](docs/installation.md#windows) · [macOS](docs/installation.md#macos) · [Keyboard shortcuts](docs/keyboard-shortcuts.md)
