@@ -75,6 +75,30 @@ The data tests cover Parquet row groups, IPC batches, CSV parsing/paging, typed 
 
 For native desktop validation, follow [the release checklist](../packaging/TESTING.md). Compilation and headless UI tests do not establish desktop integration on Windows/macOS.
 
+## Continuous integration
+
+The [Native builds workflow](https://github.com/EtienneT/rowlight/actions/workflows/ci.yml) uses standard GitHub-hosted runners for Linux x64, Windows x64, and Apple Silicon/Intel macOS. These runner minutes are [free for public repositories](https://docs.github.com/en/actions/reference/runners/github-hosted-runners). The workflow skips every job while the repository is private, even if enabled. A maintainer must enable the workflow in GitHub after publishing before these checks can run.
+
+Once public and enabled, source pushes to `main` and pull requests run development-profile checks. README/guide-only pushes skip the matrix, and new commits cancel superseded runs. Core lint still checks code without cloud features; cloud/UI lint and all workspace tests use one feature set. Native dependency caches are kept after failures and saved only from `main`, so pull requests reuse them without creating a cache for every branch. Compilation remains bounded to two jobs per runner.
+
+Optimized packages are built only when a maintainer chooses **Run workflow → packages**. Leave that checkbox off for checks alone. To request packages with the GitHub CLI:
+
+```sh
+gh workflow run ci.yml --ref main -f packages=true
+```
+
+Package runs check the code first, then build both core and cloud variants on each platform. Uploaded packages expire after seven days. Routine checks have a 30-minute timeout per platform; package runs allow 90 minutes. The size-optimized release profile is unchanged.
+
+Cold builds compile GPUI, Polars and their native dependencies separately on each OS/CPU. Caches reuse dependencies, but the application still needs compilation/linking after source changes. Thin LTO and single-codegen-unit release optimization also add time. Building two release variants on all four platforms for every push was the main avoidable cost of the original workflow.
+
+To reproduce the routine lint/test commands locally:
+
+```sh
+cargo clippy --locked --workspace --all-targets -- -D warnings
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+cargo test --locked --workspace --all-targets --all-features --no-fail-fast
+```
+
 ## Demo and measurements
 
 ```sh
@@ -103,7 +127,7 @@ The [2026-10-05 validation and measurements](validation-2026-10-05.md) cover the
 - `src/main.rs`: startup, path argument, shortcuts and application lifecycle.
 - `xtask/`: development-only source watcher, incremental preview builds and process cleanup; excluded from the viewer's runtime dependencies.
 - `packaging/` and `scripts/`: platform icons, file registration, macOS app bundle, Windows installer, and Linux desktop integration.
-- `.github/workflows/ci.yml`: formatting, Clippy, data tests and UI tests, and native packages for all four platform/CPU targets, with pinned action revisions.
+- `.github/workflows/ci.yml`: native checks for all four platform/CPU targets and optional manual packages, with pinned action revisions and a public-repository guard.
 
 For future additions that keep the app focused, see [the small-viewer roadmap](roadmap.md).
 

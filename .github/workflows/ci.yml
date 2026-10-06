@@ -1,11 +1,18 @@
 name: Native builds
 on:
   push:
+    # Branch pushes with an open PR are covered by pull_request below.
+    branches: [main]
     paths-ignore:
       - README.md
       - 'docs/**'
   pull_request:
   workflow_dispatch:
+    inputs:
+      packages:
+        description: Build optimized core and cloud packages for every platform
+        type: boolean
+        default: false
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -13,8 +20,12 @@ permissions:
   contents: read
 jobs:
   check:
+    # Never use private-repository minutes, even if this workflow is re-enabled.
+    if: ${{ github.event.repository.private == false }}
     name: ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
+    # Release builds are explicit and need more time than development checks.
+    timeout-minutes: ${{ inputs.packages && 90 || 30 }}
     strategy:
       fail-fast: false
       matrix:
@@ -30,6 +41,9 @@ jobs:
     env:
       CARGO_BUILD_JOBS: 2
       MACOSX_DEPLOYMENT_TARGET: '15.0'
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - uses: dtolnay/rust-toolchain@70dec6087f2cb6bab9fbac4da23160afbe848e91
@@ -43,46 +57,45 @@ jobs:
         with:
           # Keep native dependency builds available while fixing a later check.
           cache-on-failure: true
+          # PRs restore the main-branch cache without filling storage per branch.
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       - run: cargo fmt --all --check
-      - run: cargo clippy --locked --all-targets -- -D warnings
-      - run: cargo clippy --locked --all-targets --features cloud -- -D warnings
-      - run: cargo test --locked --all-targets
-      - name: Data and remote-file tests
-        run: cargo test --locked --features "ui-tests cloud" --lib
-      - name: Viewer UI tests
-        # Report UI failures independently of the data test result.
-        if: ${{ !cancelled() }}
-        run: cargo test --locked --features "ui-tests cloud" --bin parquetviewer
-      - name: Development runner checks
-        run: |
-          cargo clippy --locked --package xtask --all-targets -- -D warnings
-          cargo test --locked --package xtask
-          cargo dev --once -- --help
+      - name: Core lint
+        run: cargo clippy --locked --workspace --all-targets -- -D warnings
+      - name: Cloud and UI lint
+        run: cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+      - name: Data, remote, viewer and development runner tests
+        # One feature set avoids linking/running the core tests a second time.
+        # Keep reporting UI/runner results if a data test fails.
+        run: cargo test --locked --workspace --all-targets --all-features --no-fail-fast
+      - name: Development runner startup
+        run: cargo dev --once -- --help
       - name: Data smoke test with a Unicode filename
         shell: bash
         run: |
           mkdir -p samples
-          cargo run --locked --example sample -- 'samples/résultats 100%.parquet' 2501
-          cargo run --locked --example inspect -- 'samples/résultats 100%.parquet' 2000
-          cargo run --locked --example inspect -- 'samples/résultats 100%.parquet' all
+          cargo run --locked --all-features --example sample -- 'samples/résultats 100%.parquet' 2501
+          cargo run --locked --all-features --example inspect -- 'samples/résultats 100%.parquet' 2000
+          cargo run --locked --all-features --example inspect -- 'samples/résultats 100%.parquet' all
           for format in ipc csv tsv; do
-            cargo run --locked --example sample -- "samples/native.$format" 2501
-            cargo run --locked --example inspect -- "samples/native.$format" 2000
+            cargo run --locked --all-features --example sample -- "samples/native.$format" 2501
+            cargo run --locked --all-features --example inspect -- "samples/native.$format" 2000
           done
       - name: Linux release artifact
-        if: runner.os == 'Linux'
+        if: github.event_name == 'workflow_dispatch' && inputs.packages && runner.os == 'Linux'
         shell: bash
         run: ./scripts/package-linux.sh && ./scripts/package-linux.sh --cloud
       - name: macOS application and ZIP
-        if: runner.os == 'macOS'
+        if: github.event_name == 'workflow_dispatch' && inputs.packages && runner.os == 'macOS'
         run: ./scripts/package-macos.sh && ./scripts/package-macos.sh --cloud
       - name: Windows portable ZIP and installer
-        if: runner.os == 'Windows'
+        if: github.event_name == 'workflow_dispatch' && inputs.packages && runner.os == 'Windows'
         shell: pwsh
         run: |
           ./scripts/package-windows.ps1
           ./scripts/package-windows.ps1 -Cloud
       - name: Upload native packages
+        if: github.event_name == 'workflow_dispatch' && inputs.packages
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: parquetviewer-${{ matrix.platform }}
@@ -91,3 +104,4 @@ jobs:
             dist/*.exe
             dist/*.tar.gz
           if-no-files-found: error
+          retention-days: 7

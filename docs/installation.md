@@ -9,7 +9,7 @@ Choose your platform: [Linux](#linux) · [Windows](#windows) · [macOS](#macos).
 
 ## Get a build
 
-The [Native builds workflow](https://github.com/EtienneT/rowlight/actions/workflows/ci.yml) targets Linux x64, Windows x64, and macOS on Apple Silicon and Intel. Download an artifact from a successful run for your platform, if available, or build from source below. GitHub access to this repository is required to download its workflow artifacts.
+The [Native builds workflow](https://github.com/EtienneT/rowlight/actions/workflows/ci.yml) targets Linux x64, Windows x64, and macOS on Apple Silicon and Intel. Download an artifact from a successful **manual package run** for your platform, if available, or build from source below. Routine checks do not produce downloads; package artifacts expire after seven days. GitHub sign-in is required to download workflow artifacts. See [how maintainers request packages](development.md#continuous-integration).
 
 These are development packages. Publicly signed releases are not yet prepared: the macOS bundle uses an ad hoc signature, and the Windows installer is unsigned. Native Windows/macOS desktop release checks remain pending; see [validation status](#validation-status).
 
