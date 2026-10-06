@@ -1,0 +1,10 @@
+[build]
+# GPUI and Polars have substantial compile-time work. Keep parallel builds bounded.
+jobs = 4
+
+[alias]
+# Keep the feature set stable during development to reuse Cargo's cached artifacts.
+dev = "run --quiet --locked --package xtask -- dev"
+dev-build = "build --locked --bin parquetviewer --features cloud"
+quick-check = "check --locked --bin parquetviewer --features cloud"
+ui-test = "test --locked --features cloud,ui-tests --lib --bin parquetviewer"

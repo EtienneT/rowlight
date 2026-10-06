@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/vnd.apache.parquet">
+    <comment>Apache Parquet data</comment>
+    <glob pattern="*.parquet" weight="80"/>
+    <glob pattern="*.parq" weight="80"/>
+    <alias type="application/x-parquet"/>
+    <magic priority="80"><match type="string" value="PAR1" offset="0"/></magic>
+  </mime-type>
+  <mime-type type="application/vnd.apache.arrow.file">
+    <comment>Arrow IPC / Feather v2 file</comment>
+    <glob pattern="*.ipc"/><glob pattern="*.arrow"/><glob pattern="*.feather"/>
+    <magic priority="60"><match type="string" value="ARROW1" offset="0"/></magic>
+  </mime-type>
+</mime-info>

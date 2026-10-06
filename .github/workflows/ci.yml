@@ -1,0 +1,76 @@
+name: Native builds
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  check:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            platform: linux-x64
+          - os: windows-2025
+            platform: windows-x64
+          - os: macos-15
+            platform: macos-arm64
+          - os: macos-15-intel
+            platform: macos-x64
+    env:
+      CARGO_BUILD_JOBS: 2
+      MACOSX_DEPLOYMENT_TARGET: '15.0'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: dtolnay/rust-toolchain@70dec6087f2cb6bab9fbac4da23160afbe848e91
+        with:
+          toolchain: 1.99.0
+          components: rustfmt, clippy
+      - name: Linux native prerequisites
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev libwayland-dev libxkbcommon-x11-dev libxcb-shape0-dev libxcb-xfixes0-dev libssl-dev libvulkan-dev clang cmake
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - run: cargo fmt --all --check
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo clippy --locked --all-targets --features cloud -- -D warnings
+      - run: cargo test --locked --all-targets
+      - run: cargo test --locked --features "ui-tests cloud" --lib --bin parquetviewer
+      - name: Development runner checks
+        run: |
+          cargo clippy --locked --package xtask --all-targets -- -D warnings
+          cargo test --locked --package xtask
+          cargo dev --once -- --help
+      - name: Data smoke test with a Unicode filename
+        shell: bash
+        run: |
+          mkdir -p samples
+          cargo run --locked --example sample -- 'samples/résultats 100%.parquet' 2501
+          cargo run --locked --example inspect -- 'samples/résultats 100%.parquet' 2000
+          cargo run --locked --example inspect -- 'samples/résultats 100%.parquet' all
+          for format in ipc csv tsv; do
+            cargo run --locked --example sample -- "samples/native.$format" 2501
+            cargo run --locked --example inspect -- "samples/native.$format" 2000
+          done
+      - name: Linux release artifact
+        if: runner.os == 'Linux'
+        shell: bash
+        run: ./scripts/package-linux.sh && ./scripts/package-linux.sh --cloud
+      - name: macOS application and ZIP
+        if: runner.os == 'macOS'
+        run: ./scripts/package-macos.sh && ./scripts/package-macos.sh --cloud
+      - name: Windows portable ZIP and installer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          ./scripts/package-windows.ps1
+          ./scripts/package-windows.ps1 -Cloud
+      - name: Upload native packages
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: parquetviewer-${{ matrix.platform }}
+          path: |
+            dist/*.zip
+            dist/*.exe
+            dist/*.tar.gz
+          if-no-files-found: error

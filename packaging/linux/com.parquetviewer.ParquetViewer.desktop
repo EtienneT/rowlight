@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Parquet Viewer
+Comment=View tabular files, types and distributions
+Exec=parquetviewer %f
+Icon=com.parquetviewer.ParquetViewer
+Terminal=false
+Categories=Utility;
+MimeType=application/vnd.apache.parquet;application/x-parquet;application/vnd.apache.arrow.file;application/x-feather;text/csv;text/tab-separated-values;
+StartupWMClass=com.parquetviewer.ParquetViewer

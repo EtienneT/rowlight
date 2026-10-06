@@ -1,0 +1,65 @@
+[package]
+name = "parquetviewer"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+description = "A small native Parquet viewer with typed columns and paged browsing"
+repository = "https://github.com/EtienneT/rowlight"
+license = "MIT"
+publish = false
+default-run = "parquetviewer"
+
+[workspace]
+members = ["xtask"]
+default-members = ["."]
+resolver = "3"
+
+[features]
+ui-tests = ["gpui-kit/test-support"]
+cloud = ["dep:object_store", "dep:tokio", "dep:bytes", "dep:reqwest"]
+
+[dependencies]
+anyhow = "1.0"
+async-channel = "2.5"
+dirs = "6.0"
+gpui-kit = { version = "=0.7.0", default-features = false, features = ["assets"] }
+gpui-omarchy = "0.2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tempfile = "3.23"
+url = "2.5"
+csv-core = "0.1"
+chrono = { version = "0.4", default-features = false, features = ["std"] }
+# Keep the query engine out of the viewer. Networking is an optional build feature.
+polars-arrow = { version = "0.55.2", default-features = false, features = ["io_ipc", "io_ipc_compression"] }
+polars-parquet = { version = "0.55.2", default-features = false }
+object_store = { version = "0.13.1", default-features = false, features = ["aws", "azure", "gcp", "http", "tls-webpki-roots"], optional = true }
+tokio = { version = "1.44", features = ["rt-multi-thread", "time", "sync"], optional = true }
+bytes = { version = "1", optional = true }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"], optional = true }
+polars-parquet-format = "0.1"
+polars-core = { version = "0.55.2", default-features = false, features = ["temporal", "dtype-date", "dtype-datetime", "dtype-duration", "dtype-time", "dtype-struct", "dtype-categorical", "dtype-array", "dtype-decimal", "dtype-i8", "dtype-i16", "dtype-u8", "dtype-u16", "dtype-i128"] }
+polars-io = { version = "0.55.2", default-features = false, features = ["parquet", "ipc", "csv", "dtype-date", "dtype-datetime", "dtype-duration", "dtype-time", "dtype-struct", "dtype-categorical", "dtype-decimal", "dtype-i8", "dtype-i16", "dtype-u8", "dtype-u16", "dtype-i128"] }
+
+[target.'cfg(any(target_os = "windows", target_os = "macos"))'.dependencies]
+sysinfo = { version = "0.39.6", default-features = false, features = ["system"] }
+
+[target.'cfg(windows)'.build-dependencies]
+winresource = { version = "0.1.31", default-features = false }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+dbg_macro = "deny"
+todo = "deny"
+
+[profile.dev]
+# Keep Cargo's incremental, unoptimized dev defaults; size optimization is release-only.
+debug = 0
+
+[profile.release]
+opt-level = "s"
+lto = "thin"
+codegen-units = 1
+strip = true
