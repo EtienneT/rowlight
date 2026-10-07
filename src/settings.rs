@@ -15,6 +15,15 @@ use crate::{
     source::{CsvOptions, Location},
 };
 
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum Appearance {
+    #[default]
+    System,
+    Light,
+    Dark,
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
 pub struct Sort {
     pub column: String,
@@ -39,6 +48,7 @@ pub struct FileView {
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(default)]
 pub struct Settings {
+    pub appearance: Appearance,
     pub row_limit: RowLimit,
     pub show_plots: bool,
     pub association_prompted: bool,
@@ -52,6 +62,7 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
+            appearance: Appearance::System,
             row_limit: RowLimit::default(),
             show_plots: true,
             association_prompted: false,
@@ -196,6 +207,7 @@ mod tests {
         let store = SettingsStore::at(directory.path().join("app/settings.json"));
         assert_eq!(store.load()?, Settings::default());
         let mut settings = Settings {
+            appearance: Appearance::Dark,
             row_limit: RowLimit::All,
             show_plots: false,
             ..Settings::default()
@@ -214,6 +226,7 @@ mod tests {
         store.save(&settings)?;
         assert_eq!(store.load()?, settings);
         settings.row_limit = RowLimit::Paged(100);
+        settings.appearance = Appearance::Light;
         store.save(&settings)?;
         assert_eq!(store.load()?, settings);
         assert_eq!(settings.files.len(), 20);
@@ -232,6 +245,7 @@ mod tests {
             br#"{"row_limit":{"mode":"paged","rows":0},"window_width":4,"unknown":true}"#,
         )?;
         let settings = store.load()?;
+        assert_eq!(settings.appearance, Appearance::System);
         assert_eq!(settings.row_limit, RowLimit::default());
         assert_eq!(settings.window_width, 1000.0);
         assert!(settings.show_plots);

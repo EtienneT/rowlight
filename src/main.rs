@@ -1,5 +1,6 @@
 #![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 
+mod theme;
 mod viewer;
 
 use std::{ffi::OsStr, path::PathBuf};
@@ -40,11 +41,12 @@ fn main() -> anyhow::Result<()> {
     application.on_reopen(|cx| cx.activate(true));
     application.run(move |cx| {
         gpui_omarchy::init(cx);
+        theme::apply(settings.appearance, cx);
         // Documentation captures can preview a palette without changing the desktop.
         #[cfg(debug_assertions)]
         if let Some(directory) = std::env::var_os("ROWLIGHT_PREVIEW_THEME") {
             match gpui_omarchy::Theme::from_current_dir(directory) {
-                Ok(theme) => theme.apply(cx),
+                Ok(theme) => theme::preview(theme, cx),
                 Err(error) => {
                     eprintln!("Cannot load preview theme: {error}");
                     cx.quit();

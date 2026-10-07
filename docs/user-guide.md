@@ -150,7 +150,7 @@ Rowlight saves page size, plot visibility, the association-prompt decision, and 
 
 Use **Recent files…** to return to a source. **Clear history** removes remembered sources and their saved views; the current source stays out of history until you open another one. Starting the app without a file does not automatically reopen the last source.
 
-On Omarchy, Rowlight follows the current palette, including changes while it runs. Without a usable Omarchy theme, it uses Tokyo Night, including on Windows and macOS. It does not modify your desktop theme. See the [theme gallery](../README.md#your-omarchy-theme).
+Choose **☰ → Settings… → Appearance** to select **System**, **Light**, or **Dark**. Your choice applies immediately and is remembered between launches. **System** is the default: on Linux with a usable Omarchy theme, it follows the current palette, including live changes. Elsewhere, including Windows and macOS, it follows the operating system’s light or dark appearance and updates while the app runs. Light and Dark use Rowlight’s built-in palettes. Rowlight does not modify your desktop theme. See the [theme gallery](../README.md#your-omarchy-theme).
 
 <details>
 <summary>Where preferences live</summary>

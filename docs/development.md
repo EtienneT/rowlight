@@ -48,7 +48,18 @@ After fixing inherited Cargo package metadata, alternating warm `cargo quick-che
 
 The initial development build after switching to the current feature set took 11.7 seconds, including several uncached GPUI crates. Numbers vary by machine, edit, dependency features, filesystem and concurrent load. Dependency/toolchain/profile changes can cause much larger rebuilds; do not run `cargo clean` during routine iteration. Changing global Rust compiler/linker flags also invalidates dependency artifacts.
 
-The live native check intentionally introduced a compiler error, verified that the original preview remained open, then corrected it with a real UI edit. The preview restarted, kept 1,000 rows/page and collapsed plots, and left production preferences unchanged. The development app also opened the typed IPC fixture correctly. Runner tests cover argument preservation and source creation/deletion/atomic replacement; Clippy denies warnings. Native Windows/macOS checks remain pending; CI includes the runner's native build/tests and a copied-executable startup check on both platforms.
+The live native check intentionally introduced a compiler error, verified that the original preview remained open, then corrected it with a real UI edit. The preview restarted, kept 1,000 rows/page and collapsed plots, and left production preferences unchanged. The development app also opened the typed IPC fixture correctly. Runner tests cover argument preservation and source creation/deletion/atomic replacement; Clippy denies warnings. [Native Windows validation](../packaging/TESTING.md#windows-x64-validation-on-2026-10-06) subsequently passed, including both release packages and desktop/installer smoke checks. macOS desktop integration remains pending.
+
+Windows x64 measurements on 2026-10-06, Rust 1.99.0, eight Cargo jobs and a retained dependency cache:
+
+| Operation | Elapsed |
+| --- | ---: |
+| Unchanged `cargo dev --once -- --help` | 1.69 s |
+| Same command after touching the app source | 6.81 s |
+| First optimized core build and packaging | 346.91 s |
+| Cloud build and packaging following core | 298.46 s |
+
+Touching the source forced an app rebuild without changing its contents; it does not predict every code edit. Release builds use a separate profile, static Windows runtime and thin LTO. Keep routine iteration on `cargo dev`, with a stable feature set and retained target directory.
 
 ## Build and validation
 

@@ -47,7 +47,7 @@ use parquetviewer::{
     data::{self, ColumnDetail, Distribution, PAGE_SIZES, Page, RowLimit},
     filter::{Filter, FilterIndex, FilterOp},
     inspection::CellKind,
-    settings::{FileView, Settings, SettingsStore, Sort},
+    settings::{Appearance, FileView, Settings, SettingsStore, Sort},
     source::{Cancellation, CsvOptions, Delimiter, Location, Source},
 };
 
@@ -221,6 +221,7 @@ enum Panel {
     Columns,
     Filter(usize),
     Shortcuts,
+    Settings,
 }
 
 pub struct Viewer {
@@ -241,6 +242,7 @@ pub struct Viewer {
     page_input: Entity<InputState>,
     _input_subscription: Subscription,
     _bounds_subscription: Subscription,
+    _appearance_subscription: Subscription,
     load_task: Option<Task<()>>,
     dialog_task: Option<Task<()>>,
     detail: Option<ColumnDetail>,
@@ -296,6 +298,10 @@ impl Viewer {
                 Some(format!("{error:#}; using defaults.")),
             ),
         };
+        crate::theme::ensure_initialized(settings.appearance, cx);
+        let appearance_subscription = window.observe_window_appearance(|window, cx| {
+            crate::theme::system_appearance_changed(window.appearance(), cx);
+        });
         cx.on_release(|this, _| {
             this.flush_settings();
         })
@@ -363,6 +369,7 @@ impl Viewer {
             page_input,
             _input_subscription: subscription,
             _bounds_subscription: bounds_subscription,
+            _appearance_subscription: appearance_subscription,
             load_task: None,
             dialog_task: None,
             detail: None,
@@ -1384,6 +1391,7 @@ impl Viewer {
                 MenuItem::new("Keyboard shortcuts…")
                     .action(ShowShortcuts)
                     .separator_before(),
+                MenuItem::new("Settings…"),
                 MenuItem::new("Quit").action(Quit).separator_before(),
             ],
             move |index, window, cx| {
@@ -1403,7 +1411,8 @@ impl Viewer {
                     8 => this.show_panel(Panel::Url, window, cx),
                     9 => this.show_csv_options(window, cx),
                     10 => this.show_shortcuts(&ShowShortcuts, window, cx),
-                    11 => cx.quit(),
+                    11 => this.show_panel(Panel::Settings, window, cx),
+                    12 => cx.quit(),
                     _ => {}
                 })
             },
@@ -1601,6 +1610,7 @@ impl Viewer {
             Panel::Columns => "Visible columns",
             Panel::Filter(_) => "Filter column",
             Panel::Shortcuts => "Keyboard shortcuts",
+            Panel::Settings => "Settings",
         };
         let mut root =
             div()
@@ -1631,6 +1641,52 @@ impl Viewer {
                     d.child(div().text_color(cx.omarchy().secondary).child(notice))
                 });
         match panel {
+            Panel::Settings => {
+                let owner = cx.entity();
+                let options = [Appearance::System, Appearance::Light, Appearance::Dark];
+                let selected = options
+                    .iter()
+                    .position(|&mode| mode == self.settings.appearance);
+                root = root.child(
+                    div()
+                        .flex()
+                        .flex_col()
+                        .gap_3()
+                        .w(px(420.0))
+                        .child(div().font_weight(FontWeight::SEMIBOLD).child("Appearance"))
+                        .child(gpui_omarchy::button_group(
+                            "appearance",
+                            vec![
+                                gpui_omarchy::ChoiceItem::new("system", "System"),
+                                gpui_omarchy::ChoiceItem::new("light", "Light"),
+                                gpui_omarchy::ChoiceItem::new("dark", "Dark"),
+                            ],
+                            selected,
+                            move |index, _, cx| {
+                                owner.update(cx, |this, cx| {
+                                    this.settings.appearance = options[index];
+                                    crate::theme::apply(this.settings.appearance, cx);
+                                    this.save_settings(cx);
+                                    cx.notify();
+                                });
+                            },
+                            window,
+                            cx,
+                        ))
+                        .child(
+                            div()
+                                .text_sm()
+                                .text_color(cx.omarchy().secondary)
+                                .child(crate::theme::system_description(cx)),
+                        )
+                        .child(
+                            div()
+                                .text_sm()
+                                .text_color(cx.omarchy().secondary)
+                                .child("Your choice is saved automatically."),
+                        ),
+                );
+            }
             Panel::Shortcuts => {
                 root = root.child(self.shortcuts_panel(window, cx));
             }
@@ -2631,6 +2687,59 @@ mod tests {
     use polars_core::prelude::{DataFrame, IntoColumn, NamedFrom, Series};
     use polars_io::prelude::ParquetWriter;
     use std::sync::Arc;
+
+    #[gpui_kit::test]
+    fn appearance_settings_apply_immediately_and_are_saved(cx: &mut TestAppContext) {
+        use gpui_omarchy::ActiveTheme;
+        use parquetviewer::settings::{Appearance, Settings, SettingsStore};
+        let directory = tempfile::tempdir().unwrap();
+        let store = SettingsStore::at(directory.path().join("settings.json"));
+        store
+            .save(&Settings {
+                association_prompted: true,
+                ..Settings::default()
+            })
+            .unwrap();
+        cx.update(|cx| {
+            gpui_omarchy::init(cx);
+            cx.bind_keys([gpui_kit::KeyBinding::new(
+                "escape",
+                super::CloseDetail,
+                Some("ParquetViewer"),
+            )]);
+        });
+        let (handle, content) = cx.update(|cx| {
+            gpui_kit::open_window(WindowOptions::default(), cx, |window, cx| {
+                cx.new(|cx| Viewer::new(None, store.clone(), window, cx))
+            })
+            .unwrap()
+        });
+        cx.update_window(handle, |_, window, cx| {
+            window.render_frame(cx);
+            window.click("app-menu", cx);
+            window.render_frame(cx);
+            window.click(("menu-item", 11usize), cx);
+            window.render_frame(cx);
+            for (index, appearance, name) in [
+                (1usize, Appearance::Light, "Light"),
+                (2, Appearance::Dark, "Dark"),
+            ] {
+                window.within("appearance").click(index, cx);
+                window.render_frame(cx);
+                assert_eq!(cx.omarchy().name.as_ref(), name);
+                assert_eq!(content.read(cx).settings.appearance, appearance);
+                assert_eq!(store.load().unwrap().appearance, appearance);
+                assert!(store.load().unwrap().association_prompted);
+            }
+            window.within("appearance").click(0usize, cx);
+            window.render_frame(cx);
+            assert_eq!(store.load().unwrap().appearance, Appearance::System);
+            window.press("escape", cx);
+        })
+        .unwrap();
+        cx.run_until_parked();
+        cx.update(|cx| assert!(content.read(cx).panel.is_none()));
+    }
 
     #[test]
     fn overview_shows_the_most_common_boolean_and_an_actual_string_value() {
