@@ -24,6 +24,7 @@ Open a file, understand its columns, and explore its rows. Rowlight is read only
 | Find, resize, or hide a column | [Focus on the columns you need](#focus-on-the-columns-you-need) |
 | Understand a distribution or see file metadata | [Understand the data](#understand-the-data) |
 | Read a long value or copy a selection | [Inspect and copy cells](#inspect-and-copy-cells) |
+| Open a Hive folder or run SQL | [Folders and SQL](#folders-and-sql) |
 | Show only matching rows | [Filter the file](#filter-the-file) |
 | Keep my view and follow my desktop theme | [Make the view your own](#make-the-view-your-own) |
 | Fix a loading or display problem | [Troubleshooting](#troubleshooting) |
@@ -50,13 +51,13 @@ Click a column name to cycle through **ascending → descending → source order
 
 ### Show all rows
 
-Choose **All** under **Rows / page** to load the complete file when it fits the memory budget. If Rowlight declines the load, choose a paged size and keep browsing. This choice is remembered, and the memory check runs again for every file.
+Choose **All** under **Rows / page** to load the complete file when it fits the memory budget. If Rowlight declines the load, choose a paged size and keep browsing. This choice is remembered, and the memory check runs again for every file. Folders and freshly executed SQL queries start paged when that preference is All; explicitly choose All afterward if needed.
 
 For very large files, start with **100** or **500**. The [large-file reference](formats.md#large-files-and-memory) explains the limits, including why a small compressed file can still need substantial memory.
 
 ## Focus on the columns you need
 
-Columns always follow the order stored in the file.
+Columns follow the order stored in the file. Hive partition columns follow the physical columns; SQL results follow the SELECT list.
 
 | Task | Action |
 | --- | --- |
@@ -105,7 +106,7 @@ Type labels reflect the file's Polars schema: for example, `str` is text, `f64` 
 
 Choose **File overview…** from the menu. Rowlight reads up to **1,000 rows** across **16 evenly spaced windows**, including the beginning and end of a larger file. The overview shows sampled null percentages, distinct values, ranges or frequent categories, and expandable charts. Files with at most 1,000 rows are summarized completely.
 
-The overview runs in the background and can be cancelled. Its sample describes the **unfiltered source**, even while the table has active filters. An evenly spaced sample can miss rare values or patterns; use it to orient yourself, not as an exact whole-file report.
+The overview runs in the background and can be cancelled. Its sample describes the **original, unfiltered source**, even while the table has active filters or a SQL query. An evenly spaced sample can miss rare values or patterns; use it to orient yourself, not as an exact whole-file report.
 
 ### See the file's metadata
 
@@ -115,7 +116,7 @@ Choose **File details…** to open a side drawer with the full source path, size
 
 Click a cell to select it. Use the arrow keys to move, or **Shift+click / Shift+arrows** to extend a rectangular selection. Click a source-row number to select its entire row.
 
-Double-click a cell, or select it and press **Enter**, to open the inspector beside the table. It shows the value, data type, and original source row. This is useful for long text, binary data, and nested values. Use **Copy value** to copy the inspector's text, then **Esc** to close the drawer.
+Double-click a cell, or select it and press **Enter**, to open the inspector beside the table. It shows the value, data type, and original source row (or result row in SQL mode). This is useful for long text, binary data, and nested values. Use **Copy value** to copy the inspector's text, then **Esc** to close the drawer.
 
 <details>
 <summary>See the cell inspector</summary>
@@ -146,9 +147,50 @@ Filters apply to the **whole file**. Up to eight filters on different columns co
 
 Scanning runs in the background; **Cancel** keeps the prior view. Large or remote files can take time and require substantial reads. The results keep their original source row numbers, and page charts describe the loaded matches. See [filter formats and limits](formats.md#filters) for date/time inputs and memory behavior.
 
+## Folders and SQL
+
+### Open a Hive folder
+
+Choose **☰ → Open Parquet folder…**, or press **Ctrl+Shift+O** (**Cmd+Shift+O** on macOS). Select the dataset root above its `key=value` directories. For example, files under `year=2026/region=North/` gain `year` and `region` columns without loading the entire folder into memory.
+
+A folder opens with paging even if your saved row choice is All. Browse, filter partition columns, and inspect charts as usual. File details includes the file count. Reopen the folder to discover newly added files. Files must have matching schemas and partition keys; see [folder requirements](formats.md#hive-parquet-folders).
+
+### Query the complete source
+
+1. Open **SQL…** above the table, or press **Ctrl+Shift+L** (**Cmd+Shift+L**).
+2. Write a query using the table `data`. The editor lists the original columns and types beside your query.
+3. Choose **Run query**, or press **Ctrl+Enter** (**Cmd+Enter**).
+4. Browse the paged results. Choose **Edit query** to revise it or **Exit SQL** to return to your previous filters, sort, and page.
+
+![SQL editor with the original source columns beside a query and the result table visible behind it](assets/sql-query.png)
+
+The editor starts with a 1,000-row preview query. Remove or change LIMIT when you need a different result. For an exact row count:
+
+```sql
+SELECT COUNT(*) AS rows FROM data
+```
+
+For a Hive folder containing `year` and `region`:
+
+```sql
+SELECT region, COUNT(*) AS rows
+FROM data
+WHERE year = 2026
+GROUP BY region
+ORDER BY rows DESC
+```
+
+SQL works on the whole source; existing column filters and page sorting do not affect it. Those controls are disabled while the query is active. Include **WHERE** and **ORDER BY** in the query to filter and sort. Use **LIMIT** when you only need a preview, and quote column names containing spaces with double quotes.
+
+The shaded gutter becomes **Result row**, and charts describe the loaded result page. File details and File overview still describe the original source. A successful query, its view, and your draft text are remembered separately; reopening recomputes the successful query. An invalid draft or cancelled query leaves the previous result usable. If a saved query no longer works, the source opens normally with a notice and your draft remains editable.
+
+If a query fails, the editor reopens with your draft and a short explanation. Keep editing to correct it. **Details** shows the full error in a scrollable box; **Copy details** copies it for troubleshooting. Use single quotes for text values (`WHERE region = 'North'`); double quotes refer to column names.
+
+Large queries run in a separate, cancellable worker with memory and temporary-storage checks. CSV/TSV and remote Parquet require a full staging read for SQL. See [SQL behavior and limits](formats.md#sql-mode) before querying a very large or remote source.
+
 ## Make the view your own
 
-Rowlight saves page size, plot visibility, the association-prompt decision, and window dimensions automatically. For the **20 most recent sources**, it also remembers the page, sorting, column widths and visibility, filters, and scroll position. CSV/TSV options and the selected AWS profile are saved too. Reopening a remembered source restores its view; saved filters are scanned again.
+Rowlight saves page size, plot visibility, the association-prompt decision, and window dimensions automatically. For the **20 most recent sources**, it also remembers the page, sorting, column widths and visibility, filters, and scroll position. SQL drafts, the last successful query, and its separate page/column view are remembered too. CSV/TSV options and the selected AWS profile are saved. Reopening a remembered source restores its view; saved filters are scanned again and active SQL queries are recomputed.
 
 Use **Recent files…** to return to a source. **Clear history** removes remembered sources and their saved views; the current source stays out of history until you open another one. Starting the app without a file does not automatically reopen the last source.
 
@@ -177,6 +219,8 @@ Omarchy's current palette is read from `~/.local/state/omarchy/current/theme/col
 | --- | --- |
 | Double-click opens another application | Choose **Associate Parquet files…** from the menu, or follow the [platform association steps](installation.md). |
 | **All** is rejected | Select **100**, **500**, or **1,000** rows per page. The memory guard also runs when a remembered All preference is restored. |
+| SQL fails or reaches a budget | Edit the query, narrow its columns/WHERE clause, or add LIMIT. The previous view remains available; use Exit SQL to return to normal browsing. |
+| A folder reports mismatched schemas or partition keys | Select one compatible dataset root; see [Hive folder requirements](formats.md#hive-parquet-folders). |
 | A CSV has the wrong columns or fails on a later page | Set its delimiter/header in **CSV / TSV options…**. For mixed types, choose **Read all columns as text** and **Save and apply**. |
 | CSV reports invalid UTF-8 | Convert it to UTF-8, or explicitly choose replacement decoding in **CSV / TSV options…**. Other encodings are not automatically detected. |
 | A chart is absent | Binary, nested, and all-null columns have no distribution plot. Very large sample values can also cause chart/statistics calculations to be skipped with an explanation. |

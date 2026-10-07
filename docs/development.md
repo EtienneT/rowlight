@@ -21,14 +21,16 @@ The first dependency build is still substantial. Once cached, app edits use Carg
 | `cargo dev --once -- FILE` | Build and run once, without a watcher |
 | `cargo dev-build` | Build the cloud development app without launching |
 | `cargo quick-check` | Compiler feedback without executable code generation/linking |
-| `cargo ui-test` | Run the data/preferences and headless viewer tests |
+| `cargo ui-test` | Run data/preferences, headless viewer, and real SQL-worker integration tests |
 | `cargo build --release --features cloud` | Build a distribution/performance binary |
 
-`FILE` can be a local path or a remote Parquet URL in cloud mode. Quote paths containing spaces. The development helper does not print file/URL arguments. Arguments after `--` are passed to the app; for example `cargo dev --once -- --help` checks startup without a graphical display.
+`FILE` can be a local file/folder path or a remote Parquet URL in cloud mode. Quote paths containing spaces. The development helper does not print file/URL arguments. Arguments after `--` are passed to the app; for example `cargo dev --once -- --help` checks startup without a graphical display.
 
 The watcher tracks `src/`, the root manifest/lockfile, `build.rs`, `.cargo/config.toml`, the toolchain and embedded Windows resources. Documentation/data-file edits do not rebuild the app. New/deleted source files and atomic editor replacements are detected. Changes to the helper itself require restarting `cargo dev`.
 
 Nested Cargo builds remove the helper's injected package metadata from their environment. This keeps dependency fingerprints compatible with ordinary `cargo quick-check`, `cargo dev-build` and test commands; TLS dependencies no longer rebuild because the caller changed.
+
+For a small UI change, keep `cargo dev` running, save the edit, and inspect the restarted preview. Run `cargo ui-test TEST_FILTER` for the affected behavior, then format and lint the settled change. A compiler check immediately followed by a development build usually repeats work; choose the check when you only need diagnostics, and the build when you need to see the app. Full native release/installer validation belongs at release milestones rather than on every edit. [AGENTS.md](../AGENTS.md) records this workflow for coding agents.
 
 The helper runs a copy of each successful executable. This permits rebuilding on Windows while the previous preview is open. Copies are removed when their processes end. Build and preview process groups are owned by the helper, so stopping the loop does not target other viewer instances. The helper's small dependencies are outside the viewer's runtime graph, and no globally installed watcher is required.
 
@@ -61,9 +63,35 @@ Windows x64 measurements on 2026-10-06, Rust 1.99.0, eight Cargo jobs and a reta
 
 Touching the source forced an app rebuild without changing its contents; it does not predict every code edit. Release builds use a separate profile, static Windows runtime and thin LTO. Keep routine iteration on `cargo dev`, with a stable feature set and retained target directory.
 
+## SQL/Hive build impact on 2026-10-07
+
+Adding Polars' lazy streaming/SQL engine requires a one-time dependency rebuild in each profile. The first updated cloud development build on Windows took 2 minutes 11 seconds with four jobs. A cached Linux app rebuild during this work took 3.52 seconds; headless test builds also produce a separate test executable and do more work. These measurements are for these changes and machines, not a guarantee for every edit.
+
+The first updated Linux cloud release build took 3 minutes 49 seconds. Its executable is 71.9 MiB, up from 43.5 MiB before SQL. The engine adds about 28.4 MiB; result files stay temporary and the viewer still retains a paged table. Keep optimized builds for packaging, and reuse `cargo dev`/`cargo quick-check` for iteration.
+
 ## Build and validation
 
-The workspace pins **Rust 1.99.0**, edition **2024**, and the application lockfile. GPUI Kit brings its matching GPUI dependencies. Polars' dataframe and I/O crates are enabled; its lazy query engine and SQL are omitted, and cloud transport is optional.
+### Cached SQL error UI fix on 2026-10-07
+
+Measured on the Linux workstation and the retained Windows test checkout, using four Cargo jobs:
+
+| Operation | Elapsed |
+| --- | ---: |
+| Linux incremental cloud development build | 2.75 s |
+| Linux optimized cloud release build | 70.69 s |
+| Linux focused SQL error regression, including test compilation | About 7 s |
+| Linux full all-feature workspace test run, including compilation | 7.53 s |
+| Linux all-feature workspace Clippy | 0.81 s |
+| Windows incremental cloud development build | 18.32 s |
+| Windows focused SQL error regression, including test compilation | 15.03 s |
+
+Cargo's timing reports show only the application crate rebuilt in the Linux development and release builds; dependencies were already cached. Release code generation/optimization/linking took roughly 26 times as long as the development build for this edit. Test execution itself was inexpensive: the focused test took 2.04 s on Linux and 3.66 s on Windows. Source inspection, manual UI checks, source transfers and repeated packaging also add to end-to-end turnaround. These measurements describe this change, not every edit.
+
+The practical improvement is to provide the live development preview first and reserve optimized builds and installers for an explicitly requested installed update or release milestone. Reuse a focused test during iteration; finish with the appropriate broader checks once. Keep platform-specific validation, but don't make every small UI edit wait for the full OS/package matrix.
+
+### Toolchain and checks
+
+The workspace pins **Rust 1.99.0**, edition **2024**, and the application lockfile. GPUI Kit brings its matching GPUI dependencies. Polars' dataframe, I/O, lazy streaming engine and read-only SQL are enabled with explicit features; cloud transport is optional. Adding SQL requires a one-time dependency rebuild on each platform; normal source changes continue to use cached incremental dev builds.
 
 Install the [native platform prerequisites](https://gpui-kit.com/docs/installation/) before building. Cargo uses four jobs to keep dependency compilation bounded. Development builds omit debug symbols; release builds optimize for size, use thin LTO, and strip symbols. See [installation and native packaging](installation.md) for each platform's scripts.
 
@@ -82,7 +110,7 @@ cargo clippy --locked --package xtask --all-targets -- -D warnings
 cargo test --locked --package xtask
 ```
 
-The data tests cover Parquet row groups, IPC batches, CSV parsing/paging, typed sorting, empty/final pages, nulls and non-finite values, nested inspection, sampled overviews, whole-file filters, clipboard limits, and preference restoration. HTTP integration tests check real range requests, bounded cache reuse, object changes, unsupported servers, and cancellation. Headless GPUI tests drive paging, selection, column visibility/sizing, axis-independent scrolling, resize alignment, chart expansion, saved views, and the opt-in association prompt without changing host defaults.
+The data tests cover Parquet row groups, IPC batches, CSV parsing/paging, typed sorting, empty/final pages, nulls and non-finite values, nested inspection, sampled overviews, whole-file filters, clipboard limits, and preference restoration. SQL integration tests start the real executable in worker mode and cover full-source filtering/order, grouping, CTEs, empty results, Hive partitions, CSV options, compressed IPC and typed/nested values, signed HTTP staging, cancellation and memory termination. The test command also builds that executable; keep it current before running a filtered headless SQL test. HTTP integration tests check real range requests, bounded cache reuse, object changes, unsupported servers, and cancellation. Headless GPUI tests drive paging, selection, column visibility/sizing, axis-independent scrolling, resize alignment, chart expansion, saved views, SQL mode ownership/restoration, folder paging with saved All, and the opt-in association prompt without changing host defaults.
 
 For native desktop validation, follow [the release checklist](../packaging/TESTING.md). Compilation and headless UI tests do not establish desktop integration on Windows/macOS.
 
@@ -146,6 +174,9 @@ The [2026-10-05 validation and measurements](validation-2026-10-05.md) cover the
 
 - `src/data.rs`: page reads, typed sorting, summaries, bounded cell formatting.
 - `src/source.rs`: local source metadata, IPC batch paging, CSV/TSV parsing and disk-backed row index.
+- `src/hive.rs`: bounded local Parquet manifests, partition inference and sliced cross-file reads.
+- `src/query.rs`: read-only validation, isolated SQL worker, monitored budgets and streamed IPC results.
+- `src/viewer/query.rs`: query dialog, mode transitions and folder picker.
 - `src/remote.rs`: optional conditional cloud/HTTP byte ranges, bounded caching and request cancellation.
 - `src/viewer.rs`: window state, background tasks, themed controls, virtual table, plots.
 - `src/association.rs`: opt-in platform file associations (no startup default changes).

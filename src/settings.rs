@@ -43,6 +43,19 @@ pub struct FileView {
     pub widths: BTreeMap<String, f32>,
     pub hidden_columns: Vec<String>,
     pub filters: Vec<crate::filter::Filter>,
+    pub sql: SqlView,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq)]
+#[serde(default)]
+pub struct SqlView {
+    pub text: String,
+    pub query: Option<String>,
+    pub offset: usize,
+    pub row: usize,
+    pub horizontal: f32,
+    pub widths: BTreeMap<String, f32>,
+    pub hidden_columns: Vec<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
@@ -122,6 +135,27 @@ impl Settings {
                 *width = width.clamp(120.0, 800.0);
             }
             file.filters.truncate(8);
+            if file.sql.text.len() > crate::query::MAX_QUERY_BYTES {
+                file.sql.text.truncate(
+                    file.sql
+                        .text
+                        .floor_char_boundary(crate::query::MAX_QUERY_BYTES),
+                );
+            }
+            if file.sql.query.as_ref().is_some_and(|q| {
+                q.len() > crate::query::MAX_QUERY_BYTES || crate::query::validate(q).is_err()
+            }) {
+                file.sql.query = None;
+            }
+            file.sql.horizontal = if file.sql.horizontal.is_finite() {
+                file.sql.horizontal.min(0.0)
+            } else {
+                0.0
+            };
+            file.sql.widths.retain(|_, width| width.is_finite());
+            for width in file.sql.widths.values_mut() {
+                *width = width.clamp(120.0, 800.0);
+            }
         }
     }
 }

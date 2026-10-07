@@ -7,11 +7,49 @@
 | Source | Core build | Cloud build | Notes |
 | --- | :---: | :---: | --- |
 | Local Parquet (`.parquet`, `.parq`) | ✓ | ✓ | Typed columns; paged row-range reads |
+| Local Hive Parquet folder | ✓ | ✓ | `key=value` partitions; paged reads across files |
 | Local Arrow IPC / Feather v2 (`.ipc`, `.arrow`, `.feather`) | ✓ | ✓ | IPC file format; paged record-batch reads |
 | Local CSV / TSV (`.csv`, `.tsv`) | ✓ | ✓ | Configurable parsing; one indexing scan on open |
 | Remote Parquet | — | ✓ | S3, Azure, GCS, and HTTP(S), including signed GET URLs |
 
-Rowlight opens one file/object at a time. IPC streams, Feather v1, remote CSV/IPC, Iceberg tables, editing, and SQL are not currently supported. See the [roadmap](roadmap.md) for planned work.
+Rowlight opens one file, local Parquet folder, or remote object at a time. IPC streams, Feather v1, remote folders/CSV/IPC, Iceberg tables, and editing are not currently supported. See the [roadmap](roadmap.md) for planned work.
+
+## Hive Parquet folders
+
+Choose **Open Parquet folder…**, or pass a folder path to the executable. Rowlight recursively discovers Parquet files and adds virtual columns from Hive paths:
+
+```text
+events/
+  year=2025/region=North/part-001.parquet
+  year=2026/region=South/part-002.parquet
+```
+
+Physical columns keep their file order; `year` and `region` follow them in partition-path order. Values are percent-decoded; `__HIVE_DEFAULT_PARTITION__` becomes null. Partition types are inferred across the manifest as signed 64-bit integer, finite float, Boolean (`true`/`false`), or text. Oversized integer identifiers stay text rather than losing precision. Dates remain text.
+
+All files must share the same physical schema and ordered partition keys. Partition columns must be omitted from the files. Hidden/underscore entries, symlinks, and non-Parquet files are ignored. Discovery reads metadata, not every row; limits are **100,000 files**, **400,000 directory entries**, **64 nesting levels**, and a **64 MiB manifest/metadata estimate**.
+
+Folders always open paged, even if **All** was saved globally. You can explicitly choose All afterward, subject to the usual memory checks. Files are read in path order and pages can cross partition boundaries. The manifest is a snapshot taken on open: reopen to see added files. Changes to a file being read are rejected; SQL checks the whole manifest before and after execution.
+
+## SQL mode
+
+Open **SQL…** above the table, or press **Ctrl+Shift+L** (**Cmd+Shift+L**). The opened source is registered as `data`. The default query previews 1,000 rows. Run one read-only **SELECT** or **WITH** query with **Ctrl+Enter** (**Cmd+Enter**). Column names with spaces need double quotes.
+
+```sql
+SELECT "region", COUNT(*) AS rows
+FROM data
+GROUP BY "region"
+ORDER BY rows DESC
+```
+
+Queries use the **entire source**, independently of normal filters and page sorting. While SQL is active, those controls are disabled. SQL controls result column order and sorting; paging, charts, visibility, inspection, and copying work on the result. The gutter reads **Result row**, because derived rows do not necessarily correspond to an original record. **Exit SQL mode** restores the previous normal view. File details and File overview continue to describe the original source.
+
+Parquet and Hive queries use lazy Polars scans with projection and predicate pushdown where supported. Local IPC uses a lazy scan. CSV/TSV and remote Parquet first stage the complete source into a private IPC file, preserving CSV settings and existing cloud credentials/range behavior; even a selective query on these sources can require a complete read. Remote folders and external SQL table functions are unsupported. See the [Polars SQL introduction](https://docs.pola.rs/user-guide/sql/intro/) for syntax and functions.
+
+Each query runs in an isolated process. Results stream into an IPC file and are displayed in pages; a newly executed query starts paged when the saved choice is All. Paging an existing result reuses that file. Cancel or failure leaves the previous view usable. Query results are temporary snapshots and are recomputed on reopening a source; saved draft text is separate from the last successful query.
+
+The worker monitors resident memory against **25% of available memory, capped at 1 GiB**, and is stopped if it exceeds that budget. Input/result batches are checked as well. This is a periodic safeguard, not a hard allocation limit: some [streaming operations can still need substantial memory](https://docs.pola.rs/user-guide/concepts/streaming/). Narrow a query or add LIMIT when needed. Each staged input and result file is capped at **2 GiB**; total query scratch space, including Polars spills, is monitored against **4 GiB**.
+
+Scratch files live under the platform's per-user cache in `parquetviewer/queries`, and are removed when the result closes or execution fails/cancels. An abrupt crash can leave a temporary directory; close Rowlight before removing abandoned directories. Signed URLs and profile names are sent to the worker through a pipe, not a saved request file. Signed sources still have no saved history/query. SQL requires a UTF-8 source path.
 
 ## CSV and TSV
 
@@ -57,7 +95,7 @@ URLs with a query or fragment, including signed URLs, are excluded from history 
 
 Rowlight requests the footer and required column-chunk byte ranges rather than eagerly downloading the whole object. The per-source in-memory range cache is capped at **32 MiB**; each request has a **30-second timeout**. Servers must support byte ranges and provide an ETag, version, or Last-Modified value so pages cannot silently mix object versions.
 
-Reopen a changed source to refresh its metadata and clear the cache. **Cancel** interrupts active network requests; decoding checks cancellation between chunks. Whole-file filters can fetch substantial data even though ordinary browsing uses range reads.
+Reopen a changed source to refresh its metadata and clear the cache. **Cancel** interrupts active network requests; decoding checks cancellation between chunks. Whole-file filters and SQL staging can fetch substantial data even though ordinary browsing uses range reads.
 
 ## Charts and statistics
 
@@ -98,7 +136,7 @@ Filters scan the entire source in background batches of at most **4,096 rows**, 
 
 Plots summarize the first 1,000 loaded matches at most; **File overview** still describes the unfiltered source. Definitions are saved for remembered sources, but reopening must rebuild the temporary index. Incompatible filters are cleared with a notice if the schema changed.
 
-Large row groups and remote sources can make scans expensive. There is no query engine or predicate pushdown. Batches exceeding one quarter of the memory budget are rejected. **All** may reject a filtered result using the original source's conservative estimate; paged viewing remains available.
+Large row groups and remote sources can make scans expensive. This column-filter path does not use SQL or predicate pushdown; SQL mode is a separate alternative. Batches exceeding one quarter of the memory budget are rejected. **All** may reject a filtered result using the original source's conservative estimate; paged viewing remains available.
 
 ## Large files and memory
 

@@ -1,4 +1,4 @@
-//! Table interactions and small view controls. No editing or query language.
+//! Table interactions and small view controls.
 use super::*;
 use gpui_kit::base::CheckboxState;
 
@@ -471,6 +471,12 @@ impl Viewer {
             ),
             (format!("{modifier}+F"), "Find a column"),
             (format!("{modifier}+O"), "Open a file"),
+            (format!("{modifier}+Shift+O"), "Open a Hive Parquet folder"),
+            (format!("{modifier}+Shift+L"), "Open SQL query"),
+            (
+                format!("{modifier}+Enter"),
+                "Run query inside the SQL editor",
+            ),
             ("F1".into(), "Show keyboard shortcuts"),
         ];
         #[cfg(target_os = "macos")]
@@ -557,7 +563,7 @@ impl Viewer {
                 .disabled(self.loading),
             vec![
                 MenuItem::new("Column details…"),
-                MenuItem::new("Filter…"),
+                MenuItem::new("Filter…").disabled(self.sql.is_some()),
                 MenuItem::new("Hide column").disabled(self.columns.len() < 2),
                 MenuItem::new("Fit visible values"),
             ],
@@ -578,7 +584,7 @@ impl Viewer {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
-        if self.loading {
+        if self.loading || self.sql.is_some() {
             return;
         }
         let Some(page) = &self.page else {
@@ -698,7 +704,7 @@ impl Viewer {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
-        if self.loading {
+        if self.loading || self.sql.is_some() {
             return;
         }
         let Some(page) = &self.page else {
@@ -714,6 +720,33 @@ impl Viewer {
         self.load_location(location, 0, false, window, cx);
     }
     pub(super) fn filter_chips(&self, cx: &mut Context<Self>) -> Div {
+        if let Some(sql) = &self.sql {
+            return div()
+                .flex()
+                .items_center()
+                .gap_3()
+                .mb_3()
+                .text_sm()
+                .child(
+                    div()
+                        .flex_1()
+                        .truncate()
+                        .text_color(cx.omarchy().accent)
+                        .child(format!("SQL mode · {}", sql.query.replace('\n', " "))),
+                )
+                .child(
+                    control("edit-sql", "Edit query", cx)
+                        .disabled(self.loading)
+                        .on_click(cx.listener(|this, _, window, cx| {
+                            this.open_query(&super::OpenQuery, window, cx)
+                        })),
+                )
+                .child(
+                    control("exit-sql", "Exit SQL", cx)
+                        .disabled(self.loading)
+                        .on_click(cx.listener(|this, _, window, cx| this.exit_sql(window, cx))),
+                );
+        }
         div()
             .flex()
             .flex_wrap()
@@ -746,7 +779,7 @@ impl Viewer {
             })
     }
     pub(super) fn start_progress_timer(&mut self, cx: &mut Context<Self>) {
-        if !self.scanning {
+        if !self.scanning && !self.query_running {
             return;
         }
         self.progress_task = Some(cx.spawn(async move |this, cx| {

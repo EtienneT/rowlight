@@ -12,9 +12,17 @@ use viewer::{CloseDetail, OpenFile, Quit, Viewer};
 fn main() -> anyhow::Result<()> {
     let mut args = std::env::args_os().skip(1);
     let path = match args.next() {
+        Some(arg) if arg == OsStr::new("--query-worker") => {
+            let scratch = args
+                .next()
+                .map(PathBuf::from)
+                .ok_or_else(|| anyhow::anyhow!("Missing SQL worker directory"))?;
+            anyhow::ensure!(args.next().is_none(), "Invalid SQL worker arguments");
+            return parquetviewer::query::worker(&scratch);
+        }
         Some(arg) if arg == OsStr::new("--help") || arg == OsStr::new("-h") => {
             println!(
-                "Parquet Viewer\n\nUsage: parquetviewer [FILE|URL]\n\nOpen a file, or start without a path to use the file picker.\nCtrl/Cmd+O: open file · Ctrl/Cmd+F: find column · Home/End: first/last loaded row · Page Up/Down: screenful · Ctrl/Cmd+Page Up/Down or Alt+Left/Right: previous/next page · Ctrl/Cmd+Home/End: file start/end · Ctrl/Cmd+G: go to page · F1: keyboard shortcuts · Esc: clear selection/back · Ctrl/Cmd+Q: quit"
+                "Parquet Viewer\n\nUsage: parquetviewer [FILE|FOLDER|URL]\n\nOpen a file or Hive Parquet folder, or start without a path to use the file picker.\nCtrl/Cmd+O: open file · Ctrl/Cmd+Shift+O: open Parquet folder · Ctrl/Cmd+Shift+L: SQL query · Ctrl/Cmd+F: find column · Home/End: first/last loaded row · Page Up/Down: screenful · Ctrl/Cmd+Page Up/Down or Alt+Left/Right: previous/next page · Ctrl/Cmd+Home/End: file start/end · Ctrl/Cmd+G: go to page · F1: keyboard shortcuts · Esc: clear selection/back · Ctrl/Cmd+Q: quit"
             );
             return Ok(());
         }
@@ -57,9 +65,30 @@ fn main() -> anyhow::Result<()> {
         #[cfg(target_os = "macos")]
         cx.set_menus(vec![
             Menu::new("Parquet Viewer").items([MenuItem::action("Quit Parquet Viewer", Quit)]),
-            Menu::new("File").items([MenuItem::action("Open file…", OpenFile)]),
+            Menu::new("File").items([
+                MenuItem::action("Open file…", OpenFile),
+                MenuItem::action("Open Parquet folder…", viewer::OpenFolder),
+            ]),
         ]);
         cx.bind_keys([
+            KeyBinding::new(
+                if cfg!(target_os = "macos") {
+                    "cmd-shift-o"
+                } else {
+                    "ctrl-shift-o"
+                },
+                viewer::OpenFolder,
+                Some("ParquetViewer"),
+            ),
+            KeyBinding::new(
+                if cfg!(target_os = "macos") {
+                    "cmd-shift-l"
+                } else {
+                    "ctrl-shift-l"
+                },
+                viewer::OpenQuery,
+                Some("ParquetViewer"),
+            ),
             KeyBinding::new(
                 if cfg!(target_os = "macos") {
                     "cmd-o"
@@ -90,6 +119,7 @@ fn main() -> anyhow::Result<()> {
             ),
         ]);
         viewer::bind_table_keys(cx);
+        viewer::bind_sql_keys(cx);
         cx.on_window_closed(|cx, _| {
             if cx.windows().is_empty() {
                 cx.quit();

@@ -44,6 +44,20 @@ pub struct RemoteParquet {
     pub file_bytes: u64,
 }
 
+impl RemoteParquet {
+    pub(crate) fn revision(&self) -> String {
+        format!(
+            "{:?}",
+            (
+                &self.reader.size,
+                &self.reader.etag,
+                &self.reader.version,
+                &self.reader.last_modified
+            )
+        )
+    }
+}
+
 fn run<T>(cancel: &Cancellation, future: impl Future<Output = Result<T>>) -> Result<T> {
     static RUNTIME: OnceLock<tokio::runtime::Runtime> = OnceLock::new();
     let runtime = RUNTIME.get_or_init(|| {

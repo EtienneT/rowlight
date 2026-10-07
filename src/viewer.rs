@@ -7,6 +7,9 @@ use std::{
     },
 };
 
+mod errors;
+mod query;
+pub(crate) use query::bind_sql_keys;
 mod tools;
 use tools::Selection;
 
@@ -55,6 +58,9 @@ actions!(
     parquetviewer,
     [
         OpenFile,
+        OpenFolder,
+        OpenQuery,
+        RunQuery,
         FindColumn,
         PreviousPage,
         NextPage,
@@ -222,6 +228,7 @@ enum Panel {
     Filter(usize),
     Shortcuts,
     Settings,
+    Sql,
 }
 
 impl Panel {
@@ -247,6 +254,8 @@ pub struct Viewer {
     save_task: Option<Task<()>>,
     loading: bool,
     error: Option<String>,
+    error_details: bool,
+    error_scroll: ScrollHandle,
     focus: FocusHandle,
     panel_focus: FocusHandle,
     horizontal: ScrollHandle,
@@ -296,6 +305,12 @@ pub struct Viewer {
     scan_total: Arc<AtomicUsize>,
     scanning: bool,
     progress_task: Option<Task<()>>,
+    sql: Option<Arc<parquetviewer::query::QueryResult>>,
+    sql_override: Option<Option<String>>,
+    query_running: bool,
+    sql_input: Entity<TextareaState>,
+    sql_text: String,
+    _sql_subscription: Subscription,
 }
 
 impl Viewer {
@@ -317,10 +332,12 @@ impl Viewer {
             crate::theme::system_appearance_changed(window.appearance(), cx);
         });
         cx.on_release(|this, _| {
+            this.operation.cancel();
             this.flush_settings();
         })
         .detach();
         cx.on_app_quit(|this, _| {
+            this.operation.cancel();
             this.flush_settings();
             async {}
         })
@@ -365,6 +382,14 @@ impl Viewer {
         let filter_input = cx.new(|cx| InputState::new(window, cx).placeholder("Value"));
         let filter_upper = cx.new(|cx| InputState::new(window, cx).placeholder("Upper bound"));
         let association_offer = !settings.association_prompted;
+        let sql_input = cx.new(|cx| TextareaState::new(window, cx).rows(12));
+        let sql_subscription = cx.subscribe(&sql_input, |this, _, event, cx| {
+            if matches!(event, InputEvent::Change) {
+                this.sql_text = this.sql_input.read(cx).value().to_string();
+                this.schedule_save(cx);
+                cx.notify();
+            }
+        });
         let mut viewer = Self {
             page: None,
             columns: Vec::new(),
@@ -375,6 +400,8 @@ impl Viewer {
             save_task: None,
             loading: false,
             error,
+            error_details: false,
+            error_scroll: ScrollHandle::new(),
             focus: cx.focus_handle(),
             panel_focus: cx.focus_handle(),
             horizontal: ScrollHandle::new(),
@@ -424,6 +451,12 @@ impl Viewer {
             scan_total: Arc::new(AtomicUsize::new(0)),
             scanning: false,
             progress_task: None,
+            sql: None,
+            sql_override: None,
+            query_running: false,
+            sql_input,
+            sql_text: parquetviewer::query::DEFAULT_QUERY.into(),
+            _sql_subscription: sql_subscription,
         };
         viewer.focus.focus(window, cx);
         if let Some(path) = path {
@@ -451,7 +484,7 @@ impl Viewer {
         if !self.history_suppressed
             && let Some(page) = &self.page
         {
-            self.settings.remember(FileView {
+            let mut current = FileView {
                 location: Some(page.source.location.clone()),
                 csv_options: Some(page.source.csv_options),
                 path: page.path.clone(),
@@ -470,7 +503,26 @@ impl Viewer {
                     .collect(),
                 hidden_columns: self.hidden_columns.clone(),
                 filters: self.filters.clone(),
-            });
+                sql: self
+                    .settings
+                    .file_location(&page.source.location)
+                    .map_or_else(Default::default, |f| f.sql.clone()),
+            };
+            current.sql.text = self.sql_text.clone();
+            current.sql.query = self.sql.as_ref().map(|sql| sql.query.clone());
+            if self.sql.is_some() {
+                current.sql.offset = current.offset;
+                current.sql.row = current.row;
+                current.sql.horizontal = current.horizontal;
+                current.sql.widths = current.widths.clone();
+                current.sql.hidden_columns = current.hidden_columns.clone();
+                if let Some(saved) = self.settings.file_location(&page.source.location) {
+                    let mut normal = saved.clone();
+                    normal.sql = current.sql;
+                    current = normal;
+                }
+            }
+            self.settings.remember(current);
         }
     }
 
@@ -517,10 +569,13 @@ impl Viewer {
         }
         self.remember_view();
         self.history_suppressed = false;
-        let offset = self
-            .settings
-            .file_location(&location)
-            .map_or(0, |file| file.offset);
+        let offset = self.settings.file_location(&location).map_or(0, |file| {
+            if file.sql.query.is_some() {
+                file.sql.offset
+            } else {
+                file.offset
+            }
+        });
         self.load_location(location, offset, true, window, cx);
     }
 
@@ -560,6 +615,7 @@ impl Viewer {
         if self.loading {
             return;
         }
+        let editing_query = matches!(self.panel, Some(Panel::Sql));
         self.close_detail(window, cx);
         self.panel = None;
         self.overview = None;
@@ -596,7 +652,27 @@ impl Viewer {
             .as_ref()
             .filter(|index| !fresh && index.source.location == location && index.filters == filters)
             .cloned();
-        self.scanning = !filters.is_empty() && filtered.is_none();
+        let requested_query = self.sql_override.take().unwrap_or_else(|| {
+            if !fresh {
+                self.sql.as_ref().map(|sql| sql.query.clone())
+            } else {
+                self.settings
+                    .file_location(&location)
+                    .and_then(|f| f.sql.query.clone())
+            }
+        });
+        let cached_query = self
+            .sql
+            .as_ref()
+            .filter(|sql| {
+                !fresh
+                    && sql.source.location == location
+                    && Some(&sql.query) == requested_query.as_ref()
+            })
+            .cloned();
+        self.query_running = requested_query.is_some() && cached_query.is_none();
+        let execute_query = self.query_running;
+        self.scanning = requested_query.is_none() && !filters.is_empty() && filtered.is_none();
         self.scan_progress = Arc::new(AtomicUsize::new(0));
         let progress = self.scan_progress.clone();
         self.scan_total = Arc::new(AtomicUsize::new(0));
@@ -604,8 +680,14 @@ impl Viewer {
         let aws_profile = self.settings.aws_profile.clone();
         self.loading = true;
         self.error = None;
+        self.error_details = false;
+        self.error_scroll.set_offset(point(px(0.0), px(0.0)));
         self.remember_view();
         let row_limit = self.settings.row_limit;
+        let normal_offset = self
+            .settings
+            .file_location(&location)
+            .map_or(offset, |view| view.offset);
         let saved_sort = self
             .settings
             .file_location(&location)
@@ -637,7 +719,38 @@ impl Viewer {
                         }
                     }
                     scan_total.store(source.info.total_rows, Ordering::Release);
-                    let index = if filters.is_empty() {
+                    let sql = match requested_query {
+                        Some(query) => match cached_query {
+                            Some(sql) => Some(sql),
+                            None => match query::run_source(
+                                source.clone(),
+                                query,
+                                aws_profile,
+                                &cancel,
+                                &progress,
+                            ) {
+                                Ok(sql) => Some(sql),
+                                Err(error) if fresh && cancel.check().is_ok() => {
+                                    filter_notice = Some(format!("Saved SQL could not be restored; showing the source instead. Edit SQL to revise it: {error:#}"));
+                                    None
+                                }
+                                Err(error) => return Err(error),
+                            },
+                        },
+                        None => None,
+                    };
+                    // A fresh folder or freshly executed query never inherits All.
+                    let row_limit = if row_limit == RowLimit::All
+                        && ((fresh && source.is_dataset()) || execute_query)
+                    {
+                        RowLimit::default()
+                    } else {
+                        row_limit
+                    };
+                    let normal_filters = filters.clone();
+                    let index = if sql.is_some() {
+                        filtered
+                    } else if filters.is_empty() {
                         None
                     } else {
                         Some(match filtered {
@@ -650,37 +763,74 @@ impl Viewer {
                             )?),
                         })
                     };
-                    let page = match &index {
-                        Some(index) => index.load(offset, row_limit, retained_bytes, &cancel)?,
-                        None => {
-                            data::load_source(source, offset, row_limit, retained_bytes, &cancel)?
+                    let page = if let Some(sql) = &sql {
+                        sql.load(offset, row_limit, retained_bytes, &cancel)?
+                    } else {
+                        let offset = if fresh && execute_query { normal_offset } else { offset };
+                        match &index {
+                            Some(index) => {
+                                index.load(offset, row_limit, retained_bytes, &cancel)?
+                            }
+                            None => data::load_source(
+                                source,
+                                offset,
+                                row_limit,
+                                retained_bytes,
+                                &cancel,
+                            )?,
                         }
                     };
-                    let sort = saved_sort.and_then(|sort| {
-                        page.profiles
-                            .iter()
-                            .position(|profile| profile.name == sort.column && profile.sortable)
-                            .map(|column| (column, sort.descending))
-                    });
+                    let sort = if sql.is_some() {
+                        None
+                    } else {
+                        saved_sort.and_then(|sort| {
+                            page.profiles
+                                .iter()
+                                .position(|profile| profile.name == sort.column && profile.sortable)
+                                .map(|column| (column, sort.descending))
+                        })
+                    };
                     let rows = match sort {
                         Some((column, descending)) => page.sorted_rows(column, descending)?,
                         None => (0..page.frame.height()).collect(),
                     };
-                    Ok::<_, anyhow::Error>((page, rows, sort, index, filter_notice))
+                    Ok::<_, anyhow::Error>((
+                        page,
+                        rows,
+                        sort,
+                        index,
+                        filter_notice,
+                        sql,
+                        normal_filters,
+                    ))
                 })
                 .await;
             let _ = this.update_in(cx, |this, window, cx| {
                 this.loading = false;
                 this.scanning = false;
+                let query_rebuilt = this.query_running;
+                this.query_running = false;
                 this.notice = None;
                 match result {
-                    Ok((page, rows, sort, index, filter_notice)) => {
+                    Ok((page, rows, sort, index, filter_notice, sql, normal_filters)) => {
                         this.notice = filter_notice;
                         let changed_file = this.page.as_ref().is_none_or(|previous| {
                             previous.source.location != page.source.location
                         });
-                        let saved = this.settings.file_location(&page.source.location).cloned();
-                        if changed_file {
+                        let mode_changed = this.sql.is_some() != sql.is_some();
+                        let mut saved = this.settings.file_location(&page.source.location).cloned();
+                        if sql.is_some()
+                            && let Some(view) = &mut saved
+                        {
+                            view.offset = view.sql.offset;
+                            view.horizontal = view.sql.horizontal;
+                            view.row = view.sql.row;
+                            view.widths = view.sql.widths.clone();
+                            view.hidden_columns = view.sql.hidden_columns.clone();
+                        }
+                        this.sql = sql;
+                        this.settings.row_limit = page.row_limit;
+                        if changed_file || mode_changed || fresh || query_rebuilt {
                             this.viewport_x =
                                 px(saved.as_ref().map_or(0.0, |file| file.horizontal));
                             this.horizontal.set_offset(point(this.viewport_x, px(0.0)));
@@ -689,7 +839,7 @@ impl Viewer {
                             "{} · Parquet Viewer",
                             page.source.location.name()
                         ));
-                        if changed_file || fresh {
+                        if changed_file || fresh || mode_changed || query_rebuilt {
                             this.hidden_columns = saved
                                 .as_ref()
                                 .map_or_else(Vec::new, |f| f.hidden_columns.clone());
@@ -716,7 +866,11 @@ impl Viewer {
                             this.hidden_columns.clear();
                             this.columns = (0..page.profiles.len()).collect();
                         }
-                        this.filters = index.as_ref().map_or_else(Vec::new, |i| i.filters.clone());
+                        this.filters = if this.sql.is_some() {
+                            normal_filters
+                        } else {
+                            index.as_ref().map_or_else(Vec::new, |i| i.filters.clone())
+                        };
                         this.filtered = index;
                         this.selection = None;
                         this.rows = rows;
@@ -725,8 +879,19 @@ impl Viewer {
                             input.set_value(page.page_number().to_string(), window, cx)
                         });
                         this.page = Some(Arc::new(page));
+                        if changed_file || fresh {
+                            let text = saved
+                                .as_ref()
+                                .map(|f| f.sql.text.as_str())
+                                .filter(|text| !text.is_empty())
+                                .unwrap_or(parquetviewer::query::DEFAULT_QUERY)
+                                .to_owned();
+                            this.sql_text = text.clone();
+                            this.sql_input
+                                .update(cx, |input, cx| input.set_value(text, window, cx));
+                        }
                         this.vertical.scroll_to_item_strict(
-                            if changed_file {
+                            if changed_file || mode_changed || fresh {
                                 saved
                                     .map_or(0, |file| file.row)
                                     .min(this.rows.len().saturating_sub(1))
@@ -765,6 +930,10 @@ impl Viewer {
                         }
                         this.save_settings(cx);
                         this.error = Some(format!("{error:#}"));
+                        if execute_query && editing_query && this.pending_source.is_none() {
+                            this.show_panel(Panel::Sql, window, cx);
+                            this.sql_input.update(cx, |input, cx| input.focus(window, cx));
+                        }
                         window.set_window_title("Parquet Viewer");
                     }
                 }
@@ -878,7 +1047,7 @@ impl Viewer {
         let Some(page) = &self.page else {
             return;
         };
-        if self.loading || !page.profiles[column].sortable {
+        if self.loading || self.sql.is_some() || !page.profiles[column].sortable {
             return;
         }
         let next = match self.sort {
@@ -1115,7 +1284,11 @@ impl Viewer {
                     .flex_col()
                     .gap_1()
                     .child(div().text_lg().child("#"))
-                    .child("Source row"),
+                    .child(if self.sql.is_some() {
+                        "Result row"
+                    } else {
+                        "Source row"
+                    }),
             )
             .child(
                 div()
@@ -1148,7 +1321,7 @@ impl Viewer {
                         .child(control(("sort", column), format!("{}{arrow}", profile.name), cx)
                             .flex_1().min_w_0().overflow_hidden()
                             .border_color(cx.omarchy().foreground.opacity(0.0))
-                            .disabled(self.loading || !profile.sortable)
+                            .disabled(self.loading || self.sql.is_some() || !profile.sortable)
                             .on_click(cx.listener(move |this, _, window, cx| this.sort_column(column, window, cx))))
                         .child(self.column_menu(column,cx)))
                     .child(
@@ -1197,7 +1370,7 @@ impl Viewer {
                             .child(format!("{} nulls ({:.1}%)",number(profile.null_count),profile.null_count as f64 * 100.0 / page.profile_rows.max(1) as f64))
                             .child(div().mt_1().h(px(3.0)).w_full().bg(cx.omarchy().accent.opacity(0.15))
                                 .child(div().h_full().w(relative(profile.null_count as f32 / page.profile_rows.max(1) as f32)).bg(cx.omarchy().danger))),
-                        format!("{} sampled source rows · {} nulls · {} empty strings · {} NaN/infinite values{}",number(page.profile_rows),number(profile.null_count),number(profile.empty_count),number(profile.non_finite_count),if profile.summary_limited {" · Value summary unavailable"}else{""})))
+                        format!("{} sampled {} rows · {} nulls · {} empty strings · {} NaN/infinite values{}",number(page.profile_rows),if self.sql.is_some() { "result" } else { "source" },number(profile.null_count),number(profile.empty_count),number(profile.non_finite_count),if profile.summary_limited {" · Value summary unavailable"}else{""})))
                     .child(div().id(("resize-column",column)).test_support().absolute().top_0().right_0().w(px(7.0)).h_full()
                         .cursor(CursorStyle::ResizeLeftRight).hover(|d|d.bg(cx.omarchy().accent.opacity(0.5)))
                         .on_mouse_down(MouseButton::Left,cx.listener(move |this,event: &MouseDownEvent,_,cx| {
@@ -1441,6 +1614,12 @@ impl Viewer {
                     .action(ShowShortcuts)
                     .separator_before(),
                 MenuItem::new("Settings…"),
+                MenuItem::new("Open Parquet folder…")
+                    .action(OpenFolder)
+                    .disabled(self.loading),
+                MenuItem::new("SQL query…")
+                    .action(OpenQuery)
+                    .disabled(self.loading || self.page.is_none()),
                 MenuItem::new("Quit").action(Quit).separator_before(),
             ],
             move |index, window, cx| {
@@ -1461,7 +1640,9 @@ impl Viewer {
                     9 => this.show_csv_options(window, cx),
                     10 => this.show_shortcuts(&ShowShortcuts, window, cx),
                     11 => this.show_panel(Panel::Settings, window, cx),
-                    12 => cx.quit(),
+                    12 => this.open_folder(&OpenFolder, window, cx),
+                    13 => this.open_query(&OpenQuery, window, cx),
+                    14 => cx.quit(),
                     _ => {}
                 })
             },
@@ -1538,11 +1719,16 @@ impl Viewer {
         };
         let info = &page.source.info;
         let mut text = format!(
-            "{}\n\nFormat: {}\nRows: {}\nColumns: {}\nFile size: {}\nCompression: {}\nEncodings: {}\nWriter: {}\n\nSchema (file order{}):\n",
+            "{}\n\nFormat: {}\nRows: {}\nColumns: {}\nFiles: {}\nFile size: {}\nCompression: {}\nEncodings: {}\nWriter: {}\n\nSchema (file order{}):\n",
             page.source.location.display(),
             info.format,
-            number(page.total_rows),
-            number(page.profiles.len()),
+            number(info.total_rows),
+            number(
+                self.sql
+                    .as_ref()
+                    .map_or(page.profiles.len(), |sql| sql.schema.len())
+            ),
+            number(info.files),
             bytes(page.file_bytes),
             if info.codecs.is_empty() {
                 "Not applicable".into()
@@ -1562,8 +1748,22 @@ impl Viewer {
             }
         );
         use std::fmt::Write;
-        for profile in &page.profiles {
-            let _ = writeln!(text, "{}: {}", profile.name, profile.dtype);
+        let schema: Vec<_> = self.sql.as_ref().map_or_else(
+            || {
+                page.profiles
+                    .iter()
+                    .map(|p| (p.name.clone(), p.dtype.clone()))
+                    .collect()
+            },
+            |sql| {
+                sql.schema
+                    .iter()
+                    .map(|(name, dtype)| (name.to_string(), dtype.to_string()))
+                    .collect()
+            },
+        );
+        for (name, dtype) in schema {
+            let _ = writeln!(text, "{name}: {dtype}");
             if text.len() > 65_536 {
                 text.push_str("… Further schema entries omitted\n");
                 break;
@@ -1574,7 +1774,7 @@ impl Viewer {
                 text,
                 "\n{} {}:",
                 number(info.groups.len()),
-                if info.format == "Parquet" {
+                if info.format == "Parquet" || page.source.is_dataset() {
                     "row groups"
                 } else {
                     "record batches"
@@ -1655,6 +1855,7 @@ impl Viewer {
         let drawer = panel.is_drawer();
         let (width, height) = match panel {
             Panel::Settings => (500.0, 320.0),
+            Panel::Sql => (940.0, 600.0),
             Panel::Url | Panel::Csv => (640.0, 460.0),
             Panel::Recent => (720.0, 520.0),
             Panel::Shortcuts => (940.0, 640.0),
@@ -1703,9 +1904,15 @@ impl Viewer {
             Panel::Filter(_) => "Filter column",
             Panel::Shortcuts => "Keyboard shortcuts",
             Panel::Settings => "Settings",
+            Panel::Sql => "SQL query",
         };
         let mut root = div()
             .id("panel-content")
+            .key_context(if matches!(panel, Panel::Sql) {
+                "SQLQuery"
+            } else {
+                "ViewerTool"
+            })
             .flex_1()
             .min_h_0()
             .flex()
@@ -1714,6 +1921,7 @@ impl Viewer {
             .child(
                 div()
                     .flex()
+                    .flex_shrink_0()
                     .items_center()
                     .gap_4()
                     .child(
@@ -1731,16 +1939,25 @@ impl Viewer {
                     .child(gpui_omarchy::dialog_title(title, cx).text_2xl()),
             )
             .when_some(self.error.clone(), |d, error| {
-                d.child(div().text_color(cx.omarchy().danger).child(error))
+                d.child(self.error_banner(&error, window, cx))
             })
             .when_some(self.notice.clone(), |d, notice| {
-                d.child(div().text_color(cx.omarchy().secondary).child(notice))
+                d.child(
+                    div()
+                        .flex_shrink_0()
+                        .line_clamp(2)
+                        .text_color(cx.omarchy().secondary)
+                        .child(notice),
+                )
             });
         root = root.when(
             matches!(panel, Panel::Settings | Panel::Url | Panel::Csv),
             |d| d.overflow_y_scroll().track_scroll(&self.panel_scroll),
         );
         match panel {
+            Panel::Sql => {
+                root = root.child(self.sql_controls(window, cx));
+            }
             Panel::Settings => {
                 let owner = cx.entity();
                 let options = [Appearance::System, Appearance::Light, Appearance::Dark];
@@ -1856,7 +2073,7 @@ impl Viewer {
                 root=root.child(div().flex().gap_4().items_center()
                     .child(div().text_lg().child(detail.name.clone()))
                     .child(div().text_color(cx.omarchy().accent).child(detail.dtype.clone()))
-                    .child(div().child(format!("Source row {}{}",number(detail.source_row),if detail.null { " · null" } else { "" })))
+                    .child(div().child(format!("{} {}{}",if self.sql.is_some() { "Result row" } else { "Source row" },number(detail.source_row),if detail.null { " · null" } else { "" })))
                     .child(div().flex_1())
                     .child(control("copy-cell",if detail.truncated { "Copy displayed text" } else { "Copy value" },cx).on_click(cx.listener(|this,_,_,cx| {
                         if let Some(Panel::Cell(detail))=&this.panel { cx.write_to_clipboard(ClipboardItem::new_string(detail.text.clone())); this.notice=Some("Copied to clipboard".into()); cx.notify(); }
@@ -2159,7 +2376,12 @@ impl Viewer {
                         page.source.info.format
                     ))
                     .child(if self.loading {
-                        if self.scanning {
+                        if self.query_running {
+                            format!(
+                                "Running SQL · {} result rows written",
+                                number(self.scan_progress.load(Ordering::Acquire))
+                            )
+                        } else if self.scanning {
                             format!(
                                 "Filtering: {} / {} rows scanned · Total matches pending",
                                 number(self.scan_progress.load(Ordering::Acquire)),
@@ -2170,8 +2392,18 @@ impl Viewer {
                         }
                     } else {
                         format!(
-                            "Read only  ·  Plots: {} source rows  ·  Sort: loaded rows{}",
+                            "Read only  ·  Plots: {} {} rows  ·  Sort: {}{}",
                             number(page.profile_rows),
+                            if self.sql.is_some() {
+                                "result"
+                            } else {
+                                "source"
+                            },
+                            if self.sql.is_some() {
+                                "SQL query"
+                            } else {
+                                "loaded rows"
+                            },
                             if page.source.info.inferred_types {
                                 " · Inferred types"
                             } else {
@@ -2321,8 +2553,9 @@ impl Viewer {
                 return format!("{} · First {} matching rows on this page · {} total matches · {} source rows · {}",page.source.location.name(),number(detail.rows),number(matches),number(page.total_rows),if detail.rows==matches {"All matching rows"} else {"Sample only"});
             }
             format!(
-                "{} · Source rows {}–{} of {} · {}",
+                "{} · {} rows {}–{} of {} · {}",
                 page.source.location.name(),
+                if self.sql.is_some() { "SQL result" } else { "Source" },
                 number(if detail.rows == 0 {
                     0
                 } else {
@@ -2391,6 +2624,9 @@ impl Render for Viewer {
             )
             .track_focus(&self.focus)
             .on_action(cx.listener(Self::open_file))
+            .on_action(cx.listener(Self::open_folder))
+            .on_action(cx.listener(Self::open_query))
+            .on_action(cx.listener(Self::run_query_action))
             .on_action(cx.listener(Self::find_column))
             .on_action(cx.listener(Self::previous))
             .on_action(cx.listener(Self::next))
@@ -2472,6 +2708,16 @@ impl Render for Viewer {
                     .child(title),
             )
             .child(div().flex_1())
+            .when(has_file, |d| {
+                d.child(
+                    control("open-sql", "SQL…", cx)
+                        .selected(self.sql.is_some())
+                        .disabled(self.loading)
+                        .on_click(cx.listener(|this, _, window, cx| {
+                            this.open_query(&OpenQuery, window, cx)
+                        })),
+                )
+            })
             .child(
                 div()
                     .text_xs()
@@ -2557,26 +2803,8 @@ impl Render for Viewer {
                     ),
             )
         })
-        .when_some(self.error.clone(), |d, error| {
-            d.child(
-                div()
-                    .flex()
-                    .items_center()
-                    .justify_between()
-                    .gap_3()
-                    .p_3()
-                    .mb_3()
-                    .bg(cx.omarchy().danger.opacity(0.1))
-                    .text_color(cx.omarchy().danger)
-                    .text_sm()
-                    .child(error)
-                    .child(control("dismiss", "Dismiss", cx).on_click(cx.listener(
-                        |this, _, _, cx| {
-                            this.error = None;
-                            cx.notify();
-                        },
-                    ))),
-            )
+        .when(self.error.is_some() && self.panel.is_none(), |d| {
+            d.child(div().mb_3().flex_shrink_0().min_w_0().child(self.error_banner(self.error.as_ref().unwrap(), window, cx)))
         })
         .when(has_file, |d| {
             d.child(self.filter_chips(cx))
@@ -3266,6 +3494,7 @@ mod tests {
             super::Panel::Settings,
             super::Panel::Url,
             super::Panel::Csv,
+            super::Panel::Sql,
             super::Panel::Recent,
             super::Panel::Shortcuts,
             super::Panel::Find,

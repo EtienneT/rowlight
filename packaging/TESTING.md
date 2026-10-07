@@ -1,5 +1,21 @@
 # Native release checks
 
+## SQL error recovery on 2026-10-07
+
+The bounded error display passed the focused native GPUI regression on Linux and
+Windows. The Linux workspace run passed 67 tests, plus formatting and all-feature
+Clippy. Tests keep the editor and Run button usable at 1,000 × 500 with a large
+diagnostic, scroll and copy the full diagnostic, and successfully run a corrected
+query. Common error explanations are checked without exposing engine plans in
+the summary.
+
+An isolated running Linux app also passed missing-column and syntax errors,
+expanded details at 1,000 × 500, and correcting the query to count a synthetic
+100,000-row Hive dataset. Windows coverage here is native headless GUI/worker
+testing; desktop rendering and macOS checks remain part of release validation.
+
+## Release checklist
+
 Run these against the extracted/installed package on each target OS, including both Mac architectures. Record the version, OS/CPU, archive checksum, and result. CI covers native compilation, core/GUI logic, and packaging; it does not substitute for desktop integration testing.
 
 1. Launch from the desktop application entry rather than the source checkout. Confirm a usable window, readable text, picker, drag/drop, and close/quit.
@@ -17,7 +33,7 @@ Before public distribution, verify Developer ID/notarization on macOS and Authen
 
 - Open IPC/Feather v2 (compressed and uncompressed), CSV and TSV, including Unicode paths and final/empty pages. Large reads remain paged. Confirm CSV quoted newlines/CRLF, delimiter/header/encoding and all-text settings; reopen to verify preferences.
 - Find a late column by name/type. Click a cell, select text, copy it, and check full nested values and the explicit oversized-value limit. File details must show schema and Parquet compression/encodings/row groups.
-- Check Settings, recent files, remote sources, CSV options and shortcuts in dialogs; search, column visibility, filters, file details and cell inspection in side drawers. The table should remain visible behind each tool. Close with the button, Esc and the backdrop; the table's scroll, selection and sorting must be preserved. Tab should stay within the open tool, and Enter in a text field should not dismiss it unexpectedly. Resize to a small window and verify tool contents remain reachable.
+- Check Settings, recent files, remote sources, CSV options, SQL and shortcuts in dialogs; search, column visibility, filters, file details and cell inspection in side drawers. The table should remain visible behind each tool. Close with the button, Esc and the backdrop; the table's scroll, selection and sorting must be preserved. Tab should stay within the open tool, and Enter in a text field should not dismiss it unexpectedly. Resize to a small window and verify tool contents remain reachable.
 - Build the file overview on sorted data. Verify the scope label, sampled counts and expanded chart; Back returns to the overview. Cancel a long source scan; opening another source while busy must cancel/queue correctly.
 - Reopen a recent file and verify its page/scroll/sort. Clear history, close and reopen; the history stays empty.
 - Cloud download: open HTTP(S), S3, Azure and GCS with existing credentials. Verify range-only traffic, timeout/cancellation, repeated-page cache reuse and changed-object rejection. Signed URLs and secrets must not appear in saved preferences/history or error messages. SSO/role profiles require exported temporary credentials.
@@ -46,3 +62,22 @@ The running Linux development and optimized apps passed Light/Dark switching, sa
 The fixed scrollbar layout and tool overlays passed 52 tests on Linux and 50 on Windows, plus formatting and Clippy with warnings denied. Regression tests click the visible vertical scrollbar at the beginning, middle and end of a 40-column table, with plots shown and hidden. All utility overlays fit a 1,000 × 500 window, keep the table visible and preserve scroll/sort/selection when dismissed through the backdrop.
 
 The running Linux development and optimized apps passed both scrollbars, Settings Light/Dark controls, search with text input, cell inspection, shortcuts and Esc dismissal on an isolated X11 display. The installed Linux app was updated with the tested optimized executable. The Windows cloud ZIP and installer rebuilt, its extracted executable passed the startup help check, and the retained cloud portable app was updated. These Windows UI checks exercise compiled logic; desktop overlay checks and native macOS checks remain pending. No GitHub Actions runs were used.
+
+## SQL and Hive release checks
+
+- Open a local Hive folder with matching schemas and nested `key=value` partitions through the picker, command line and drag/drop. Verify virtual integer/float/Boolean/text columns, percent-decoded values and the Hive null marker. Metadata should show original rows, file count and row groups. Pages must cross files correctly. Add/change a partition and reopen.
+- Save All on a small file, then open/reopen a large folder: it must start paged. Explicit All on the folder still uses the memory guard.
+- Run SELECT/WHERE/ORDER BY, grouped counts, WITH, transformed columns and an empty result. Queries must use the whole source rather than the current page or normal filters. Result row numbers and chart scope must be clear; column sorting/filtering must be disabled until Exit SQL restores the previous normal view.
+- Page/hide/resize result columns, save an invalid draft, quit and reopen. Recompute the last successful query and restore its separate view; the draft must remain editable. Cancel a long query, provoke a memory-budget failure and check that the previous page remains usable with no orphan worker. Query cache files should disappear when the result closes.
+- Check compressed IPC with temporal/nested columns, CSV/TSV parsing options, and cloud Parquet with a signed URL and existing provider profile. SQL may stage the entire CSV/remote source; verify cancellation and avoid private URLs in preferences/logs.
+- Run these on Windows and both macOS architectures with the downloaded package. Native builds and headless UI tests do not prove picker/desktop behavior.
+
+## SQL and Hive validation on 2026-10-07
+
+The SQL/Hive changes passed all 64 workspace tests on Linux and all 62 on Windows 11 x64, plus formatting and core/all-feature Clippy with warnings denied. The new integration tests launch the actual SQL worker: full-source ordering/transformation, grouped/CTE/empty results, Hive partition predicates and type inference, compressed IPC with temporal/nested columns, CSV parsing settings, signed HTTP staging, changed-object rejection, memory termination and cancellation. Headless viewer tests cover SQL ownership of filtering/sorting, separate saved normal/result views and drafts, keyboard submission with the editor focused, recovery from an invalid saved query, and folder paging despite saved All.
+
+An isolated Linux X11 window opened a synthetic 100,000-row/two-file Hive folder at 500 rows despite an All preference. A SQL query selected the 2026 partition, ordered its rows descending and returned 1,200 rows; paging/restart restored its result view. A grouped query returned two 50,000-row counts. Chart expansion retained the window size and showed the result sample; the SQL dialog remained usable at 1,000 × 500. Ctrl+Enter worked in the multiline editor, and Exit SQL restored normal browsing. Graceful quit and leaving SQL removed the current result's scratch files. The worker also remained usable after a Cargo rebuild replaced the running Linux executable.
+
+Windows checks ran natively with four Cargo jobs and a retained build cache. These establish executable/worker behavior and headless UI logic; Windows desktop picker/SQL interaction and native macOS validation remain pending. GitHub Actions remained disabled.
+
+The optimized Linux cloud executable (71.9 MiB) passed the same folder/query/paging/restart interaction with isolated preferences and was atomically installed locally. The Windows cloud executable (67.0 MiB) passed startup help and a real Hive grouped-count worker run; the resulting IPC file was read back successfully. Its cloud ZIP/setup rebuilt successfully and the retained cloud portable app was updated. These are unsigned development builds. The Windows release build took 6 minutes 49 seconds; build plus packaging took 429.3 seconds. Native macOS and Windows desktop interaction remain pending.

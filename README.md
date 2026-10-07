@@ -29,11 +29,11 @@
 Open a file, see its schema and distributions, and explore without changing the data.
 
 - **See the shape:** column types, nulls, distributions, and expanded charts.
-- **Explore:** sort the loaded page, filter the file, find columns, and inspect cells.
+- **Explore:** sort the loaded page, filter or query the source with SQL, find columns, and inspect cells.
 - **Keep it light:** paged reads, virtual scrolling, and guarded All mode.
 - **Pick up where you left off:** saved view settings and keyboard navigation.
 
-Plots summarize the displayed rows; **File overview** provides a bounded sample across the file. Optional cloud builds open remote Parquet from S3, Azure, GCS, and HTTP(S).
+Plots summarize the displayed rows; **File overview** provides a bounded sample across the file. Open local Hive Parquet folders with paging across partitions. Optional cloud builds open remote Parquet from S3, Azure, GCS, and HTTP(S).
 
 ## Your Omarchy theme
 

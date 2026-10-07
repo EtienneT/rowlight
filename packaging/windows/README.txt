@@ -2,6 +2,9 @@ Parquet Viewer
 
 Run parquetviewer.exe, then use the top-left menu > Open file, Ctrl+O, or drop
 a Parquet, IPC/Feather v2, CSV or TSV file onto its window.
+Use Ctrl+Shift+O to open a local Hive-partitioned Parquet folder; it starts paged.
+Use SQL or Ctrl+Shift+L to query the complete source as data. Ctrl+Enter runs it.
+Exit SQL restores normal filtering/sorting. Large queries have memory/storage guards.
 The portable ZIP does not change file associations or add Start menu entries.
 Use the setup executable for a per-user installation with file type registration.
 

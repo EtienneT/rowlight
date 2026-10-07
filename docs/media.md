@@ -22,6 +22,7 @@ The demo shows the table and distributions, an expanded numeric chart with stati
 - [Cell inspector](assets/cell-inspector.png)
 - [Column search](assets/find-column.png)
 - [Compact table](assets/compact-table.png)
+- [SQL dialog](assets/sql-query.png): optimized Linux app in its built-in Dark appearance, querying a synthetic Hive folder containing two copies of the fixture under `year=2025/site=North` and `year=2026/site=South`. Captured on 2026-10-07 using an isolated display and preferences.
 
 The GIF is scaled to 1,000 pixels wide and uses eight frames per second with a bounded color palette. The source recording and temporary data remain under ignored `target/readme-preview/`.
 

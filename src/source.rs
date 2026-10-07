@@ -193,6 +193,7 @@ pub struct SourceInfo {
     pub format: &'static str,
     pub total_rows: usize,
     pub file_bytes: u64,
+    pub files: usize,
     pub groups: Vec<GroupInfo>,
     pub codecs: Vec<String>,
     pub encodings: Vec<String>,
@@ -201,6 +202,7 @@ pub struct SourceInfo {
 }
 
 enum Kind {
+    Hive(crate::hive::Hive),
     Parquet(Arc<FileMetadata>),
     Ipc(ipc::FileMetadata, Vec<usize>),
     Csv(CsvIndex),
@@ -244,6 +246,16 @@ impl Source {
         let Location::Local(path) = &location else {
             unreachable!()
         };
+        if path.is_dir() {
+            let (hive, info) = crate::hive::Hive::open(path, cancel)?;
+            return Ok(Arc::new(Self {
+                location,
+                info,
+                csv_options,
+                stamp: None,
+                kind: Kind::Hive(hive),
+            }));
+        }
         let mut file =
             File::open(path).with_context(|| format!("Cannot open {}", path.display()))?;
         let stat = file.metadata()?;
@@ -279,6 +291,7 @@ impl Source {
                 format: "Arrow IPC / Feather v2",
                 total_rows: total,
                 file_bytes: stat.len(),
+                files: 1,
                 groups: metadata
                     .blocks
                     .iter()
@@ -311,6 +324,7 @@ impl Source {
                 },
                 total_rows: index.rows,
                 file_bytes: stat.len(),
+                files: 1,
                 groups: Vec::new(),
                 codecs: Vec::new(),
                 encodings: vec![
@@ -349,6 +363,33 @@ impl Source {
         Ok(())
     }
 
+    pub fn is_dataset(&self) -> bool {
+        matches!(self.kind, Kind::Hive(_))
+    }
+
+    pub(crate) fn remote_revision(&self) -> Option<String> {
+        match &self.kind {
+            #[cfg(feature = "cloud")]
+            Kind::Remote(remote) => Some(remote.revision()),
+            _ => None,
+        }
+    }
+
+    pub fn check_snapshot(&self, cancel: &Cancellation) -> Result<()> {
+        match &self.kind {
+            Kind::Hive(hive) => hive.check_unchanged(cancel),
+            _ => self.check_unchanged(),
+        }
+    }
+
+    pub(crate) fn hive(&self) -> Option<&crate::hive::Hive> {
+        if let Kind::Hive(hive) = &self.kind {
+            Some(hive)
+        } else {
+            None
+        }
+    }
+
     pub fn read_slice(
         &self,
         offset: usize,
@@ -359,6 +400,7 @@ impl Source {
         cancel.check()?;
         let budget = crate::memory::all_rows_budget();
         let frame = match &self.kind {
+            Kind::Hive(hive) => hive.read(offset, count, cancel)?,
             Kind::Parquet(metadata) => {
                 let Location::Local(path) = &self.location else {
                     unreachable!()
@@ -525,6 +567,7 @@ pub(crate) fn parquet_info(metadata: &FileMetadata, file_bytes: u64) -> SourceIn
         format: "Parquet",
         total_rows: metadata.num_rows,
         file_bytes,
+        files: 1,
         groups: metadata
             .row_groups
             .iter()

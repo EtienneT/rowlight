@@ -9,6 +9,9 @@ Press **F1**, or choose **Keyboard shortcuts…** from the top-left menu, to see
 | Action | Linux / Windows | macOS |
 | --- | --- | --- |
 | Open a file | Ctrl+O | Cmd+O |
+| Open a Hive Parquet folder | Ctrl+Shift+O | Cmd+Shift+O |
+| Open the SQL editor | Ctrl+Shift+L | Cmd+Shift+L |
+| Run SQL, while its editor is open | Ctrl+Enter | Cmd+Enter |
 | Find a column by name or type | Ctrl+F | Cmd+F |
 | Focus the page number; type a number and press Enter | Ctrl+G | Cmd+G |
 | Inspect the selected cell | Enter | Enter |
@@ -36,7 +39,7 @@ Add **Shift** to these navigation shortcuts to extend the selection. **Shift+cli
 | First row of the first page / last row of the last page | Ctrl+Home / End | Cmd+Home / End |
 | Same, macOS alternative | — | Cmd+Up / Down |
 
-File-page navigation follows any active filters. Previous/next page keeps the selected column. These shortcuts use ordinary paging and never switch to **All** mode.
+File-page navigation follows active filters or the active SQL result. Previous/next page keeps the selected column. These shortcuts use ordinary paging and never switch to **All** mode.
 
 ## Select and copy
 

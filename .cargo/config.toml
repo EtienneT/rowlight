@@ -7,4 +7,4 @@ jobs = 4
 dev = "run --quiet --locked --package xtask -- dev"
 dev-build = "build --locked --bin parquetviewer --features cloud"
 quick-check = "check --locked --bin parquetviewer --features cloud"
-ui-test = "test --locked --features cloud,ui-tests --lib --bin parquetviewer"
+ui-test = "test --locked --features cloud,ui-tests"
