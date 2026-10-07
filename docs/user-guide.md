@@ -28,6 +28,8 @@ Open a file, understand its columns, and explore its rows. Rowlight is read only
 | Keep my view and follow my desktop theme | [Make the view your own](#make-the-view-your-own) |
 | Fix a loading or display problem | [Troubleshooting](#troubleshooting) |
 
+Settings and opening options use dialogs. Column search, visibility, filters, file details, and cell inspection open in side drawers, with the table visible behind them. Close a tool with **Close**, **Esc**, or a click outside it; your table position stays in place. Expanded charts and the file overview use the main view so they have room to show the data.
+
 ## Browse and sort
 
 The shaded **# / Source row** gutter shows each row's original position in the file. It is separate from the file's data columns and stays attached to the same record after sorting or filtering.
@@ -36,7 +38,7 @@ Missing values appear as muted, italic `null`; empty text appears as **(empty st
 
 ### Move through rows and pages
 
-The mouse wheel scrolls rows. Use a horizontal gesture or the bottom horizontal scrollbar to move through a wide table. Headers and cells move together.
+The mouse wheel scrolls rows. Use a horizontal gesture or the bottom horizontal scrollbar to move through a wide table. Headers and cells move together, and the vertical scrollbar stays at the visible right edge, even when later columns are in view.
 
 The status bar shows the source information, displayed row range, and pagination. Choose **100**, **500**, or **1,000** under **Rows / page**. Use the page buttons, or press **Ctrl+G** (**Cmd+G**), enter a page number, and press **Enter**.
 
@@ -107,13 +109,13 @@ The overview runs in the background and can be cancelled. Its sample describes t
 
 ### See the file's metadata
 
-Choose **File details…** for the full source path, size, and complete schema in file order. Parquet details include its writer, compression, encodings, and row-group sizes; IPC details include record batches. This view uses metadata already read when opening the file.
+Choose **File details…** to open a side drawer with the full source path, size, and complete schema in file order. Parquet details include its writer, compression, encodings, and row-group sizes; IPC details include record batches. This view uses metadata already read when opening the file.
 
 ## Inspect and copy cells
 
 Click a cell to select it. Use the arrow keys to move, or **Shift+click / Shift+arrows** to extend a rectangular selection. Click a source-row number to select its entire row.
 
-Double-click a cell, or select it and press **Enter**, to open the inspector. It shows the value, data type, and original source row. This is useful for long text, binary data, and nested values. Use **Copy value** to copy the inspector's text, then **Esc** to return.
+Double-click a cell, or select it and press **Enter**, to open the inspector beside the table. It shows the value, data type, and original source row. This is useful for long text, binary data, and nested values. Use **Copy value** to copy the inspector's text, then **Esc** to close the drawer.
 
 <details>
 <summary>See the cell inspector</summary>

@@ -224,6 +224,19 @@ enum Panel {
     Settings,
 }
 
+impl Panel {
+    fn is_drawer(&self) -> bool {
+        matches!(
+            self,
+            Self::Find | Self::Cell(_) | Self::Info | Self::Columns | Self::Filter(_)
+        )
+    }
+
+    fn is_overlay(&self) -> bool {
+        !matches!(self, Self::Overview)
+    }
+}
+
 pub struct Viewer {
     page: Option<Arc<Page>>,
     columns: Vec<usize>,
@@ -235,6 +248,7 @@ pub struct Viewer {
     loading: bool,
     error: Option<String>,
     focus: FocusHandle,
+    panel_focus: FocusHandle,
     horizontal: ScrollHandle,
     viewport_width: Pixels,
     viewport_x: Pixels,
@@ -362,6 +376,7 @@ impl Viewer {
             loading: false,
             error,
             focus: cx.focus_handle(),
+            panel_focus: cx.focus_handle(),
             horizontal: ScrollHandle::new(),
             viewport_width: (window.viewport_size().width - px(44.0)).max(px(0.0)),
             viewport_x: px(0.0),
@@ -1063,6 +1078,14 @@ impl Viewer {
             .into_any_element()
     }
 
+    fn header_height(&self) -> Pixels {
+        px(if self.settings.show_plots {
+            244.0
+        } else {
+            104.0
+        })
+    }
+
     fn header(&self, cx: &mut Context<Self>) -> Div {
         let Some(page) = &self.page else {
             return div();
@@ -1070,11 +1093,7 @@ impl Viewer {
         let visible = self.visible_columns();
         let mut header = div()
             .flex()
-            .h(px(if self.settings.show_plots {
-                244.0
-            } else {
-                104.0
-            }))
+            .h(self.header_height())
             .w_full()
             .flex_shrink_0()
             .bg(cx.omarchy().surface.opacity(0.2))
@@ -1200,7 +1219,11 @@ impl Viewer {
         let viewport_owner = cx.weak_entity();
         let width = ROW_NUMBER_WIDTH + self.columns_width(0..self.columns.len());
         let header = self.header(cx);
+        let header_height = self.header_height();
+        let gutter = px(16.0);
         div()
+            .id("table-frame")
+            .test_support()
             .relative()
             .flex_1()
             .min_h_0()
@@ -1209,6 +1232,8 @@ impl Viewer {
             .border_1()
             .border_color(cx.omarchy().border)
             .rounded_lg()
+            .pb(gutter)
+            .pr(gutter)
             .child(
                 div()
                     .id("horizontal-table")
@@ -1284,20 +1309,44 @@ impl Viewer {
                             }),
                     ),
             )
-            .child(scrollbar(
-                "horizontal-scrollbar",
-                ScrollbarAxis::Horizontal,
-                &self.horizontal,
-                window,
-                cx,
-            ))
-            .child(scrollbar(
-                "vertical-scrollbar",
-                ScrollbarAxis::Vertical,
-                &self.vertical,
-                window,
-                cx,
-            ))
+            // The row list spans all columns. Its layout bounds cannot place
+            // a scrollbar at the visible edge of a horizontally clipped table.
+            .child(
+                div()
+                    .absolute()
+                    .top_0()
+                    .left_0()
+                    .bottom_0()
+                    .right(gutter)
+                    .child(
+                        scrollbar(
+                            "horizontal-scrollbar",
+                            ScrollbarAxis::Horizontal,
+                            &self.horizontal,
+                            window,
+                            cx,
+                        )
+                        .viewport_from_layout(),
+                    ),
+            )
+            .child(
+                div()
+                    .absolute()
+                    .top(header_height)
+                    .left_0()
+                    .right_0()
+                    .bottom(gutter)
+                    .child(
+                        scrollbar(
+                            "vertical-scrollbar",
+                            ScrollbarAxis::Vertical,
+                            &self.vertical,
+                            window,
+                            cx,
+                        )
+                        .viewport_from_layout(),
+                    ),
+            )
     }
 
     fn toggle_plots(&mut self, cx: &mut Context<Self>) {
@@ -1423,8 +1472,12 @@ impl Viewer {
         self.detail = None;
         self.detail_scope = None;
         self.panel_scroll.set_offset(point(px(0.0), px(0.0)));
+        if panel.is_overlay() {
+            self.panel_focus.focus(window, cx);
+        } else {
+            self.focus.focus(window, cx);
+        }
         self.panel = Some(panel);
-        self.focus.focus(window, cx);
         cx.notify();
     }
 
@@ -1597,7 +1650,46 @@ impl Viewer {
         }));
     }
 
-    fn panel_view(&self, window: &mut Window, cx: &mut Context<Self>) -> Div {
+    fn panel_overlay(&self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let panel = self.panel.as_ref().unwrap();
+        let drawer = panel.is_drawer();
+        let (width, height) = match panel {
+            Panel::Settings => (500.0, 320.0),
+            Panel::Url | Panel::Csv => (640.0, 460.0),
+            Panel::Recent => (720.0, 520.0),
+            Panel::Shortcuts => (940.0, 640.0),
+            Panel::Find => (560.0, f32::from(window.viewport_size().height)),
+            _ => (720.0, f32::from(window.viewport_size().height)),
+        };
+        let height = px(height).min(window.viewport_size().height - px(40.0));
+        let content = div()
+            .id(if drawer {
+                "panel-drawer"
+            } else {
+                "panel-dialog"
+            })
+            .test_support()
+            .flex()
+            .flex_col()
+            .flex_1()
+            .min_h_0()
+            .w_full()
+            .child(self.panel_view(window, cx));
+        gpui_omarchy::dialog(&self.panel_focus, cx)
+            .p_5()
+            .when(drawer, |d| d.justify_end())
+            .on_ok(|_, _, _| false)
+            .on_close(cx.listener(|this, _, window, cx| this.close_detail(window, cx)))
+            .popup(
+                gpui_omarchy::dialog_popup(cx)
+                    .w(px(width))
+                    .h(height)
+                    .overflow_hidden()
+                    .child(content),
+            )
+    }
+
+    fn panel_view(&self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let panel = self.panel.as_ref().unwrap();
         let title = match panel {
             Panel::Find => "Find a column",
@@ -1612,34 +1704,42 @@ impl Viewer {
             Panel::Shortcuts => "Keyboard shortcuts",
             Panel::Settings => "Settings",
         };
-        let mut root =
-            div()
-                .flex_1()
-                .min_h_0()
-                .flex()
-                .flex_col()
-                .gap_4()
-                .child(
-                    div()
-                        .flex()
-                        .items_center()
-                        .gap_4()
-                        .child(control("close-panel", "← Back", cx).on_click(
-                            cx.listener(|this, _, window, cx| this.close_detail(window, cx)),
-                        ))
-                        .child(
-                            div()
-                                .text_2xl()
-                                .font_weight(FontWeight::SEMIBOLD)
-                                .child(title),
-                        ),
-                )
-                .when_some(self.error.clone(), |d, error| {
-                    d.child(div().text_color(cx.omarchy().danger).child(error))
-                })
-                .when_some(self.notice.clone(), |d, notice| {
-                    d.child(div().text_color(cx.omarchy().secondary).child(notice))
-                });
+        let mut root = div()
+            .id("panel-content")
+            .flex_1()
+            .min_h_0()
+            .flex()
+            .flex_col()
+            .gap_4()
+            .child(
+                div()
+                    .flex()
+                    .items_center()
+                    .gap_4()
+                    .child(
+                        control(
+                            "close-panel",
+                            if panel.is_overlay() {
+                                "Close"
+                            } else {
+                                "← Back"
+                            },
+                            cx,
+                        )
+                        .on_click(cx.listener(|this, _, window, cx| this.close_detail(window, cx))),
+                    )
+                    .child(gpui_omarchy::dialog_title(title, cx).text_2xl()),
+            )
+            .when_some(self.error.clone(), |d, error| {
+                d.child(div().text_color(cx.omarchy().danger).child(error))
+            })
+            .when_some(self.notice.clone(), |d, notice| {
+                d.child(div().text_color(cx.omarchy().secondary).child(notice))
+            });
+        root = root.when(
+            matches!(panel, Panel::Settings | Panel::Url | Panel::Csv),
+            |d| d.overflow_y_scroll().track_scroll(&self.panel_scroll),
+        );
         match panel {
             Panel::Settings => {
                 let owner = cx.entity();
@@ -2352,7 +2452,7 @@ impl Render for Viewer {
             .font_family(cx.omarchy().font.clone())
             .bg(cx.omarchy().background)
             .text_color(cx.omarchy().foreground);
-        if self.panel.is_some() {
+        if self.panel.as_ref().is_some_and(|panel| !panel.is_overlay()) {
             return root.child(self.panel_view(window, cx)).into_any_element();
         }
         if self.detail.is_some() {
@@ -2516,6 +2616,9 @@ impl Render for Viewer {
                         },
                     )),
             )
+        })
+        .when(self.panel.as_ref().is_some_and(Panel::is_overlay), |d| {
+            d.child(self.panel_overlay(window, cx))
         })
         .into_any_element()
     }
@@ -3049,6 +3152,166 @@ mod tests {
     }
 
     #[gpui_kit::test]
+    fn vertical_scrollbar_stays_reachable_across_wide_table_positions(cx: &mut TestAppContext) {
+        let file = fixture(1200);
+        cx.update(gpui_omarchy::init);
+        let (handle, content) = cx.update(|cx| {
+            gpui_kit::open_window(
+                WindowOptions {
+                    window_bounds: Some(WindowBounds::Windowed(Bounds {
+                        origin: point(px(0.0), px(0.0)),
+                        size: size(px(1280.0), px(800.0)),
+                    })),
+                    ..Default::default()
+                },
+                cx,
+                |window, cx| {
+                    cx.new(|cx| {
+                        Viewer::new(
+                            Some(file.path().to_owned()),
+                            parquetviewer::settings::SettingsStore::at(
+                                file.path().with_extension("settings.json"),
+                            ),
+                            window,
+                            cx,
+                        )
+                    })
+                },
+            )
+            .unwrap()
+        });
+        cx.run_until_parked();
+        for (plots, x) in [
+            (true, 0.0),
+            (true, -3000.0),
+            (true, -10000.0),
+            (false, 0.0),
+            (false, -3000.0),
+            (false, -10000.0),
+        ] {
+            cx.update_window(handle, |_, window, cx| {
+                content.update(cx, |this, cx| {
+                    this.settings.show_plots = plots;
+                    this.horizontal.set_offset(point(px(x), px(0.0)));
+                    this.vertical
+                        .scroll_to_item_strict(0, gpui_kit::ScrollStrategy::Top);
+                    cx.notify();
+                });
+                window.render_frame(cx);
+            })
+            .unwrap();
+            cx.run_until_parked();
+            cx.update_window(handle, |_, window, cx| {
+                window.render_frame(cx);
+                let horizontal = content.read(cx).horizontal.offset().x;
+                let frame = window.find("table-frame").bounds();
+                window.click_at(
+                    "table-frame",
+                    point(frame.size.width - px(4.0), frame.size.height - px(60.0)),
+                    cx,
+                );
+                let view = content.read(cx);
+                assert!(
+                    view.vertical.0.borrow().base_handle.offset().y < px(-500.0),
+                    "The visible right edge must scroll rows at horizontal offset {horizontal:?}"
+                );
+                assert_eq!(view.horizontal.offset().x, horizontal);
+            })
+            .unwrap();
+        }
+    }
+
+    #[gpui_kit::test]
+    fn tools_overlay_the_table_fit_small_windows_and_preserve_the_view(cx: &mut TestAppContext) {
+        let file = fixture(1200);
+        cx.update(gpui_omarchy::init);
+        let (handle, content) = cx.update(|cx| {
+            gpui_kit::open_window(
+                WindowOptions {
+                    window_bounds: Some(WindowBounds::Windowed(Bounds {
+                        origin: point(px(0.0), px(0.0)),
+                        size: size(px(1000.0), px(500.0)),
+                    })),
+                    ..Default::default()
+                },
+                cx,
+                |window, cx| {
+                    cx.new(|cx| {
+                        Viewer::new(
+                            Some(file.path().to_owned()),
+                            parquetviewer::settings::SettingsStore::at(
+                                file.path().with_extension("settings.json"),
+                            ),
+                            window,
+                            cx,
+                        )
+                    })
+                },
+            )
+            .unwrap()
+        });
+        cx.run_until_parked();
+        cx.update_window(handle, |_, window, cx| {
+            content.update(cx, |this, cx| {
+                this.horizontal.set_offset(point(px(-1200.0), px(0.0)));
+                this.vertical
+                    .scroll_to_item_strict(20, gpui_kit::ScrollStrategy::Top);
+                cx.notify();
+            });
+            window.render_frame(cx);
+        })
+        .unwrap();
+        cx.run_until_parked();
+        for panel in [
+            super::Panel::Settings,
+            super::Panel::Url,
+            super::Panel::Csv,
+            super::Panel::Recent,
+            super::Panel::Shortcuts,
+            super::Panel::Find,
+            super::Panel::Columns,
+            super::Panel::Info,
+            super::Panel::Filter(0),
+        ] {
+            let drawer = panel.is_drawer();
+            cx.update_window(handle, |_, window, cx| {
+                let x = content.read(cx).horizontal.offset().x;
+                let y = content.read(cx).vertical.0.borrow().base_handle.offset().y;
+                content.update(cx, |this, cx| this.show_panel(panel, window, cx));
+                window.render_frame(cx);
+                assert!(window.find("horizontal-table").visible());
+                let popup = window
+                    .find(if drawer {
+                        "panel-drawer"
+                    } else {
+                        "panel-dialog"
+                    })
+                    .bounds();
+                assert!(popup.left() >= px(0.0) && popup.right() <= window.viewport_size().width);
+                assert!(popup.top() >= px(0.0) && popup.bottom() <= window.viewport_size().height);
+                if drawer {
+                    assert!(popup.left() > px(250.0));
+                }
+                if let Some(super::Panel::Csv) = content.read(cx).panel {
+                    assert!(window.find("apply-csv").visible());
+                }
+                let sort = content.read(cx).sort;
+                // A press on the dimmed table dismisses the overlay without
+                // changing a selection, sort, or either scroll position.
+                window.click_at("table-frame", point(px(4.0), px(4.0)), cx);
+                window.render_frame(cx);
+                let view = content.read(cx);
+                assert!(view.panel.is_none());
+                assert_eq!(view.horizontal.offset().x, x);
+                assert_eq!(view.vertical.0.borrow().base_handle.offset().y, y);
+                assert_eq!(view.sort, sort);
+                assert!(view.selection.is_none());
+            })
+            .unwrap();
+        }
+    }
+
+    #[gpui_kit::test]
     fn resizing_refreshes_headers_and_idle_scrollbar_remains_clickable(cx: &mut TestAppContext) {
         let file = fixture(251);
         let path = file.path().to_owned();
@@ -3101,11 +3364,11 @@ mod tests {
         cx.update_window(handle, |_, window, cx| {
             window.render_frame(cx);
             assert!(window.try_find(("column", 14usize)).is_none());
-            let bounds = window.find("horizontal-table").bounds();
+            let bounds = window.find("table-frame").bounds();
             // Click the scrollbar track after idle, with no preceding scroll/hover.
             window.click_at(
-                "horizontal-table",
-                point(bounds.size.width - px(30.0), bounds.size.height - px(5.0)),
+                "table-frame",
+                point(bounds.size.width - px(46.0), bounds.size.height - px(5.0)),
                 cx,
             );
             assert!(content.read(cx).horizontal.offset().x < px(-100.0));

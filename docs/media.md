@@ -16,7 +16,7 @@ The README selects the wordmark for GitHub's light or dark appearance. These are
 
 The theme gallery shows **Tokyo Night**, **Catppuccin**, **Gruvbox**, and **Flexoki Light**, using the stock Omarchy `colors.toml` palettes through gpui-omarchy. The same file, column widths, page size, and window size are used for every capture. These screenshots show Linux theme integration; they do not establish Windows or macOS runtime validation.
 
-The demo shows the table and distributions, an expanded numeric chart with statistics and a tooltip, cell inspection, next-page navigation, column search, and collapsed plot headers. Additional stills are kept for documentation:
+The demo shows the table and distributions, an expanded numeric chart with statistics and a tooltip, cell inspection, next-page navigation, column search, and collapsed plot headers. The column-search and cell-inspector stills show the current side drawers; the older recording shows these tools as separate views. Additional stills are kept for documentation:
 
 - [Expanded column chart](assets/column-detail.png)
 - [Cell inspector](assets/cell-inspector.png)
