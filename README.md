@@ -6,7 +6,7 @@
   </picture>
 </p>
 
-<h3 align="center">Bringing data into view.</h3>
+<h3 align="center">Shed light on your data.</h3>
 
 <p align="center">
   A small, read-only desktop viewer for Parquet, Arrow IPC / Feather, CSV, and TSV.<br>
@@ -46,11 +46,29 @@ Rowlight follows the current Omarchy palette, including live theme changes. Thes
 | **Gruvbox** | **Flexoki Light** |
 | [<img src="docs/assets/gruvbox.png" alt="Gruvbox" width="420">](docs/assets/gruvbox.png) | [<img src="docs/assets/flexoki-light.png" alt="Flexoki Light" width="420">](docs/assets/flexoki-light.png) |
 
-## Try it
+## Install
 
-The first alpha is being prepared. [Release downloads](https://github.com/EtienneT/rowlight/releases)
-will include Linux x64 archives and Windows x64 installers/portable ZIPs.
-[macOS contributions are welcome](docs/platforms.md).
+The first alpha is being prepared; downloads are not published yet. Once available,
+open [Releases](https://github.com/EtienneT/rowlight/releases), select the release,
+and expand **Assets**. No Rust installation is needed.
+
+- **Windows 10+ x64:** download the file ending in `-windows-x64-cloud-setup.exe`,
+  run it, and open **Rowlight** from Start. A portable ZIP is also available.
+- **Linux x64:** download the file ending in `-linux-x64-cloud.tar.gz`, extract it,
+  and run this from the extracted folder:
+
+  ```sh
+  ./scripts/install-linux.sh
+  ```
+
+  Open **Rowlight** from the application menu. Requires glibc 2.39+ (Ubuntu 24.04
+  baseline), Wayland or X11, and Vulkan.
+
+The alpha is unsigned; Windows may show a publisher warning.
+[Installation, checksums, and file associations](docs/installation.md) ·
+[Platform support](docs/platforms.md)
+
+## Run from source
 
 With Rust and the [native prerequisites](https://gpui-kit.com/docs/installation/) installed:
 
@@ -58,4 +76,4 @@ With Rust and the [native prerequisites](https://gpui-kit.com/docs/installation/
 cargo dev -- /path/to/file.parquet
 ```
 
-[Build and install](docs/installation.md) · [Platform support](docs/platforms.md) · [Keyboard shortcuts](docs/keyboard-shortcuts.md)
+[Development](docs/development.md) · [Keyboard shortcuts](docs/keyboard-shortcuts.md)

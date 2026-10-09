@@ -1,6 +1,6 @@
 # Rowlight 0.1.0-alpha.1
 
-Bringing data into view. A small, read-only desktop viewer for Parquet, Arrow IPC
+Shed light on your data. A small, read-only desktop viewer for Parquet, Arrow IPC
 / Feather v2, CSV and TSV, built with Rust, GPUI Kit and Polars.
 
 Open a file or Hive Parquet folder, see typed columns and distributions, inspect

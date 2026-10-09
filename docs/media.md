@@ -4,7 +4,7 @@ The README uses a vector logo, four captures of the running Linux application, a
 
 ## Logo
 
-Three horizontal rows form the mark. The middle row lights up in warm amber, ending in a small point of light. The shape stays simple at icon sizes and connects directly to **Bringing data into view.**
+Three horizontal rows form the mark. The middle row lights up in warm amber, ending in a small point of light. The shape stays simple at icon sizes and connects directly to **Shed light on your data.**
 
 - [Standalone mark](assets/icon.svg)
 - [Wordmark on a light background](assets/logo-light.svg)

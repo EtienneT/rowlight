@@ -4,6 +4,24 @@ Maintained downloads are Linux x64 and Windows x64, with cloud support included.
 macOS source tooling is experimental. GitHub Actions remains disabled; do not
 enable or dispatch it without the owner's explicit request.
 
+## Private preparation, public downloads
+
+Build, test and prepare the release while the repository is private. A GitHub
+draft can hold the notes and downloads for review before publication. Private
+repository downloads require repository access; they are not a public install
+channel.
+
+For the first public release, complete the history/license review and remaining
+[native release checks](../packaging/TESTING.md), make the repository public, then
+publish **v0.1.0-alpha.1** as a prerelease at the reviewed commit. Upload all three
+packages and `SHA256SUMS` before publishing. Update the
+README's installation section to link to that release. Creating releases and
+uploading locally built packages does not require GitHub Actions.
+
+GitHub documents [draft and prerelease publication](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository).
+If immutable releases are enabled later, draft first: assets cannot be replaced
+after publication. Publish a new version for corrected binaries.
+
 ## Build and validate
 
 1. Set the version in Cargo.toml, update only the root package entry in Cargo.lock,
@@ -65,6 +83,34 @@ validated downloads and SHA256SUMS, and mark the release as a prerelease. A GitH
 draft can be reviewed before publication. Do not enable Actions as a side effect.
 Replace the README's alpha-preparation sentence with the actual release link.
 
-For the first alpha, signing is deliberately deferred and the release notes
-disclose it. Checksums do not replace Authenticode. Mac signing/notarization is
-outside the current release scope.
+## Distribution policy
+
+- **Linux:** start with the existing archive and per-user installer, with the
+  glibc baseline visible beside the download. Preserve desktop registration,
+  preferences and file defaults on upgrades. A Flatpak can be evaluated later
+  for broader distro coverage; the current archive is not universal.
+- **Windows:** recommend the per-user setup executable, with the portable ZIP as
+  an alternative. Preserve the stable installer/application identity on upgrades
+  and let users choose file defaults through Windows.
+- **Every release:** use a versioned tag, include license notices and SHA256SUMS,
+  document requirements and known limitations, and validate the exact downloads.
+  Keep alpha/beta versions marked as prereleases. Package-manager instructions
+  should be added only when an actual package is available.
+
+The first alpha is currently unsigned; disclose that beside the installation
+steps and in the release notes. For wider Windows distribution, plan Authenticode
+signing of both the application and installer, with timestamping, before computing
+the final package checksums. Signing identifies the publisher but new releases
+can still trigger [SmartScreen warnings](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/smartscreen-reputation).
+Microsoft's [signing options](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/code-signing-options)
+include the [SignPath Foundation](https://signpath.org/terms), which offers free
+signing for qualifying open-source projects. Its conditions include an existing
+release and a verifiable build/reputation; approval is not guaranteed. Evaluate
+it after the initial alpha rather than assuming it can sign the first release.
+
+When public, standard GitHub-hosted runners are
+[free](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
+[Larger runners are billed](https://docs.github.com/en/billing/reference/actions-runner-pricing).
+This does not change the owner's decision to keep Actions disabled.
+
+Mac signing/notarization is outside the current release scope.
