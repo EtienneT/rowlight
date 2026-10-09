@@ -7,7 +7,6 @@
 </p>
 
 <h3 align="center">Bringing data into view.</h3>
-<p align="center">Easy to pronounce and works across formats.</p>
 
 <p align="center">
   A small, read-only desktop viewer for Parquet, Arrow IPC / Feather, CSV, and TSV.<br>
