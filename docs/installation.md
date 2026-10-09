@@ -1,143 +1,123 @@
 # Install Rowlight
 
-[User guide](user-guide.md) · [Formats](formats.md) · [Keyboard shortcuts](keyboard-shortcuts.md)
+[User guide](user-guide.md) · [Formats](formats.md) · [Platform support](platforms.md)
 
-Choose your platform: [Linux](#linux) · [Windows](#windows) · [macOS](#macos). To run from source without installing, use [Try from source](#try-from-source).
+Rowlight's maintained platforms are **Linux x64 and Windows x64**. The first
+alpha is being prepared; published downloads will appear on the
+[Releases page](https://github.com/EtienneT/rowlight/releases). You do not need
+Rust to run a downloaded build.
 
-> [!NOTE]
-> Rowlight's executable, application bundle, package filenames, and preferences directory currently retain the original **Parquet Viewer / `parquetviewer`** name. Use those names in the commands and file-association dialogs below.
+## Choose a download
 
-## Get a build
-
-The [Native builds workflow](https://github.com/EtienneT/rowlight/actions/workflows/ci.yml) targets Linux x64, Windows x64, and macOS on Apple Silicon and Intel. Download an artifact from a successful **manual package run** for your platform, if available, or build from source below. Routine checks do not produce downloads; package artifacts expire after seven days. GitHub sign-in is required to download workflow artifacts. See [how maintainers request packages](development.md#continuous-integration).
-
-These are development packages. Publicly signed releases are not yet prepared: the macOS bundle uses an ad hoc signature, and the Windows installer is unsigned. Native Windows/macOS desktop release checks remain pending; see [validation status](#validation-status).
+| Platform | Download | Use |
+| --- | --- | --- |
+| Linux x64 | `rowlight-VERSION-linux-x64-cloud.tar.gz` | Extract, then run or install |
+| Windows x64 | `rowlight-VERSION-windows-x64-cloud-setup.exe` | Per-user installation |
+| Windows x64 | `rowlight-VERSION-windows-x64-cloud.zip` | Portable use |
 
 ### Core or cloud
 
-**Core** includes local Parquet, Arrow IPC / Feather v2, CSV, and TSV. **Cloud** includes those formats plus remote Parquet from S3, Azure, GCS, and HTTP(S). The cloud package has `-cloud` in its filename; both variants share the same preferences and application identity.
+The cloud download includes local Parquet, Arrow IPC / Feather v2, CSV and TSV,
+plus remote Parquet from S3, Azure, GCS and HTTP(S). Local-only core packages can
+also be built from source; they omit `-cloud` in their filenames.
 
-For source packaging, add `--cloud` to the Linux/macOS scripts, or `-Cloud` to the Windows script. For an uninstalled source run, add `--features cloud` to Cargo. See [remote Parquet setup](formats.md#remote-parquet).
+The alpha is unsigned. Windows may show an unrecognized-publisher warning.
+Verify the download against its `.sha256` file or the release's `SHA256SUMS`:
+
+```sh
+# Linux: run beside the archive and its .sha256 file
+sha256sum -c rowlight-VERSION-linux-x64-cloud.tar.gz.sha256
+```
+
+```powershell
+# Windows: compare the hash with the corresponding line in SHA256SUMS
+Get-FileHash .\rowlight-VERSION-windows-x64-cloud-setup.exe -Algorithm SHA256
+```
+
+> [!NOTE]
+> The executable remains `parquetviewer` / `parquetviewer.exe`. Existing settings
+> and application identifiers are preserved for compatibility. The visible app
+> name is Rowlight; legacy Windows registrations may still say Parquet Viewer.
 
 ## Linux
 
-Use a graphical Wayland or X11 session with a working Vulkan driver. The installer needs `xdg-mime`, `update-mime-database`, and `update-desktop-database`.
+Requires glibc **2.39 or later**, a graphical Wayland or X11 session, and a Vulkan
+driver. Official archives are built on Ubuntu 24.04. Installation also needs
+`xdg-mime`, `update-mime-database` and `update-desktop-database` (on Ubuntu,
+`xdg-utils`, `shared-mime-info` and `desktop-file-utils`).
 
-### Install a downloaded archive
-
-1. Extract the Linux archive and open a terminal in its `parquetviewer` directory.
-2. Run:
-
-   ```sh
-   ./scripts/install-linux.sh
-   ```
-
-3. Launch **Parquet Viewer** from the application menu, or open `~/.local/bin/parquetviewer`.
-
-The archive contains its executable, so no Rust toolchain is needed. Installation is per user and does not require administrator privileges.
-
-### Build and install from source
-
-Install Rust and the [native GPUI prerequisites](https://gpui-kit.com/docs/installation/), then run from the checkout:
+Extract the archive and open a terminal in its extracted directory:
 
 ```sh
+# Run without registering anything:
+./parquetviewer /path/to/file.parquet
+# Or install the executable and desktop entry for your user:
 ./scripts/install-linux.sh
-# Include remote Parquet support:
-./scripts/install-linux.sh --cloud
 ```
 
-The script builds the release executable and installs it in `~/.local/bin`. Use `--skip-build` only when the desired release executable is already available. To create an archive without installing, run `./scripts/package-linux.sh` (optionally with `--cloud`).
+Installation does not require administrator privileges. Launch **Rowlight**
+from the application menu or `~/.local/bin/parquetviewer`.
+License notices are installed under your XDG data directory in `parquetviewer/`.
 
-### Make double-click open Parquet
+Registration preserves existing defaults. Accept the first-launch association
+offer, or use **Associate Parquet files…** from the menu, to opt in to changing
+Parquet's default. **No thanks** remembers your choice.
 
-On first launch, accept the association offer, or choose **Associate Parquet files…** from the top-left menu later. **No thanks** remembers your decision. Registration preserves existing defaults for the advertised formats until you opt in to changing Parquet's default.
+The previous default is recorded in
+`${XDG_DATA_HOME:-~/.local/share}/parquetviewer/previous-default`. Restore it with
+`xdg-mime default PREVIOUS.desktop application/vnd.apache.parquet application/x-parquet`,
+replacing `PREVIOUS.desktop` with that saved value.
 
-The installer records the previous Parquet default in `${XDG_DATA_HOME:-~/.local/share}/parquetviewer/previous-default`. To restore it, read that file and replace `PREVIOUS.desktop` below with the saved application:
-
-```sh
-xdg-mime default PREVIOUS.desktop application/vnd.apache.parquet application/x-parquet
-```
-
-The launcher has an absolute executable path, so double-click opening does not depend on the file manager's `PATH`. Installed registrations and icons live under your XDG data directory; the executable lives under `~/.local/bin`.
+To remove the executable and registration, delete `~/.local/bin/parquetviewer`,
+`applications/com.parquetviewer.ParquetViewer.desktop`,
+`mime/packages/parquetviewer.xml`, and
+`icons/hicolor/scalable/apps/com.parquetviewer.ParquetViewer.svg` under your XDG
+data directory. Refresh the MIME/desktop databases afterwards. Keep your
+preferences unless you want to reset the app.
 
 ## Windows
 
 Requires **Windows 10 or later, x64**, with a DirectX 11 graphics driver.
 
-### Install or run a downloaded build
+Run the setup executable for a per-user installation with a Start menu entry and
+**Open with** registration. For portable use, extract the ZIP and run
+`parquetviewer.exe`; it does not register itself or add a Start menu entry.
 
-Run `parquetviewer-windows-x64-setup.exe` for a per-user installation with a Start menu entry and **Open with** registration. A cloud build is named `parquetviewer-windows-x64-cloud-setup.exe`.
+To make double-click open Parquet, use **Choose in Windows Settings** in the
+first-launch offer or **Associate Parquet files…** from the menu. Choose Rowlight
+for `.parquet` and `.parq` in Default Apps. On Windows 10, choose defaults by file
+type. You can also right-click a file → **Open with → Choose another app → Always**.
+Windows owns the final default selection; installation does not replace it.
 
-For portable use, extract the ZIP and run `parquetviewer.exe`. Use the picker, drag/drop, or a command-line path. The portable build does not register itself or add a Start menu entry.
-
-### Make double-click open Parquet
-
-1. Use the first-launch **Choose in Windows Settings** button, or **Associate Parquet files…** from the app menu.
-2. In Default Apps, choose **Parquet Viewer** for `.parquet` / `.parq`. On Windows 10, use **Choose default apps by file type**.
-3. Alternatively, right-click a file → **Open with → Choose another app → Always**.
-
-Windows owns the final default-app selection. The installer registers the viewer for supported local formats without overwriting that selection. Uninstall removes the app and its registrations but keeps your preferences.
-
-### Build from source
-
-Install Rust's **MSVC** toolchain, Visual Studio C++ Build Tools with a Windows SDK, CMake, and [Inno Setup 6](https://jrsoftware.org/isinfo.php). Run from the checkout in PowerShell:
-
-```powershell
-./scripts/package-windows.ps1
-# Include remote Parquet support:
-./scripts/package-windows.ps1 -Cloud
-```
-
-This produces the setup executable and portable ZIP under `dist/`. The package uses a static C runtime, embeds its icon/version information, and uses GPUI's per-monitor DPI manifest.
-
-## macOS
-
-Requires **macOS 15 or later** on Apple Silicon or Intel. Choose the archive matching your Mac's CPU (`arm64` or `x64`).
-
-### Install a downloaded build
-
-Extract the ZIP, then move **Parquet Viewer.app** to Applications and open it. Rust and Swift are not needed to run the bundled app.
-
-### Make double-click open Parquet
-
-Choose **Make default** in the first-launch offer, or reopen it through **Associate Parquet files…**. Declining preserves your existing default. Finder also offers **Get Info → Open with → Change All**.
-
-The bundle declares supported local formats and handles Finder document-open events at launch or while running. Files opened during a read are queued and displayed afterward.
-
-### Build from source
-
-Install Rust and Xcode Command Line Tools, following the [native GPUI prerequisites](https://gpui-kit.com/docs/installation/). Build natively on the Mac you are targeting:
-
-```sh
-./scripts/package-macos.sh
-# Or build, install to ~/Applications, and register with Finder:
-./scripts/install-macos.sh
-```
-
-Add `--cloud` for remote Parquet support. Packaging creates `dist/Parquet Viewer.app` and a ZIP for the current architecture. The default-association helper is bundled; the user does not need to compile it.
+Uninstall through Windows Settings. It removes the app's registrations and keeps
+preferences. On upgrades, the original `Programs\Parquet Viewer` installation
+directory is retained.
 
 ## Try from source
 
-The checkout pins **Rust 1.99.0** and its application lockfile. Install Rust with rustup and the [platform prerequisites](https://gpui-kit.com/docs/installation/), then run from the project root:
+Install Rust with rustup and the [native prerequisites](development.md#toolchain-and-checks).
+The checkout pins Rust **1.99.0** and Cargo.lock. Use the fast development preview:
 
 ```sh
 cargo dev -- /path/to/file.parquet
 ```
 
-This opens a development preview with cloud support, watches source changes, and saves preview preferences separately from the installed app. It skips the association prompt. Close the preview or press Ctrl+C to stop. Quote paths containing spaces.
+Source saves rebuild and restart the preview. Its settings are separate from the
+installed app, and it skips the association prompt. Close the preview or press
+Ctrl+C to stop. Quote paths containing spaces.
 
-For a normal release run without installation:
+For packages, use `./scripts/package-linux-container.sh --cloud` on Linux with
+Docker, or `./scripts/package-windows.ps1 -Cloud` in a native Windows MSVC/SDK
+environment with Inno Setup 6. The Linux container has a separate retained cache;
+it does not replace the host development cache. See [release preparation](releasing.md).
 
-```sh
-cargo run --locked --release -- /path/to/file.parquet
-# With remote support:
-cargo run --locked --release --features cloud -- 's3://my-bucket/data/example.parquet'
-```
+## macOS
 
-The first build compiles substantial native dependencies. For subsequent changes, use the [fast development loop](development.md) instead of rebuilding release every time.
+macOS is **experimental community tooling**, outside the official release matrix.
+There are no official Mac downloads or native test guarantees. Existing source
+and native `scripts/package-macos.sh` / `scripts/install-macos.sh` tooling remain
+available for contributors with Mac hardware. Read [platform support](platforms.md)
+before relying on them.
 
-## Validation status
-
-Linux has been built and exercised in a native window. The workflow is configured to build, test, and package all four platform/CPU targets; inspect its [current results](https://github.com/EtienneT/rowlight/actions/workflows/ci.yml) before relying on an artifact.
-
-Before distributing Windows/macOS packages, complete the [native desktop release checks](../packaging/TESTING.md), including file associations, scaling, and both Mac architectures. Public distribution additionally needs Windows application/installer signing and macOS Developer ID signing/notarization. Source builds require no project signing credentials.
+Preferences remain in the existing `parquetviewer` user configuration directory;
+see [saved settings](user-guide.md#make-the-view-your-own).

@@ -1,5 +1,53 @@
 # Native release checks
 
+## 0.1.0-alpha.1 preparation on 2026-10-09
+
+The maintained release targets are Linux x64 and Windows x64. macOS remains
+experimental community tooling. GitHub Actions stayed disabled throughout;
+these checks used local Linux and native Windows builds.
+
+- Linux passed formatting, all-feature workspace Clippy and 67 tests, including
+  real SQL workers and headless UI regressions. The incremental development build
+  took 5.35 seconds; optimized builds were reserved for the release packages.
+- The Linux cloud executable was built on Ubuntu 24.04 in a separate retained
+  four-job container cache. The cold build took 228.6 seconds. A final incremental
+  release build took 89.3 seconds. Its strongest glibc requirement is 2.35, within
+  the supported 2.39 baseline; the ABI guard rejected the older Arch-built binary
+  requiring glibc 2.44.
+- The extracted Linux package ran in an Ubuntu 24.04 runtime container without
+  Rust or development libraries. A native X11 window with software Vulkan opened
+  a synthetic 100,000-row Hive source, forced paging despite saved All, and returned
+  the expected count through the SQL editor. The per-user installer preserved
+  existing Parquet/CSV defaults, registered the Rowlight launcher and installed
+  the executable and license notices. The same package also opened and ran that
+  query on the Linux host with isolated preferences.
+- Windows passed the focused SQL error-recovery regression natively. The
+  development build took 76.6 seconds; the focused compile/test took 25.9 seconds.
+  Native optimized build/packaging took 243.8 seconds, with a final package pass
+  taking 202.0 seconds. These are observations, not timing guarantees.
+- The Windows cloud ZIP and setup passed version/startup, Rowlight product
+  metadata, current notices, upgrade from the previous installer, quoted file-open
+  registration for all local formats, unchanged file defaults, and uninstall
+  cleanup. Test preferences were preserved. Tests used a temporary installation
+  and left the user's installed app and default handlers untouched.
+- A native Windows window opened with the expected Rowlight title. Visual capture
+  was refused because the owned test window could not become foreground; no
+  desktop capture was taken. Windows desktop picker, chart interaction, drag/drop,
+  appearance switching and physical mixed-DPI checks still need manual validation
+  with the exact download. Real cloud provider credentials were not exercised.
+- Gitleaks 8.30.1 found no secrets in all 16 Git commits or the final source review.
+  A separate history review of 143 blobs found no known private machine paths,
+  LAN addresses or tracked datasets. README media uses synthetic data. The
+  notice inventory covers 671 dependencies plus Lucide/Feather and additional
+  attribution; generated output omits local Cargo paths.
+- A local, unpublished alpha draft contains the Linux archive, Windows portable
+  ZIP, Windows installer, SHA256SUMS, notes and explicit source provenance. Hashes
+  were verified after transfer; both archives include the current notices.
+
+Public visibility, a reviewed release commit/tag, private vulnerability reporting
+and publication remain separate final steps. The alpha is unsigned and its notes
+disclose that. See [release preparation](../docs/releasing.md).
+
 ## SQL error recovery on 2026-10-07
 
 The bounded error display passed the focused native GPUI regression on Linux and
@@ -16,7 +64,7 @@ testing; desktop rendering and macOS checks remain part of release validation.
 
 ## Release checklist
 
-Run these against the extracted/installed package on each target OS, including both Mac architectures. Record the version, OS/CPU, archive checksum, and result. CI covers native compilation, core/GUI logic, and packaging; it does not substitute for desktop integration testing.
+Run these against the extracted/installed package on Linux x64 and Windows x64. macOS checks below apply only to future community distributions. Record the version, OS/CPU, archive checksum, and result. CI covers native compilation, core/GUI logic, and packaging; it does not substitute for desktop integration testing.
 
 1. Launch from the desktop application entry rather than the source checkout. Confirm a usable window, readable text, picker, drag/drop, and close/quit.
 2. Install/register the viewer. Verify the first-launch offer appears and declining does not change the default. Quit/reopen to verify the decline is remembered. Reopen the offer through the app menu, then choose it as the default for `.parquet` and `.parq`, then double-click a file whose name contains spaces, Unicode, and `%`. On macOS repeat while the application is already running, including during a read. Verify the requested document opens.
@@ -27,7 +75,7 @@ Run these against the extracted/installed package on each target OS, including b
 7. Verify Windows scaling on different-DPI monitors, and verify Cmd+O/Cmd+Q plus Finder document opening on macOS. Confirm the artifact's architecture matches the machine.
 8. Upgrade the installation, then uninstall. Verify launchers/registrations are removed and unrelated file associations remain intact. User settings should remain unless explicitly deleted.
 
-Before public distribution, verify Developer ID/notarization on macOS and Authenticode signing on Windows, then repeat with the exact downloaded artifact on a clean machine. Current build scripts produce unsigned/local development artifacts.
+The first Linux/Windows alpha is unsigned; disclose this in its release notes and verify download checksums. Authenticode signing is a future Windows distribution improvement. A future Mac maintainer must plan native validation and Developer ID/notarization for Mac downloads. Repeat smoke checks with the exact extracted artifact before publication.
 
 ## New source and overview checks
 
@@ -37,7 +85,7 @@ Before public distribution, verify Developer ID/notarization on macOS and Authen
 - Build the file overview on sorted data. Verify the scope label, sampled counts and expanded chart; Back returns to the overview. Cancel a long source scan; opening another source while busy must cancel/queue correctly.
 - Reopen a recent file and verify its page/scroll/sort. Clear history, close and reopen; the history stays empty.
 - Cloud download: open HTTP(S), S3, Azure and GCS with existing credentials. Verify range-only traffic, timeout/cancellation, repeated-page cache reuse and changed-object rejection. Signed URLs and secrets must not appear in saved preferences/history or error messages. SSO/role profiles require exported temporary credentials.
-- Build both core and cloud packages. Verify Open With registration for all local formats without replacing existing defaults, on Windows, macOS and Linux.
+- Validate the cloud release packages. Verify Open With registration for all local formats without replacing existing defaults on Windows and Linux. Core packages and macOS are optional source-build/community checks.
 
 ## Windows x64 validation on 2026-10-06
 

@@ -12,6 +12,15 @@ use viewer::{CloseDetail, OpenFile, Quit, Viewer};
 fn main() -> anyhow::Result<()> {
     let mut args = std::env::args_os().skip(1);
     let path = match args.next() {
+        Some(arg) if arg == OsStr::new("--version") || arg == OsStr::new("-V") => {
+            let variant = if cfg!(feature = "cloud") {
+                "cloud"
+            } else {
+                "core"
+            };
+            println!("Rowlight {} ({variant})", env!("CARGO_PKG_VERSION"));
+            return Ok(());
+        }
         Some(arg) if arg == OsStr::new("--query-worker") => {
             let scratch = args
                 .next()
@@ -22,7 +31,7 @@ fn main() -> anyhow::Result<()> {
         }
         Some(arg) if arg == OsStr::new("--help") || arg == OsStr::new("-h") => {
             println!(
-                "Parquet Viewer\n\nUsage: parquetviewer [FILE|FOLDER|URL]\n\nOpen a file or Hive Parquet folder, or start without a path to use the file picker.\nCtrl/Cmd+O: open file · Ctrl/Cmd+Shift+O: open Parquet folder · Ctrl/Cmd+Shift+L: SQL query · Ctrl/Cmd+F: find column · Home/End: first/last loaded row · Page Up/Down: screenful · Ctrl/Cmd+Page Up/Down or Alt+Left/Right: previous/next page · Ctrl/Cmd+Home/End: file start/end · Ctrl/Cmd+G: go to page · F1: keyboard shortcuts · Esc: clear selection/back · Ctrl/Cmd+Q: quit"
+                "Rowlight\n\nUsage: parquetviewer [FILE|FOLDER|URL]\n\nOpen a file or Hive Parquet folder, or start without a path to use the file picker.\nCtrl/Cmd+O: open file · Ctrl/Cmd+Shift+O: open Parquet folder · Ctrl/Cmd+Shift+L: SQL query · Ctrl/Cmd+F: find column · Home/End: first/last loaded row · Page Up/Down: screenful · Ctrl/Cmd+Page Up/Down or Alt+Left/Right: previous/next page · Ctrl/Cmd+Home/End: file start/end · Ctrl/Cmd+G: go to page · F1: keyboard shortcuts · Esc: clear selection/back · Ctrl/Cmd+Q: quit"
             );
             return Ok(());
         }
@@ -31,7 +40,7 @@ fn main() -> anyhow::Result<()> {
     };
     anyhow::ensure!(
         args.next().is_none(),
-        "Open one file at a time. Usage: parquetviewer [FILE|URL]"
+        "Open one file at a time. Usage: parquetviewer [FILE|FOLDER|URL]"
     );
     let store = SettingsStore::user()?;
     let settings = store.load().unwrap_or_default();
@@ -64,7 +73,7 @@ fn main() -> anyhow::Result<()> {
         }
         #[cfg(target_os = "macos")]
         cx.set_menus(vec![
-            Menu::new("Parquet Viewer").items([MenuItem::action("Quit Parquet Viewer", Quit)]),
+            Menu::new("Rowlight").items([MenuItem::action("Quit Rowlight", Quit)]),
             Menu::new("File").items([
                 MenuItem::action("Open file…", OpenFile),
                 MenuItem::action("Open Parquet folder…", viewer::OpenFolder),
@@ -133,7 +142,7 @@ fn main() -> anyhow::Result<()> {
                 cx,
             ))),
             titlebar: Some(TitlebarOptions {
-                title: Some("Parquet Viewer".into()),
+                title: Some("Rowlight".into()),
                 ..Default::default()
             }),
             app_id: Some("com.parquetviewer.ParquetViewer".into()),
@@ -157,7 +166,7 @@ fn main() -> anyhow::Result<()> {
                 .detach();
             }
             Err(error) => {
-                eprintln!("Cannot open Parquet Viewer: {error:#}");
+                eprintln!("Cannot open Rowlight: {error:#}");
                 cx.quit();
             }
         }

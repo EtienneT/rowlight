@@ -11,12 +11,14 @@
 
 <p align="center">
   A small, read-only desktop viewer for Parquet, Arrow IPC / Feather, CSV, and TSV.<br>
-  Built with Rust, GPUI Kit, and Polars. Targets Linux, Windows, and macOS.
+  Built with Rust, GPUI Kit, and Polars. For Linux and Windows.
 </p>
 
 <p align="center">
   <a href="docs/user-guide.md">User guide</a> ·
+  <a href="https://github.com/EtienneT/rowlight/releases">Downloads</a> ·
   <a href="docs/development.md">Development</a> ·
+  <a href="CONTRIBUTING.md">Contribute</a> ·
   <a href="LICENSE">MIT license</a>
 </p>
 
@@ -47,10 +49,14 @@ Rowlight follows the current Omarchy palette, including live theme changes. Thes
 
 ## Try it
 
+The first alpha is being prepared. [Release downloads](https://github.com/EtienneT/rowlight/releases)
+will include Linux x64 archives and Windows x64 installers/portable ZIPs.
+[macOS contributions are welcome](docs/platforms.md).
+
 With Rust and the [native prerequisites](https://gpui-kit.com/docs/installation/) installed:
 
 ```sh
 cargo dev -- /path/to/file.parquet
 ```
 
-[Build and install](docs/installation.md) · [Windows](docs/installation.md#windows) · [macOS](docs/installation.md#macos) · [Keyboard shortcuts](docs/keyboard-shortcuts.md)
+[Build and install](docs/installation.md) · [Platform support](docs/platforms.md) · [Keyboard shortcuts](docs/keyboard-shortcuts.md)

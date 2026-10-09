@@ -34,6 +34,7 @@ if [[ ! -f "$app_data_dir/parquetviewer/previous-default" ]]; then
   printf '%s\n' "$previous_default" > "$app_data_dir/parquetviewer/previous-default"
 fi
 install -m755 "$app_source" "$app_bin_dir/parquetviewer"
+install -m644 "$project_root/LICENSE" "$project_root/THIRD_PARTY_NOTICES.html" "$app_data_dir/parquetviewer/"
 # Use an absolute, escaped executable path; the file manager need not inherit PATH.
 desktop_exec="$app_bin_dir/parquetviewer"
 desktop_exec=${desktop_exec//\\/\\\\}

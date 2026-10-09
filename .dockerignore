@@ -1,0 +1,6 @@
+# Only the builder Dockerfile is needed; source is mounted at runtime.
+**
+!packaging
+!packaging/linux
+!packaging/linux/Dockerfile
+!packaging/linux/Smoke.Dockerfile

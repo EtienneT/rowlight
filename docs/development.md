@@ -112,11 +112,11 @@ cargo test --locked --package xtask
 
 The data tests cover Parquet row groups, IPC batches, CSV parsing/paging, typed sorting, empty/final pages, nulls and non-finite values, nested inspection, sampled overviews, whole-file filters, clipboard limits, and preference restoration. SQL integration tests start the real executable in worker mode and cover full-source filtering/order, grouping, CTEs, empty results, Hive partitions, CSV options, compressed IPC and typed/nested values, signed HTTP staging, cancellation and memory termination. The test command also builds that executable; keep it current before running a filtered headless SQL test. HTTP integration tests check real range requests, bounded cache reuse, object changes, unsupported servers, and cancellation. Headless GPUI tests drive paging, selection, column visibility/sizing, axis-independent scrolling, resize alignment, chart expansion, saved views, SQL mode ownership/restoration, folder paging with saved All, and the opt-in association prompt without changing host defaults.
 
-For native desktop validation, follow [the release checklist](../packaging/TESTING.md). Compilation and headless UI tests do not establish desktop integration on Windows/macOS.
+For native desktop validation, follow [the release checklist](../packaging/TESTING.md). Compilation and headless UI tests do not establish desktop integration. Linux and Windows are maintained; macOS is experimental community tooling.
 
 ## Continuous integration
 
-The [Native builds workflow](https://github.com/EtienneT/rowlight/actions/workflows/ci.yml) uses standard GitHub-hosted runners for Linux x64, Windows x64, and Apple Silicon/Intel macOS. These runner minutes are [free for public repositories](https://docs.github.com/en/actions/reference/runners/github-hosted-runners). The workflow skips every job while the repository is private, even if enabled. A maintainer must enable the workflow in GitHub after publishing before these checks can run.
+The [Native builds workflow](https://github.com/EtienneT/rowlight/actions/workflows/ci.yml) uses standard GitHub-hosted runners for Linux x64 and Windows x64. macOS is outside the maintained matrix. These runner minutes are [free for public repositories](https://docs.github.com/en/actions/reference/runners/github-hosted-runners). The workflow skips every job while the repository is private, even if enabled. The workflow remains disabled at the owner's request; making the repository public does not authorize enabling or dispatching it. A maintainer can explicitly enable it later if wanted.
 
 Once public and enabled, source pushes to `main` and pull requests run development-profile checks. README/guide-only pushes skip the matrix, and new commits cancel superseded runs. Core lint still checks code without cloud features; cloud/UI lint and all workspace tests use one feature set. Native dependency caches are kept after failures and saved only from `main`, so pull requests reuse them without creating a cache for every branch.
 
@@ -126,18 +126,16 @@ Cargo parallelism is bounded for the [public runner hardware](https://docs.githu
 | --- | ---: | ---: |
 | Linux x64 | 4 | 16 GB |
 | Windows x64 | 4 | 16 GB |
-| macOS Intel | 3 | 14 GB |
-| macOS Apple Silicon | 2 | 7 GB |
 
 These are starting limits, not measured speedups. Check the first public runs for time and memory pressure before raising them further. Local builds retain the four-job default; `CARGO_BUILD_JOBS` can override it for a particular machine.
 
-Optimized packages are built only when a maintainer chooses **Run workflow → packages**. Leave that checkbox off for checks alone. To request packages with the GitHub CLI:
+Optimized packages are built only when a maintainer chooses **Run workflow → packages**. Leave that checkbox off for checks alone. Only after explicit approval to enable and use Actions, request packages with the GitHub CLI:
 
 ```sh
 gh workflow run ci.yml --ref main -f packages=true
 ```
 
-Package runs check the code first, then build both core and cloud variants on each platform. Uploaded packages expire after seven days. Routine checks have a 30-minute timeout per platform; package runs allow 90 minutes. The size-optimized release profile is unchanged.
+Package runs check the code first, then build the cloud variant on each maintained platform. Core packaging remains an optional source-build choice. Uploaded packages expire after seven days. Routine checks have a 30-minute timeout per platform; package runs allow 90 minutes. The size-optimized release profile is unchanged.
 
 Cold builds compile GPUI, Polars and their native dependencies separately on each OS/CPU. Caches reuse dependencies, but the application still needs compilation/linking after source changes. Thin LTO and single-codegen-unit release optimization also add time. Building two release variants on all four platforms for every push was the main avoidable cost of the original workflow.
 
@@ -184,7 +182,9 @@ The [2026-10-05 validation and measurements](validation-2026-10-05.md) cover the
 - `src/main.rs`: startup, path argument, shortcuts and application lifecycle.
 - `xtask/`: development-only source watcher, incremental preview builds and process cleanup; excluded from the viewer's runtime dependencies.
 - `packaging/` and `scripts/`: platform icons, file registration, macOS app bundle, Windows installer, and Linux desktop integration.
-- `.github/workflows/ci.yml`: native checks for all four platform/CPU targets and optional manual packages, with pinned action revisions and a public-repository guard.
+- `.github/workflows/ci.yml`: native checks for the two maintained platform/CPU targets and optional manual packages, with pinned action revisions and a public-repository guard.
+
+For distribution, see [release preparation](releasing.md) and [platform support](platforms.md).
 
 For future additions that keep the app focused, see [the small-viewer roadmap](roadmap.md).
 

@@ -240,7 +240,7 @@ impl Source {
             #[cfg(not(feature = "cloud"))]
             {
                 let _ = (url, profile);
-                anyhow::bail!("Remote sources require the cloud build of Parquet Viewer");
+                anyhow::bail!("Remote sources require the cloud build of Rowlight");
             }
         }
         let Location::Local(path) = &location else {

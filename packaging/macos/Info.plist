@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleName</key>
-	<string>Parquet Viewer</string>
+	<string>Rowlight</string>
 	<key>CFBundleDisplayName</key>
-	<string>Parquet Viewer</string>
+	<string>Rowlight</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.parquetviewer.ParquetViewer</string>
 	<key>CFBundleExecutable</key>

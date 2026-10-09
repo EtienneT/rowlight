@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       packages:
-        description: Build optimized core and cloud packages for every platform
+        description: Build optimized Linux and Windows cloud release packages
         type: boolean
         default: false
 concurrency:
@@ -36,16 +36,8 @@ jobs:
           - os: windows-2025
             platform: windows-x64
             build_jobs: 4
-          - os: macos-15
-            platform: macos-arm64
-            # The standard Apple Silicon runner has only 7 GB RAM.
-            build_jobs: 2
-          - os: macos-15-intel
-            platform: macos-x64
-            build_jobs: 3
     env:
       CARGO_BUILD_JOBS: ${{ matrix.build_jobs }}
-      MACOSX_DEPLOYMENT_TARGET: '15.0'
     defaults:
       run:
         shell: bash
@@ -89,24 +81,21 @@ jobs:
       - name: Linux release artifact
         if: github.event_name == 'workflow_dispatch' && inputs.packages && runner.os == 'Linux'
         shell: bash
-        run: ./scripts/package-linux.sh && ./scripts/package-linux.sh --cloud
-      - name: macOS application and ZIP
-        if: github.event_name == 'workflow_dispatch' && inputs.packages && runner.os == 'macOS'
-        run: ./scripts/package-macos.sh && ./scripts/package-macos.sh --cloud
+        run: ./scripts/package-linux.sh --cloud
       - name: Windows portable ZIP and installer
         if: github.event_name == 'workflow_dispatch' && inputs.packages && runner.os == 'Windows'
         shell: pwsh
         run: |
-          ./scripts/package-windows.ps1
           ./scripts/package-windows.ps1 -Cloud
       - name: Upload native packages
         if: github.event_name == 'workflow_dispatch' && inputs.packages
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
-          name: parquetviewer-${{ matrix.platform }}
+          name: rowlight-${{ matrix.platform }}
           path: |
             dist/*.zip
             dist/*.exe
             dist/*.tar.gz
+            dist/*.sha256
           if-no-files-found: error
           retention-days: 7

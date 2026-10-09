@@ -1,0 +1,29 @@
+name: Bug report
+description: Report a reproducible problem in Rowlight.
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Rowlight version
+      description: Run parquetviewer --version, or give the download filename.
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system and architecture
+      placeholder: Windows 11 x64 or Ubuntu 24.04 x64; Wayland or X11 on Linux
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps and expected behavior
+      description: Describe what happened and what you expected. Include format, approximate rows/columns, and a small synthetic example if useful. Remove private values, paths, credentials and signed URLs.
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Error details or screenshot
+      description: Optional. Review error details and screenshots for sensitive information before sharing.

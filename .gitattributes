@@ -1,0 +1,7 @@
+# Keep lockfile/license fingerprints and scripts identical on Windows and Linux.
+* text=auto eol=lf
+*.png binary
+*.gif binary
+*.ico binary
+# Generated notices preserve upstream license texts, including their whitespace.
+THIRD_PARTY_NOTICES.html -text -whitespace

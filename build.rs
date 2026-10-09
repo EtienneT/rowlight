@@ -8,8 +8,8 @@ fn main() -> std::io::Result<()> {
         // A second manifest with resource ID 1 fails to link with MSVC.
         winresource::WindowsResource::new()
             .set_icon("packaging/windows/icon.ico")
-            .set("ProductName", "Parquet Viewer")
-            .set("FileDescription", "Parquet Viewer")
+            .set("ProductName", "Rowlight")
+            .set("FileDescription", "Rowlight")
             .compile()?;
     }
     Ok(())

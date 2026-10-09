@@ -3,6 +3,11 @@
 Keep the app simple and lightweight. Preserve bounded paging, original column order,
 and the existing GPUI Kit / Polars architecture.
 
+Linux x64 and Windows x64 are maintained release targets. macOS is experimental
+community tooling, excluded from official downloads and required CI. Preserve
+legacy executable, application and settings identifiers when updating branding
+so existing file associations and preferences continue to work.
+
 ## Fast development loop
 
 - **Use development builds while implementing changes.** Use `cargo dev -- FILE`

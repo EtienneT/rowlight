@@ -1,9 +1,9 @@
 [package]
 name = "parquetviewer"
-version = "0.1.0"
+version = "0.1.0-alpha.1"
 edition = "2024"
 rust-version = "1.99"
-description = "A small native Parquet viewer with typed columns and paged browsing"
+description = "Rowlight: a small native data viewer with typed columns and paged browsing"
 repository = "https://github.com/EtienneT/rowlight"
 license = "MIT"
 publish = false

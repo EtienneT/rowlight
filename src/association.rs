@@ -13,7 +13,7 @@ pub fn associate() -> Result<String> {
             .join("applications/com.parquetviewer.ParquetViewer.desktop");
         ensure!(
             desktop.is_file(),
-            "Install Parquet Viewer first, then choose this action again."
+            "Install Rowlight first, then choose this action again."
         );
         std::fs::create_dir_all(
             dirs::config_dir().context("Cannot find the configuration directory")?,
@@ -39,9 +39,9 @@ pub fn associate() -> Result<String> {
             actual.status.success()
                 && String::from_utf8_lossy(&actual.stdout).trim()
                     == "com.parquetviewer.ParquetViewer.desktop",
-            "The desktop did not accept the file default. Choose Parquet Viewer in your file manager's Open With dialog."
+            "The desktop did not accept the file default. Choose Rowlight in your file manager's Open With dialog."
         );
-        Ok("Parquet files now open in Parquet Viewer.".into())
+        Ok("Parquet files now open in Rowlight.".into())
     }
     #[cfg(target_os = "windows")]
     {
@@ -50,7 +50,7 @@ pub fn associate() -> Result<String> {
             .arg("ms-settings:defaultapps?registeredAppUser=Parquet%20Viewer")
             .spawn()
             .context("Cannot open Windows Default Apps")?;
-        Ok("In Windows Default Apps, select Parquet Viewer for .parquet and .parq. On Windows 10, search for .parquet in Default Apps.".into())
+        Ok("In Windows Default Apps, select Rowlight for .parquet and .parq. On Windows 10, search for .parquet in Default Apps.".into())
     }
     #[cfg(target_os = "macos")]
     {
@@ -71,8 +71,8 @@ pub fn associate() -> Result<String> {
             "macOS could not change the file default: {}",
             String::from_utf8_lossy(&output.stderr)
         );
-        Ok("Parquet files now open in Parquet Viewer.".into())
+        Ok("Parquet files now open in Rowlight.".into())
     }
     #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
-    anyhow::bail!("Choose Parquet Viewer in your file manager's Open With dialog.");
+    anyhow::bail!("Choose Rowlight in your file manager's Open With dialog.");
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run on macOS; builds a Finder application and an archive for this Mac's CPU.
+# Experimental community tooling, not part of the maintained release matrix.
 set -euo pipefail
 [[ $(uname -s) == Darwin ]] || { printf 'Build the macOS package on a Mac.\n' >&2; exit 1; }
 project_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
@@ -15,6 +15,8 @@ suffix=""
 if $cloud; then build_arguments+=(--features cloud); suffix="-cloud"; fi
 if ! $skip_build; then cargo build "${build_arguments[@]}"; fi
 version=$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -1)
+# Apple bundle versions are numeric even when Cargo uses a prerelease suffix.
+bundle_version=${version%%-*}
 case $(uname -m) in arm64) architecture=arm64 ;; x86_64) architecture=x64 ;; *) exit 1 ;; esac
 bundle="$project_root/dist/Parquet Viewer.app"
 mkdir -p "$bundle/Contents/MacOS" "$bundle/Contents/Resources"
@@ -22,8 +24,8 @@ install -m755 target/release/parquetviewer "$bundle/Contents/MacOS/parquetviewer
 xcrun swiftc -O -parse-as-library packaging/macos/associate.swift -o "$bundle/Contents/MacOS/parquetviewer-associate"
 install -m644 packaging/macos/Info.plist "$bundle/Contents/Info.plist"
 install -m644 LICENSE "$bundle/Contents/Resources/LICENSE"
-/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $version" "$bundle/Contents/Info.plist"
-/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $version" "$bundle/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $bundle_version" "$bundle/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Set :CFBundleVersion $bundle_version" "$bundle/Contents/Info.plist"
 icon_directory=$(mktemp -d "$project_root/dist/icon.XXXXXX")
 trap 'rm -rf "$icon_directory"' EXIT
 mkdir "$icon_directory/ParquetViewer.iconset"
