@@ -11,6 +11,7 @@
     <title>Rowlight — Shed light on your data.</title>
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="site.css">
+    <script src="theme.js" defer></script>
     <script src="site.js" defer></script>
   </head>
   <body>
@@ -21,7 +22,7 @@
         <div class="nav-links">
           <a href="#explore">Explore</a>
           <a href="#themes">Themes</a>
-          <a href="https://github.com/EtienneT/rowlight/blob/main/docs/user-guide.md">Guide <span aria-hidden="true">↗</span></a>
+          <a href="guide.html">Guide</a>
         </div>
         <a class="button button-small" href="#download">Get Rowlight <span aria-hidden="true">↓</span></a>
       </nav>
@@ -62,24 +63,24 @@
         <div class="demo-caption"><span class="eyebrow">A small window into Rowlight</span><p id="demo-help">Real desktop app screenshot, using synthetic data.</p></div>
       </section>
 
-      <div class="format-strip container" aria-label="Supported formats"><span>Bring your files.</span><ul><li>Parquet</li><li>Arrow IPC / Feather</li><li>CSV</li><li>TSV</li></ul><a href="https://github.com/EtienneT/rowlight/blob/main/docs/formats.md">Format details <span aria-hidden="true">↗</span></a></div>
+      <div class="format-strip container" aria-label="Supported formats"><span>Bring your files.</span><ul><li>Parquet</li><li>Arrow IPC / Feather</li><li>CSV</li><li>TSV</li></ul><a href="formats.html">Format details <span aria-hidden="true">→</span></a></div>
 
       <section class="section container" id="explore" aria-labelledby="explore-title">
         <div class="section-heading"><div><p class="eyebrow">01 / From file to understanding</p><h2 id="explore-title">See the shape.<br><span class="muted">Then look closer.</span></h2></div><p>Column types, missing values, and distributions, right where you need them. Follow a question without leaving your data behind.</p></div>
         <div class="feature-showcase">
           <div class="feature-copy">
-            <span class="feature-index">01.01</span><h3>A column tells a story.</h3><p>Expand a distribution to explore its values and statistics. Histograms for numbers and dates. Frequency bars for categories and booleans.</p><p class="fine-print">Charts describe the displayed rows. File overview takes a bounded sample across the original file.</p><a class="text-link" href="https://github.com/EtienneT/rowlight/blob/main/docs/user-guide.md#understand-the-data">Explore the details <span aria-hidden="true">↗</span></a>
+            <span class="feature-index">01.01</span><h3>A column tells a story.</h3><p>Expand a distribution to explore its values and statistics. Histograms for numbers and dates. Frequency bars for categories and booleans.</p><p class="fine-print">Charts describe the displayed rows. File overview takes a bounded sample across the original file.</p><a class="text-link" href="guide.html#understand-the-data">Explore the details <span aria-hidden="true">→</span></a>
           </div>
           <figure class="app-capture"><img src="assets/column-detail.png" width="1400" height="860" loading="lazy" alt="Rowlight's expanded amount histogram with a hover tooltip and column statistics."><figcaption>Real app capture · synthetic sample data</figcaption></figure>
         </div>
         <div class="feature-pair">
-          <article><span class="feature-index">01.02</span><h3>Large files. Small steps.</h3><p>Browse in pages of 100, 500, or 1,000 rows, with virtual scrolling for rows and columns. All mode checks a memory budget before loading.</p><a class="text-link" href="https://github.com/EtienneT/rowlight/blob/main/docs/formats.md#large-files-and-memory">How paging works <span aria-hidden="true">↗</span></a></article>
-          <article><span class="feature-index">01.03</span><h3>A closer look at any value.</h3><p>Find a column, inspect a long cell, or copy a selection. Original column order and source row numbers keep you oriented. Your file stays unchanged.</p><a class="text-link" href="https://github.com/EtienneT/rowlight/blob/main/docs/user-guide.md#inspect-and-copy-cells">Inspect and copy <span aria-hidden="true">↗</span></a></article>
+          <article><span class="feature-index">01.02</span><h3>Large files. Small steps.</h3><p>Browse in pages of 100, 500, or 1,000 rows, with virtual scrolling for rows and columns. All mode checks a memory budget before loading.</p><a class="text-link" href="formats.html#large-files-and-memory">How paging works <span aria-hidden="true">→</span></a></article>
+          <article><span class="feature-index">01.03</span><h3>A closer look at any value.</h3><p>Find a column, inspect a long cell, or copy a selection. Original column order and source row numbers keep you oriented. Your file stays unchanged.</p><a class="text-link" href="guide.html#inspect-and-copy-cells">Inspect and copy <span aria-hidden="true">→</span></a></article>
         </div>
       </section>
 
       <section class="sql-section" aria-labelledby="sql-title"><div class="container sql-layout">
-        <div class="sql-copy"><p class="eyebrow">02 / Follow your question</p><h2 id="sql-title">A little SQL.<br><span class="muted">A new perspective.</span></h2><p>Query your open file or local Hive Parquet folder as <code>data</code>. Select the columns you need, filter records, or sort across the query source.</p><a class="text-link" href="https://github.com/EtienneT/rowlight/blob/main/docs/user-guide.md#folders-and-sql">Meet SQL mode <span aria-hidden="true">↗</span></a></div>
+        <div class="sql-copy"><p class="eyebrow">02 / Follow your question</p><h2 id="sql-title">A little SQL.<br><span class="muted">A new perspective.</span></h2><p>Query your open file or local Hive Parquet folder as <code>data</code>. Select the columns you need, filter records, or sort across the query source.</p><a class="text-link" href="guide.html#folders-and-sql">Meet SQL mode <span aria-hidden="true">→</span></a></div>
         <div class="sql-example"><div class="code-heading"><span>YOUR FILE, AS <code>data</code></span><span>SQL</span></div><pre><code><span class="sql-keyword">SELECT</span> region, <span class="sql-function">AVG</span>(amount) <span class="sql-keyword">AS</span> average
 <span class="sql-keyword">FROM</span> data
 <span class="sql-keyword">WHERE</span> active = <span class="sql-keyword">true</span>
@@ -104,14 +105,14 @@
         <div class="download-heading"><p class="eyebrow">Less setup. More insight.</p><h2 id="download-title">Give your data<br><span>a little daylight.</span></h2><p>Free to use. MIT licensed. Built in the open.</p></div>
         <div class="release-notice"><span class="live-dot" aria-hidden="true"></span><p><strong>Rowlight 0.1.0-alpha.1 is available.</strong> An early, unsigned alpha for Linux and Windows. Choose a download below and verify its checksum before installing.</p><a class="text-link" href="https://github.com/EtienneT/rowlight/releases/tag/v0.1.0-alpha.1">Release notes <span aria-hidden="true">↗</span></a></div>
         <div class="platforms">
-          <article class="platform"><p class="eyebrow">LINUX / X64</p><h3>A home on your desktop.</h3><p>Archive with a per-user installer.<br>Ubuntu 24.04 / glibc 2.39+, Wayland or X11, and Vulkan.</p><div class="platform-links"><a class="text-link" href="https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz">Download archive <span aria-hidden="true">↓</span></a><a class="text-link" href="https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst">Arch / Omarchy package <span aria-hidden="true">↓</span></a></div><a class="text-link platform-guide" href="https://github.com/EtienneT/rowlight/blob/main/docs/installation.md">Linux installation guide <span aria-hidden="true">↗</span></a></article>
-          <article class="platform"><p class="eyebrow">WINDOWS / X64</p><h3>Open it and get going.</h3><p>Per-user installer or portable ZIP.<br>Windows 10 or later, with a DirectX 11 graphics driver.</p><div class="platform-links"><a class="text-link" href="https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe">Download installer <span aria-hidden="true">↓</span></a><a class="text-link" href="https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud.zip">Portable ZIP <span aria-hidden="true">↓</span></a></div><a class="text-link platform-guide" href="https://github.com/EtienneT/rowlight/blob/main/docs/installation.md#windows">Windows installation guide <span aria-hidden="true">↗</span></a></article>
+          <article class="platform"><p class="eyebrow">LINUX / X64</p><h3>A home on your desktop.</h3><p>Archive with a per-user installer.<br>Ubuntu 24.04 / glibc 2.39+, Wayland or X11, and Vulkan.</p><div class="platform-links"><a class="text-link" href="https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz">Download archive <span aria-hidden="true">↓</span></a><a class="text-link" href="https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst">Arch / Omarchy package <span aria-hidden="true">↓</span></a></div><a class="text-link platform-guide" href="installation.html">Linux installation guide <span aria-hidden="true">→</span></a></article>
+          <article class="platform"><p class="eyebrow">WINDOWS / X64</p><h3>Open it and get going.</h3><p>Per-user installer or portable ZIP.<br>Windows 10 or later, with a DirectX 11 graphics driver.</p><div class="platform-links"><a class="text-link" href="https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe">Download installer <span aria-hidden="true">↓</span></a><a class="text-link" href="https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud.zip">Portable ZIP <span aria-hidden="true">↓</span></a></div><a class="text-link platform-guide" href="installation.html#windows">Windows installation guide <span aria-hidden="true">→</span></a></article>
         </div>
         <p class="fine-print download-note">The alpha is unsigned; Windows may show a publisher warning. Verify downloads against <a href="https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/SHA256SUMS">SHA256SUMS</a>; checksums verify integrity, not publisher identity. macOS is experimental community tooling, with no official downloads.</p>
         <div class="source-callout"><div><strong>Prefer to build it yourself?</strong><p>The source and development guide are on GitHub.</p></div><a class="button button-secondary" href="https://github.com/EtienneT/rowlight/blob/main/docs/development.md">Build from source <span aria-hidden="true">↗</span></a></div>
       </section>
 
-      <section class="faq-section container" aria-labelledby="faq-title"><div><p class="eyebrow">A few useful details</p><h2 id="faq-title">Good questions.</h2><a class="text-link" href="https://github.com/EtienneT/rowlight/blob/main/docs/user-guide.md">Read the user guide <span aria-hidden="true">↗</span></a></div><div class="faq-list">
+      <section class="faq-section container" aria-labelledby="faq-title"><div><p class="eyebrow">A few useful details</p><h2 id="faq-title">Good questions.</h2><a class="text-link" href="guide.html">Read the user guide <span aria-hidden="true">→</span></a></div><div class="faq-list">
         <details><summary>Does Rowlight change my files?</summary><p>No. Rowlight is read only. Sorting, filtering, querying, and copying leave your source data unchanged.</p></details>
         <details><summary>Do charts summarize the whole file?</summary><p>Header charts summarize the displayed rows, capped at 1,000 rows in All mode. File overview samples up to 1,000 rows across 16 evenly spaced windows of the original source. Large-file charts are previews, not exact whole-file statistics.</p></details>
         <details><summary>What does sorting apply to?</summary><p>Clicking a column sorts the loaded page. In All mode, it sorts all loaded rows. Use SQL with ORDER BY to sort across the complete query source.</p></details>

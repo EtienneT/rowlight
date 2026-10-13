@@ -5,6 +5,29 @@ The landing page lives in [index.html](index.html), with [site.css](site.css) an
 build step, external fonts, analytics, or server application. Existing synthetic
 Linux app captures in `assets/` are shared with the documentation.
 
+The [user guide](guide.html), [installation instructions](installation.html),
+[formats and limits](formats.html), and [keyboard shortcuts](keyboard-shortcuts.html)
+are also served on the website. Shared `theme.js` keeps the selected website
+palette consistent across the landing page and documentation. `guide.css`
+provides the reading layout, section navigation, and scrollable reference tables.
+
+## Update the website documentation
+
+Edit the existing Markdown files (`user-guide.md`, `installation.md`, `formats.md`,
+and `keyboard-shortcuts.md`), then regenerate their checked-in HTML:
+
+```sh
+uv run --script scripts/build-website-docs.py
+uv run --script scripts/build-website-docs.py --check
+```
+
+The generator pins Python-Markdown in uv's isolated script cache; it does not
+install a global package. GitHub Pages serves the generated HTML directly and
+does not run a documentation build. Include the generated files in the same
+commit as source changes. The shared page template lives in
+`scripts/templates/website-docs.html`; the header and footer come from `index.html`.
+Regenerate after changes to their navigation as well.
+
 ## Preview locally
 
 From the repository root, run:
@@ -55,7 +78,8 @@ or dispatching application build/test workflows.
   column sorting is page-local unless All mode or SQL is used.
 - Replace app screenshots only with captures using synthetic data. Keep their
   descriptions accurate; the gallery demonstrates Linux theme integration.
-- Check `node --check docs/site.js`, `git diff --check`, and the rendered desktop
+- Check `node --check docs/site.js`, `node --check docs/theme.js`,
+  `uv run --script scripts/build-website-docs.py --check`, `git diff --check`, and the rendered desktop
   and narrow layouts after changes. Exercise sorting, pagination, inspection,
   theme switching, and keyboard dismissal of the inspector.
 - Keep navigation, content, and screenshots usable without JavaScript. Avoid

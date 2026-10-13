@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/user-guide.md">User guide</a> ·
+  <a href="https://etiennet.github.io/rowlight/guide.html">User guide</a> ·
   <a href="https://github.com/EtienneT/rowlight/releases">Downloads</a> ·
   <a href="docs/development.md">Development</a> ·
   <a href="https://etiennet.github.io/rowlight/">Website</a> ·

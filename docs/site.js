@@ -19,12 +19,6 @@
     { key: "note", type: "str", kind: "category" },
     { key: "created_at", type: "date", kind: "category" },
   ];
-  const themes = {
-    "tokyo-night": "Tokyo Night",
-    catppuccin: "Catppuccin",
-    gruvbox: "Gruvbox",
-    "flexoki-light": "Flexoki Light",
-  };
   const pageSize = 8;
   let page = 0;
   let sortKey = null;
@@ -191,19 +185,6 @@
     if (event.target === inspector && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) inspector.close();
   });
 
-  function setTheme(theme) {
-    if (!Object.hasOwn(themes, theme)) return;
-    document.documentElement.dataset.theme = theme;
-    document.querySelectorAll(".theme-button").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.theme === theme)));
-    const screenshot = document.getElementById("theme-image");
-    screenshot.src = `assets/${theme}.png`;
-    screenshot.alt = `Rowlight running on Linux in ${themes[theme]}, showing a synthetic Parquet file.`;
-    document.getElementById("theme-caption").textContent = themes[theme];
-    document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
-    try { localStorage.setItem("rowlight-site-theme", theme); } catch { /* Storage is optional. */ }
-  }
-  document.querySelectorAll(".theme-button").forEach((button) => button.addEventListener("click", () => setTheme(button.dataset.theme)));
-  try { setTheme(localStorage.getItem("rowlight-site-theme")); } catch { /* Use the default theme. */ }
   render();
   document.getElementById("demo-fallback").hidden = true;
   document.getElementById("interactive-demo").hidden = false;
