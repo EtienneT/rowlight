@@ -11,6 +11,18 @@ are also served on the website. Shared `theme.js` keeps the selected website
 palette consistent across the landing page and documentation. `guide.css`
 provides the reading layout, section navigation, and scrollable reference tables.
 
+The installation page has Linux/Windows tabs and copyable commands. `install.js`
+provides progressive enhancement; both OS sections remain readable without
+JavaScript. Direct links to OS sections select the matching tab.
+
+`install.sh` and `install.ps1` download the pinned published release, verify its
+`SHA256SUMS`, and delegate to the existing native package/installer. Keep their
+version and filenames synchronized with the installation source and landing page.
+Linux auto-selects pacman on Arch or a per-user archive elsewhere, retaining an
+existing per-user install. Windows opens the per-user setup wizard. Neither script
+builds the app or changes file defaults directly. `--check` (Bash) and `-Check`
+(PowerShell) only download and verify; they do not install anything.
+
 ## Update the website documentation
 
 Edit the existing Markdown files (`user-guide.md`, `installation.md`, `formats.md`,

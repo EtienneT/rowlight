@@ -49,6 +49,8 @@ Rowlight follows the current Omarchy palette, including live theme changes. Thes
 
 ## Install
 
+For a copyable install command, [choose your operating system on the website](https://etiennet.github.io/rowlight/installation.html).
+
 Download [Rowlight 0.1.0-alpha.1](https://github.com/EtienneT/rowlight/releases/tag/v0.1.0-alpha.1).
 No Rust installation is needed.
 

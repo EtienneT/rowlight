@@ -40,6 +40,15 @@
 .guide-content details > :last-child { margin-bottom: 18px; }
 .guide-content hr { margin: 34px 0; border: 0; border-top: 1px solid var(--border); }
 .guide-end { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px; border-top: 1px solid var(--border); padding-top: 26px; margin-top: 45px; font-size: 12px; color: var(--muted); }
+.guide-content .install-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--border); margin: 30px 0 25px; padding-bottom: 10px; }
+.guide-content .install-tabs a { padding: 9px 21px; border: 1px solid var(--border); border-radius: 5px; text-decoration: none; color: var(--muted); font-weight: 600; }
+.guide-content .install-tabs a[aria-selected="true"] { border-color: var(--accent); color: var(--accent); background: var(--surface); }
+.guide-content .install-panel > h2 { margin: 0 0 18px; border: 0; padding: 0; font-size: 24px; }
+.install-command { margin: 20px 0; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); overflow: hidden; }
+.install-command-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--border); color: var(--muted); font: 10px var(--mono); text-transform: uppercase; letter-spacing: .05em; }
+.install-command-toolbar .quiet-button { color: var(--text); text-transform: none; letter-spacing: 0; }
+.guide-content .install-command pre { margin: 0; border: 0; border-radius: 0; padding: 18px 16px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
+.install-panel > details { background: transparent; }
 @media (max-width: 900px) {
   .guide-layout { grid-template-columns: 195px minmax(0, 1fr); gap: 35px; }
 }

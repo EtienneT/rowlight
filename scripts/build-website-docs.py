@@ -160,6 +160,26 @@ def heading_slug(value, separator):
     return re.sub(r"[^\w\- ]", "", value.strip().lower()).replace(" ", separator)
 
 
+def installation_tabs(body):
+    linux = re.search(r'<h2 id="linux">.*?(?=<h2 id="windows">)', body, re.DOTALL)
+    windows = re.search(
+        r'<h2 id="windows">.*?(?=<h2 id="download-checksums">)', body, re.DOTALL
+    )
+    if linux is None or windows is None:
+        raise ValueError(
+            "Installation source must contain Linux, Windows, and Download checksums sections."
+        )
+    tabs = '<nav class="install-tabs" aria-label="Operating system"><a id="install-tab-linux" href="#linux">Linux</a><a id="install-tab-windows" href="#windows">Windows</a></nav>'
+    panels = (
+        '<section class="install-panel" id="install-linux">'
+        + linux[0]
+        + '</section><section class="install-panel" id="install-windows">'
+        + windows[0]
+        + "</section>"
+    )
+    return body[: linux.start()] + tabs + panels + body[windows.end() :]
+
+
 def render_pages():
     homepage = (DOCS / "index.html").read_text(encoding="utf-8")
     header = website_html(
@@ -187,6 +207,8 @@ def render_pages():
         body = renderer.convert(source)
         body = re.sub(r"^<h1\b.*?</h1>\s*", "", body, count=1, flags=re.DOTALL)
         body = website_html(body, content=True)
+        if source_name == "installation.md":
+            body = installation_tabs(body)
         toc = (
             "<ul>"
             + "".join(
@@ -212,6 +234,9 @@ def render_pages():
                 toc=toc,
                 body=body,
                 source_url=f"{REPO}/blob/main/docs/{source_name}",
+                page_scripts='    <script src="install.js" defer></script>'
+                if source_name == "installation.md"
+                else "",
             ),
         )
 

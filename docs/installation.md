@@ -1,188 +1,199 @@
 # Install Rowlight
 
-[User guide](user-guide.md) · [Formats](formats.md) · [Platform support](platforms.md)
+Choose your operating system, copy one command, and open Rowlight. The installer
+downloads **0.1.0-alpha.1** and checks its SHA-256 hash before running it.
+No Rust installation is needed.
 
-Rowlight's maintained platforms are **Linux x64 and Windows x64**. Download
-[0.1.0-alpha.1](https://github.com/EtienneT/rowlight/releases/tag/v0.1.0-alpha.1),
-or choose a version from the [Releases page](https://github.com/EtienneT/rowlight/releases)
-and expand **Assets**. Alpha releases are marked **Pre-release**. You do not need
-Rust to run a downloaded build. GitHub's automatic **Source code** archives are
-for building the project, not installing the application.
+## Linux
 
-## Choose a download
-
-| Platform | Download | Use |
-| --- | --- | --- |
-| Omarchy / Arch x64 | `rowlight-bin-PKGVER-1-x86_64.pkg.tar.zst` | Recommended; install with pacman |
-| Other Linux x64 | `rowlight-VERSION-linux-x64-cloud.tar.gz` | Extract, then run or install |
-| Windows x64 | `rowlight-VERSION-windows-x64-cloud-setup.exe` | Recommended; per-user installation |
-| Windows x64 | `rowlight-VERSION-windows-x64-cloud.zip` | Portable use |
-
-`VERSION` is the release version, for example `0.1.0-alpha.1`; the Arch package's
-`PKGVER` uses dots, for example `0.1.0.alpha.1`. Download the
-matching `SHA256SUMS` file as well. Installation steps are below:
-[Omarchy / Arch](#omarchy--arch) · [Other Linux](#other-linux) · [Windows](#windows).
-
-### Core or cloud
-
-The cloud download includes local Parquet, Arrow IPC / Feather v2, CSV and TSV,
-plus remote Parquet from S3, Azure, GCS and HTTP(S). Local-only core packages can
-also be built from source; they omit `-cloud` in their filenames.
-
-The alpha is unsigned. Windows may show an unrecognized-publisher warning.
-Verify the download against the release's `SHA256SUMS`:
+Paste this into your terminal:
 
 ```sh
-# Linux: run beside the downloaded archive and SHA256SUMS
-sha256sum --ignore-missing --check SHA256SUMS
+curl -fsSL https://etiennet.github.io/rowlight/install.sh | bash
 ```
 
-```powershell
-# Windows: compare the hash with the corresponding line in SHA256SUMS
-Get-FileHash .\rowlight-VERSION-windows-x64-cloud-setup.exe -Algorithm SHA256
-```
+When it finishes, open **Rowlight** from your application menu. On Omarchy / Arch,
+the command uses **pacman**, which asks for your password and confirmation. On
+other Linux desktops, it installs for your user account without sudo. An existing
+per-user Rowlight installation is updated in place.
 
-Expect `OK` on Linux or an identical hash on Windows. If verification fails,
-download the file again before installing. Checksums detect damaged or changed
-downloads; they do not verify the publisher's identity. See Microsoft's
-[signing guidance](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/code-signing-options).
+**Requirements:** Linux x64, glibc 2.39+ (Ubuntu 24.04 or newer), Wayland or X11,
+and a working Vulkan graphics driver.
 
-> [!NOTE]
-> The executable remains `parquetviewer` / `parquetviewer.exe`. Existing settings
-> and application identifiers are preserved for compatibility. The visible app
-> name is Rowlight; legacy Windows registrations may still say Parquet Viewer.
+[Review the install script](https://github.com/EtienneT/rowlight/blob/main/docs/install.sh)
+· [Download an archive instead](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz)
 
-## Omarchy / Arch
+<details>
+<summary>Manual installation</summary>
 
-Download the `.pkg.tar.zst` file and `SHA256SUMS` from the same release, then verify
-the package using the Linux checksum command above. From that folder, run:
+### Omarchy / Arch
+
+Download the [Arch package](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst)
+and verify its checksum, then run this in the download folder:
 
 ```sh
 sudo pacman -U ./rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst
 ```
 
-Pacman installs the executable, desktop entry, MIME types, icon and licenses, and
-resolves the declared dependencies. Open **Rowlight** from the application menu.
-The package registers Open With support without writing a new default-app choice.
-Use the first-launch offer to opt in to making Rowlight the Parquet default.
+Pacman installs Rowlight and resolves its declared dependencies. A Vulkan driver
+for your GPU is still required. The package adds Open With support and preserves
+existing file defaults. Follow Omarchy's normal process for system updates.
 
-To update, download the newer package and use `pacman -U` again. Remove it with
-`sudo pacman -R rowlight-bin`; preferences are kept. A working Vulkan driver is
-required. Follow Omarchy's normal update process for system updates.
+An AUR listing is not available yet; `yay -S rowlight-bin` is not an installation
+option. If you are switching from a per-user install to the Arch package, first
+run `./scripts/uninstall-linux.sh` from an extracted Rowlight archive. This avoids
+an older launcher or executable under `~/.local` taking precedence. Preferences
+are kept.
 
-An AUR listing is not available yet. Until it is published, updates require
-downloading the next release; `yay -S rowlight-bin` is not an installation option.
-The [package recipe](https://github.com/EtienneT/rowlight/tree/main/packaging/arch)
-is prepared for a future AUR maintainer.
+### Other Linux
 
-If you previously used the per-user archive installer, run its uninstall script
-before switching to the Arch package. An old launcher or binary in `~/.local`
-can take precedence over the package-managed installation. Your settings remain.
+Download the [Linux archive](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz)
+and verify its checksum. Extract it, then run this from the extracted folder:
 
-## Other Linux
+```sh
+./scripts/install-linux.sh
+```
 
-Requires glibc **2.39 or later**, a graphical Wayland or X11 session, and a Vulkan
-driver. Official archives are built on Ubuntu 24.04. Installation also needs
-`xdg-mime`, `update-mime-database` and `update-desktop-database` (on Ubuntu,
-`xdg-utils`, `shared-mime-info` and `desktop-file-utils`).
+The per-user installer needs `xdg-mime`, `update-mime-database`, and
+`update-desktop-database`. If they are missing on Ubuntu, install them first:
 
-1. Download the Linux archive and verify its checksum.
-2. Extract it using your file manager, or run the following in your Downloads
-   folder, replacing `VERSION` with the downloaded version:
+```sh
+sudo apt install xdg-utils shared-mime-info desktop-file-utils
+```
 
-   ```sh
-   tar -xzf rowlight-VERSION-linux-x64-cloud.tar.gz
-   cd rowlight-VERSION-linux-x64-cloud
-   ./scripts/install-linux.sh
-   ```
+For portable use, skip installation and run `./parquetviewer` from the extracted
+folder. Keep the extracted files together.
 
-3. Open **Rowlight** from the application menu, then choose **Open file**.
+</details>
 
-Installation does not require administrator privileges. Launch **Rowlight**
-from the application menu or `~/.local/bin/parquetviewer`.
-License notices are installed under your XDG data directory in `parquetviewer/`.
+<details>
+<summary>Updates, removal, and file defaults</summary>
 
-For portable use, skip the installer and run `./parquetviewer` from the extracted
-folder. To open a file directly, run `./parquetviewer "/path/to/file.parquet"`.
-To update an installation, extract the new release and run its installer again.
-Your preferences and existing file defaults are preserved.
+Rerun the quick-install command to install the version shown on this page. A new
+release will have an updated command script. Your preferences and existing file
+defaults are preserved.
 
-Registration preserves existing defaults. Accept the first-launch association
-offer, or use **Associate Parquet files…** from the menu, to opt in to changing
-Parquet's default. **No thanks** remembers your choice.
+For an Arch installation, remove the package with:
 
-The previous default is recorded in
-`${XDG_DATA_HOME:-~/.local/share}/parquetviewer/previous-default`. Restore it with
-`xdg-mime default PREVIOUS.desktop application/vnd.apache.parquet application/x-parquet`,
-replacing `PREVIOUS.desktop` with that saved value.
+```sh
+sudo pacman -R rowlight-bin
+```
 
-To remove the per-user installation, run this from an extracted Rowlight archive:
+For a per-user installation, download and extract the Linux archive, then run:
 
 ```sh
 ./scripts/uninstall-linux.sh
 ```
 
-It removes the installed executable, registration and license files. Preferences
-are kept. If Rowlight was the Parquet default and the installer recorded an older
-default, that choice is restored. Other defaults are left alone.
+Preferences are kept. The per-user uninstaller restores an older recorded Parquet
+default when Rowlight is still the default; other default choices are left alone.
+
+To make Rowlight the default for Parquet, accept its first-launch offer or choose
+**Associate Parquet files…** from the app menu. **No thanks** remembers your choice.
+The executable remains `parquetviewer`, and settings keep their existing identity.
+
+</details>
 
 ## Windows
 
-Requires **Windows 10 or later, x64**, with a DirectX 11 graphics driver.
+Open **PowerShell** from Start and paste this command:
 
-1. Download `rowlight-VERSION-windows-x64-cloud-setup.exe` and verify its checksum.
-2. Double-click the installer and follow its steps. It installs for your Windows
-   account without an administrator prompt, adds **Rowlight** to Start, and
-   registers it under **Open with**.
-3. Open **Rowlight** from Start, then choose **Open file**.
+```powershell
+irm https://etiennet.github.io/rowlight/install.ps1 | iex
+```
 
-The first alpha is unsigned. Windows security settings may warn about an unknown
-publisher or block it; a checksum does not replace a trusted signature.
+The command downloads and checks the installer, then opens the setup wizard.
+Follow its steps and open **Rowlight** from Start. It installs for your account
+without an administrator prompt.
 
-For portable use, right-click the ZIP, choose **Extract All**, and run
-`parquetviewer.exe` from the extracted folder. Keep the extracted files together;
-the ZIP does not include an installer or add a Start menu entry.
+**Requirements:** Windows 10 or later, x64, with a DirectX 11 graphics driver.
+This alpha is unsigned; Windows may show an unknown-publisher warning or block
+the installer under your security policy.
 
-To update an installation, run the newer setup executable. It retains your
-preferences and existing file defaults. For a portable update, close the app and
-extract the new ZIP into a new folder.
+[Review the install script](https://github.com/EtienneT/rowlight/blob/main/docs/install.ps1)
+· [Download the installer instead](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe)
 
-To make double-click open Parquet, use **Choose in Windows Settings** in the
-first-launch offer or **Associate Parquet files…** from the menu. Choose Rowlight
-for `.parquet` and `.parq` in Default Apps. On Windows 10, choose defaults by file
-type. You can also right-click a file → **Open with → Choose another app → Always**.
-Windows owns the final default selection; installation does not replace it.
+<details>
+<summary>Portable use, updates, and removal</summary>
 
-Uninstall through **Settings → Apps → Installed apps → Rowlight → Uninstall**
-(**Apps & features** on Windows 10). It removes the app's registrations and keeps
-preferences. On upgrades, the original `Programs\Parquet Viewer` installation
-directory is retained.
+For portable use, download the [ZIP](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud.zip),
+verify its checksum, choose **Extract All**, and run `parquetviewer.exe`. Keep the
+extracted files together. The ZIP does not add a Start menu entry.
+
+To update an installation, rerun the quick-install command when this page points
+to a newer release, or run that release's setup executable. For a portable update,
+close Rowlight and extract the newer ZIP into a new folder. Preferences are kept.
+
+Remove the installed app through **Settings → Apps → Installed apps → Rowlight →
+Uninstall** (**Apps & features** on Windows 10). It removes registrations and
+keeps preferences. Upgrades retain the original `Programs\Parquet Viewer` directory.
+
+</details>
+
+<details>
+<summary>Make Rowlight the default for Parquet</summary>
+
+Use **Choose in Windows Settings** in the first-launch offer, or **Associate
+Parquet files…** from the app menu. Choose Rowlight for `.parquet` and `.parq` in
+Default Apps. You can also right-click a file → **Open with → Choose another app
+→ Always**. Windows owns the final default selection; installation preserves it.
+
+</details>
+
+## Download checksums
+
+The quick-install commands verify the downloaded package against the release's
+[SHA256SUMS](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/SHA256SUMS).
+Checksums verify file integrity, not publisher identity. This alpha is unsigned.
+
+<details>
+<summary>Verify a manually downloaded file</summary>
+
+Download `SHA256SUMS` from the same release as your package. On Linux, run this
+beside the package and checksum file:
+
+```sh
+sha256sum --ignore-missing --check SHA256SUMS
+```
+
+On Windows, compare this output with the matching line in `SHA256SUMS`:
+
+```powershell
+Get-FileHash .\rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe -Algorithm SHA256
+```
+
+Expect `OK` on Linux or an identical hash on Windows. If verification fails,
+download again before installing. GitHub's **Source code** archives are for
+building the project; use the packaged downloads to install Rowlight.
+
+</details>
+
+## Included in the download
+
+<span id="core-or-cloud"></span>
+
+The standard download includes local Parquet, Arrow IPC / Feather v2, CSV and TSV,
+plus remote Parquet from S3, Azure, GCS and HTTP(S). It uses existing provider
+credentials. A local-only core build can be made from source.
 
 ## Try from source
 
-Install Rust with rustup and the [native prerequisites](development.md#toolchain-and-checks).
-The checkout pins Rust **1.99.0** and Cargo.lock. Use the fast development preview:
+Install Rust and the [native prerequisites](development.md#toolchain-and-checks),
+then run this from a checkout:
 
 ```sh
 cargo dev -- /path/to/file.parquet
 ```
 
-Source saves rebuild and restart the preview. Its settings are separate from the
-installed app, and it skips the association prompt. Close the preview or press
-Ctrl+C to stop. Quote paths containing spaces.
-
-For packages, use `./scripts/package-linux-container.sh --cloud` on Linux with
-Docker, or `./scripts/package-windows.ps1 -Cloud` in a native Windows MSVC/SDK
-environment with Inno Setup 6. The Linux container has a separate retained cache;
-it does not replace the host development cache. See [release preparation](releasing.md).
+Source saves rebuild and restart the preview. Its settings are isolated from the
+installed app. Close the preview or press Ctrl+C to stop. See
+[development](development.md) and [release preparation](releasing.md) for build details.
 
 ## macOS
 
-macOS is **experimental community tooling**, outside the official release matrix.
-There are no official Mac downloads or native test guarantees. Existing source
-and native `scripts/package-macos.sh` / `scripts/install-macos.sh` tooling remain
-available for contributors with Mac hardware. Read [platform support](platforms.md)
-before relying on them.
+macOS is experimental community tooling, with no official downloads or
+quick-install command. Contributors can use the existing source and native
+packaging tools. Read [platform support](platforms.md) before relying on them.
 
-Preferences remain in the existing `parquetviewer` user configuration directory;
-see [saved settings](user-guide.md#make-the-view-your-own).
+[Start using Rowlight](user-guide.md) · [Supported formats](formats.md)
+· [Keyboard shortcuts](keyboard-shortcuts.md)
