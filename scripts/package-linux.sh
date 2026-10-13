@@ -25,10 +25,17 @@ package="$project_root/dist/$name"
 rm -rf -- "$package"
 mkdir -p "$package/scripts" "$package/packaging/linux" "$package/docs/assets"
 install -m755 "$binary" "$package/parquetviewer"
-install -m755 scripts/install-linux.sh "$package/scripts/install-linux.sh"
+install -m755 scripts/install-linux.sh scripts/uninstall-linux.sh "$package/scripts/"
 install -m644 packaging/linux/* "$package/packaging/linux/"
 install -m644 LICENSE README.md THIRD_PARTY_NOTICES.html "$package/"
-install -m644 docs/*.md "$package/docs/"
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  # Do not distribute unrelated, unfinished documentation from another task.
+  while IFS= read -r -d '' document; do
+    install -m644 "$document" "$package/$document"
+  done < <(git ls-files -z -- docs/'*.md')
+else
+  install -m644 docs/*.md "$package/docs/"
+fi
 install -m644 docs/assets/* "$package/docs/assets/"
 install -m644 packaging/TESTING.md "$package/packaging/"
 tar -czf "dist/$name.tar.gz" -C dist "$name"

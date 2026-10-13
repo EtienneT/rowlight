@@ -13,7 +13,7 @@ channel.
 
 For the first public release, complete the history/license review and remaining
 [native release checks](../packaging/TESTING.md), make the repository public, then
-publish **v0.1.0-alpha.1** as a prerelease at the reviewed commit. Upload all three
+publish **v0.1.0-alpha.1** as a prerelease at the reviewed commit. Upload all four
 packages and `SHA256SUMS` before publishing. Update the
 README's installation section to link to that release. Creating releases and
 uploading locally built packages does not require GitHub Actions.
@@ -53,16 +53,26 @@ after publication. Publish a new version for corrected binaries.
    including install/uninstall/default preservation. Record actual results and
    outstanding checks. Linux can additionally use `packaging/linux/Smoke.Dockerfile`
    for an Ubuntu runtime environment without Rust or development libraries.
-7. Collect validated native downloads:
+7. Build the Arch package from that Linux archive. Set its SHA-256 checksum in
+   `packaging/arch/PKGBUILD`, build with `makepkg`, generate `.SRCINFO` with
+   `makepkg --printsrcinfo`, and copy the package and its `.sha256` file to `dist/`.
+   For a local build before the GitHub release exists, put the matching archive
+   in the recipe's working directory. Makepkg verifies its pinned checksum.
+   Validate installation and removal in an isolated Arch root or clean system.
+8. Collect validated native downloads:
 
    ```sh
    python3 scripts/prepare-release.py
    ```
 
-   `dist/release-VERSION/` contains the three downloads, SHA256SUMS, release notes
+   `dist/release-VERSION/` contains the four downloads, individual checksums,
+   SHA256SUMS, release notes
    and source provenance. It is a **local draft**, not a published GitHub release.
    The manifest explicitly records uncommitted source; never tag that draft as
    though it came from the older base commit. After committing, regenerate it.
+   If reusing a native Windows build after Linux-only changes, record its source
+   commit using `--windows-build-commit COMMIT` and document that reuse in the
+   validation record. Rebuild Windows when its code or packaging changes.
 
 ## Before making the repository public
 
@@ -78,17 +88,20 @@ after publication. Publish a new version for corrected binaries.
 
 ## Publish after approval
 
-Create a tag at the reviewed commit, use the local release notes, attach the three
+Create a tag at the reviewed commit, use the local release notes, attach the four
 validated downloads and SHA256SUMS, and mark the release as a prerelease. A GitHub
 draft can be reviewed before publication. Do not enable Actions as a side effect.
 Replace the README's alpha-preparation sentence with the actual release link.
 
 ## Distribution policy
 
-- **Linux:** start with the existing archive and per-user installer, with the
+- **Linux:** offer the native Arch package for Omarchy/Arch and the archive and
+  per-user installer for other distributions, with the
   glibc baseline visible beside the download. Preserve desktop registration,
   preferences and file defaults on upgrades. A Flatpak can be evaluated later
   for broader distro coverage; the current archive is not universal.
+  Publish the AUR recipe when an account is available; until then, users install
+  the downloadable Arch package with `pacman -U` and update it manually.
 - **Windows:** recommend the per-user setup executable, with the portable ZIP as
   an alternative. Preserve the stable installer/application identity on upgrades
   and let users choose file defaults through Windows.

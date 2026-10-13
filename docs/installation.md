@@ -2,9 +2,9 @@
 
 [User guide](user-guide.md) · [Formats](formats.md) · [Platform support](platforms.md)
 
-Rowlight's maintained platforms are **Linux x64 and Windows x64**. The first
-alpha is being prepared; downloads are not published yet. When available, open
-the [Releases page](https://github.com/EtienneT/rowlight/releases), select a release
+Rowlight's maintained platforms are **Linux x64 and Windows x64**. Download
+[0.1.0-alpha.1](https://github.com/EtienneT/rowlight/releases/tag/v0.1.0-alpha.1),
+or choose a version from the [Releases page](https://github.com/EtienneT/rowlight/releases)
 and expand **Assets**. Alpha releases are marked **Pre-release**. You do not need
 Rust to run a downloaded build. GitHub's automatic **Source code** archives are
 for building the project, not installing the application.
@@ -13,13 +13,15 @@ for building the project, not installing the application.
 
 | Platform | Download | Use |
 | --- | --- | --- |
-| Linux x64 | `rowlight-VERSION-linux-x64-cloud.tar.gz` | Extract, then run or install |
+| Omarchy / Arch x64 | `rowlight-bin-PKGVER-1-x86_64.pkg.tar.zst` | Recommended; install with pacman |
+| Other Linux x64 | `rowlight-VERSION-linux-x64-cloud.tar.gz` | Extract, then run or install |
 | Windows x64 | `rowlight-VERSION-windows-x64-cloud-setup.exe` | Recommended; per-user installation |
 | Windows x64 | `rowlight-VERSION-windows-x64-cloud.zip` | Portable use |
 
-`VERSION` is the release version, for example `0.1.0-alpha.1`. Download the
+`VERSION` is the release version, for example `0.1.0-alpha.1`; the Arch package's
+`PKGVER` uses dots, for example `0.1.0.alpha.1`. Download the
 matching `SHA256SUMS` file as well. Installation steps are below:
-[Linux](#linux) · [Windows](#windows).
+[Omarchy / Arch](#omarchy--arch) · [Other Linux](#other-linux) · [Windows](#windows).
 
 ### Core or cloud
 
@@ -50,7 +52,34 @@ downloads; they do not verify the publisher's identity. See Microsoft's
 > and application identifiers are preserved for compatibility. The visible app
 > name is Rowlight; legacy Windows registrations may still say Parquet Viewer.
 
-## Linux
+## Omarchy / Arch
+
+Download the `.pkg.tar.zst` file and `SHA256SUMS` from the same release, then verify
+the package using the Linux checksum command above. From that folder, run:
+
+```sh
+sudo pacman -U ./rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst
+```
+
+Pacman installs the executable, desktop entry, MIME types, icon and licenses, and
+resolves the declared dependencies. Open **Rowlight** from the application menu.
+The package registers Open With support without writing a new default-app choice.
+Use the first-launch offer to opt in to making Rowlight the Parquet default.
+
+To update, download the newer package and use `pacman -U` again. Remove it with
+`sudo pacman -R rowlight-bin`; preferences are kept. A working Vulkan driver is
+required. Follow Omarchy's normal update process for system updates.
+
+An AUR listing is not available yet. Until it is published, updates require
+downloading the next release; `yay -S rowlight-bin` is not an installation option.
+The [package recipe](https://github.com/EtienneT/rowlight/tree/main/packaging/arch)
+is prepared for a future AUR maintainer.
+
+If you previously used the per-user archive installer, run its uninstall script
+before switching to the Arch package. An old launcher or binary in `~/.local`
+can take precedence over the package-managed installation. Your settings remain.
+
+## Other Linux
 
 Requires glibc **2.39 or later**, a graphical Wayland or X11 session, and a Vulkan
 driver. Official archives are built on Ubuntu 24.04. Installation also needs
@@ -87,12 +116,15 @@ The previous default is recorded in
 `xdg-mime default PREVIOUS.desktop application/vnd.apache.parquet application/x-parquet`,
 replacing `PREVIOUS.desktop` with that saved value.
 
-To remove the executable and registration, delete `~/.local/bin/parquetviewer`,
-`applications/com.parquetviewer.ParquetViewer.desktop`,
-`mime/packages/parquetviewer.xml`, and
-`icons/hicolor/scalable/apps/com.parquetviewer.ParquetViewer.svg` under your XDG
-data directory. Refresh the MIME/desktop databases afterwards. Keep your
-preferences unless you want to reset the app.
+To remove the per-user installation, run this from an extracted Rowlight archive:
+
+```sh
+./scripts/uninstall-linux.sh
+```
+
+It removes the installed executable, registration and license files. Preferences
+are kept. If Rowlight was the Parquet default and the installer recorded an older
+default, that choice is restored. Other defaults are left alone.
 
 ## Windows
 

@@ -2,7 +2,7 @@
 
 | Platform | Status | Distribution |
 | --- | --- | --- |
-| Linux x64 | Maintained | Archive with a per-user installer; Ubuntu 24.04 / glibc 2.39 baseline |
+| Linux x64 | Maintained | Arch package and archive with a per-user installer; Ubuntu 24.04 / glibc 2.39 archive baseline |
 | Windows x64 | Maintained | Per-user installer and portable ZIP; Windows 10 or later |
 | macOS | Experimental, community contributions welcome | Source and existing native packaging scripts only |
 | Other architectures | Unverified | Source contributions welcome |

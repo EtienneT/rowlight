@@ -11,6 +11,10 @@ appearance, with an explicit choice in Settings.
 
 ## Downloads
 
+- **Omarchy / Arch x64:** native package; install using
+  `sudo pacman -U ./rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst`.
+  AUR publication is pending; future updates currently require downloading the
+  newer package.
 - **Linux x64:** archive with a per-user installer; glibc 2.39+ (Ubuntu 24.04
   baseline), Wayland or X11, Vulkan graphics driver.
 - **Windows x64:** per-user setup executable or portable ZIP; Windows 10+ and a
@@ -32,6 +36,11 @@ not publisher identity.
 - CSV/TSV indexing and SQL on CSV/remote Parquet can require a complete scan.
 - Iceberg, remote folders, editing and IPC streams are not supported.
 - macOS is experimental community tooling; no official Mac downloads.
+- On Linux, after accepting the file-association offer, click the table before
+  using keyboard shortcuts.
+- Native Windows build, startup, installation, upgrade and removal were tested.
+  Some Windows desktop interactions, mixed-DPI displays and real cloud accounts
+  still need manual validation; see the linked validation record.
 
 See [installation](https://github.com/EtienneT/rowlight/blob/main/docs/installation.md),
 the [user guide](https://github.com/EtienneT/rowlight/blob/main/docs/user-guide.md),

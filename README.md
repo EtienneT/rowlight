@@ -17,6 +17,7 @@
   <a href="docs/user-guide.md">User guide</a> ·
   <a href="https://github.com/EtienneT/rowlight/releases">Downloads</a> ·
   <a href="docs/development.md">Development</a> ·
+  <a href="docs/website.md">Website preview</a> ·
   <a href="CONTRIBUTING.md">Contribute</a> ·
   <a href="LICENSE">MIT license</a>
 </p>
@@ -48,13 +49,19 @@ Rowlight follows the current Omarchy palette, including live theme changes. Thes
 
 ## Install
 
-The first alpha is being prepared; downloads are not published yet. Once available,
-open [Releases](https://github.com/EtienneT/rowlight/releases), select the release,
-and expand **Assets**. No Rust installation is needed.
+Download [Rowlight 0.1.0-alpha.1](https://github.com/EtienneT/rowlight/releases/tag/v0.1.0-alpha.1).
+No Rust installation is needed.
 
-- **Windows 10+ x64:** download the file ending in `-windows-x64-cloud-setup.exe`,
-  run it, and open **Rowlight** from Start. A portable ZIP is also available.
-- **Linux x64:** download the file ending in `-linux-x64-cloud.tar.gz`, extract it,
+- **Windows 10+ x64:** run the [installer](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe),
+  then open **Rowlight** from Start. A [portable ZIP](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud.zip) is also available.
+- **Omarchy / Arch x64:** download the [Arch package](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst),
+  then install it with:
+
+  ```sh
+  sudo pacman -U ./rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst
+  ```
+
+- **Other Linux x64:** download the [archive](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz), extract it,
   and run this from the extracted folder:
 
   ```sh

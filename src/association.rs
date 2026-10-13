@@ -8,11 +8,12 @@ use std::process::Command;
 pub fn associate() -> Result<String> {
     #[cfg(target_os = "linux")]
     {
-        let desktop = dirs::data_dir()
-            .context("Cannot find the applications directory")?
-            .join("applications/com.parquetviewer.ParquetViewer.desktop");
+        let data_home = dirs::data_dir().context("Cannot find the applications directory")?;
+        let data_dirs = std::env::var_os("XDG_DATA_DIRS")
+            .filter(|value| !value.is_empty())
+            .unwrap_or_else(|| "/usr/local/share:/usr/share".into());
         ensure!(
-            desktop.is_file(),
+            desktop_registered(&data_home, std::env::split_paths(&data_dirs)),
             "Install Rowlight first, then choose this action again."
         );
         std::fs::create_dir_all(
@@ -75,4 +76,44 @@ pub fn associate() -> Result<String> {
     }
     #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
     anyhow::bail!("Choose Rowlight in your file manager's Open With dialog.");
+}
+
+#[cfg(target_os = "linux")]
+fn desktop_registered(
+    data_home: &std::path::Path,
+    data_dirs: impl Iterator<Item = std::path::PathBuf>,
+) -> bool {
+    std::iter::once(data_home.to_path_buf())
+        .chain(data_dirs.filter(|path| path.is_absolute()))
+        .any(|path| {
+            path.join("applications/com.parquetviewer.ParquetViewer.desktop")
+                .is_file()
+        })
+}
+
+#[cfg(all(test, target_os = "linux"))]
+mod tests {
+    use super::desktop_registered;
+
+    #[test]
+    fn associations_recognize_user_and_system_package_installations() {
+        let root = tempfile::tempdir().unwrap();
+        let user = root.path().join("user");
+        let system = root.path().join("system");
+        assert!(!desktop_registered(&user, std::iter::once(system.clone())));
+
+        let applications = system.join("applications");
+        std::fs::create_dir_all(&applications).unwrap();
+        let desktop = applications.join("com.parquetviewer.ParquetViewer.desktop");
+        std::fs::write(&desktop, "[Desktop Entry]\nName=Rowlight\n").unwrap();
+        assert!(desktop_registered(&user, std::iter::once(system)));
+
+        std::fs::create_dir_all(user.join("applications")).unwrap();
+        std::fs::rename(
+            desktop,
+            user.join("applications/com.parquetviewer.ParquetViewer.desktop"),
+        )
+        .unwrap();
+        assert!(desktop_registered(&user, std::iter::empty()));
+    }
 }

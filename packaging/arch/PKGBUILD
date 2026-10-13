@@ -1,0 +1,33 @@
+# Maintainer: Etienne Tremblay (https://github.com/EtienneT/rowlight)
+pkgname=rowlight-bin
+pkgver=0.1.0.alpha.1
+_version=0.1.0-alpha.1
+pkgrel=1
+pkgdesc='Read-only desktop viewer for Parquet, Arrow IPC, CSV and TSV'
+arch=('x86_64')
+url='https://github.com/EtienneT/rowlight'
+license=('MIT')
+depends=('glibc>=2.39' 'gcc-libs' 'fontconfig' 'libxcb' 'libxkbcommon-x11'
+         'wayland' 'vulkan-icd-loader' 'xdg-utils' 'desktop-file-utils' 'shared-mime-info')
+optdepends=('vulkan-driver: a Vulkan driver suitable for your GPU'
+            'ttf-dejavu: fonts for systems without an installed font family')
+provides=("rowlight=$pkgver")
+conflicts=('rowlight')
+# Retain the already stripped, validated executable exactly as released.
+options=('!strip' '!debug')
+source=("$url/releases/download/v$_version/rowlight-$_version-linux-x64-cloud.tar.gz")
+sha256sums=('fe8cdba3f8dbb1cd1428736a6c8085a0f8348f65eaeef8b1c5f1b518699b5e35')
+
+package() {
+  local release="$srcdir/rowlight-$_version-linux-x64-cloud"
+  install -Dm755 "$release/parquetviewer" "$pkgdir/usr/bin/parquetviewer"
+  install -Dm644 "$release/packaging/linux/com.parquetviewer.ParquetViewer.desktop" \
+    "$pkgdir/usr/share/applications/com.parquetviewer.ParquetViewer.desktop"
+  install -Dm644 "$release/packaging/linux/com.parquetviewer.ParquetViewer.svg" \
+    "$pkgdir/usr/share/icons/hicolor/scalable/apps/com.parquetviewer.ParquetViewer.svg"
+  install -Dm644 "$release/packaging/linux/parquet.xml" \
+    "$pkgdir/usr/share/mime/packages/rowlight.xml"
+  install -Dm644 "$release/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 "$release/THIRD_PARTY_NOTICES.html" \
+    "$pkgdir/usr/share/licenses/$pkgname/THIRD_PARTY_NOTICES.html"
+}

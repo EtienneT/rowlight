@@ -1,5 +1,40 @@
 # Native release checks
 
+## 0.1.0-alpha.1 publication on 2026-10-13
+
+- Formatting, all-feature workspace Clippy and all 68 Linux tests passed. The new
+  association regression recognizes both per-user and system desktop entries.
+- The Linux cloud executable was rebuilt in the retained Ubuntu 24.04 release
+  cache with four jobs (79 seconds), and passed the glibc guard (2.35 <= 2.39).
+  An isolated Ubuntu runtime with software Vulkan/X11 opened the 100,000-row Hive
+  fixture, forced paging despite saved All, ran the count query and rendered it.
+- The archive installer preserved existing defaults. Its new uninstaller removed
+  the app and registration while retaining preferences and unrelated defaults.
+  A system desktop entry, with no per-user Rowlight entry, successfully accepted
+  the first-launch opt-in association without changing the CSV default.
+- The Arch package was built with makepkg using a neutral temporary build path.
+  Its executable is byte-identical to the validated Linux archive. Pacman install
+  and removal passed in an isolated empty root, with dependency resolution skipped
+  for that file-ownership check; all declared runtime dependencies are present on
+  the Arch host. The staged binary's version and desktop-file validation passed.
+- Windows ZIP/setup files are the unchanged native packages validated on
+  2026-10-09. Their application source matches `f8feaba` apart from formatting;
+  subsequent application changes are compiled only on Linux. The recorded native
+  Windows checks below remain the evidence; no new Windows build is claimed.
+- The publication review scanned all 19 existing commits and 70 historical Actions
+  log files with Gitleaks, plus Git history for private paths and network addresses.
+  No secrets or known private identifiers were found. Final release changes and
+  package metadata were also reviewed before tagging.
+- Linux shortcuts after accepting the association offer required clicking the
+  table to restore focus in the native check; this is documented in the alpha notes.
+  Windows desktop/mixed-DPI and real cloud-account checks listed below remain
+  manual work. The release is unsigned. AUR registration is unavailable, so the
+  downloadable Arch package is provided without claiming an AUR listing.
+
+The repository is public, private vulnerability reporting is enabled, and GitHub
+Actions remains disabled. Packages, individual checksums, SHA256SUMS and source
+provenance are attached to the versioned GitHub prerelease.
+
 ## 0.1.0-alpha.1 preparation on 2026-10-09
 
 The maintained release targets are Linux x64 and Windows x64. macOS remains
