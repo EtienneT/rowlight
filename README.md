@@ -17,7 +17,7 @@
   <a href="docs/user-guide.md">User guide</a> ·
   <a href="https://github.com/EtienneT/rowlight/releases">Downloads</a> ·
   <a href="docs/development.md">Development</a> ·
-  <a href="docs/website.md">Website preview</a> ·
+  <a href="https://etiennet.github.io/rowlight/">Website</a> ·
   <a href="CONTRIBUTING.md">Contribute</a> ·
   <a href="LICENSE">MIT license</a>
 </p>
