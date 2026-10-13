@@ -14,6 +14,8 @@ provides the reading layout, section navigation, and scrollable reference tables
 The installation page has Linux/Windows tabs and copyable commands. `install.js`
 provides progressive enhancement; both OS sections remain readable without
 JavaScript. Direct links to OS sections select the matching tab.
+Generated pages use content hashes in stylesheet and script URLs so updates
+replace previously cached assets.
 
 `install.sh` and `install.ps1` download the pinned published release, verify its
 `SHA256SUMS`, and delegate to the existing native package/installer. Keep their

@@ -13,6 +13,7 @@ import html
 import posixpath
 import re
 import struct
+from hashlib import sha256
 from html.parser import HTMLParser
 from pathlib import Path
 from string import Template
@@ -160,6 +161,11 @@ def heading_slug(value, separator):
     return re.sub(r"[^\w\- ]", "", value.strip().lower()).replace(" ", separator)
 
 
+def asset_url(filename):
+    digest = sha256((DOCS / filename).read_bytes()).hexdigest()[:12]
+    return f"{filename}?v={digest}"
+
+
 def installation_tabs(body):
     linux = re.search(r'<h2 id="linux">.*?(?=<h2 id="windows">)', body, re.DOTALL)
     windows = re.search(
@@ -234,7 +240,10 @@ def render_pages():
                 toc=toc,
                 body=body,
                 source_url=f"{REPO}/blob/main/docs/{source_name}",
-                page_scripts='    <script src="install.js" defer></script>'
+                site_css=asset_url("site.css"),
+                guide_css=asset_url("guide.css"),
+                theme_js=asset_url("theme.js"),
+                page_scripts=f'    <script src="{asset_url("install.js")}" defer></script>'
                 if source_name == "installation.md"
                 else "",
             ),
