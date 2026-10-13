@@ -240,7 +240,7 @@ impl Source {
             #[cfg(not(feature = "cloud"))]
             {
                 let _ = (url, profile);
-                anyhow::bail!("Remote sources require the cloud build of Rowlight");
+                anyhow::bail!("Remote sources require the cloud build of Tablelamp");
             }
         }
         let Location::Local(path) = &location else {

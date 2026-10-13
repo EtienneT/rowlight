@@ -1,12 +1,14 @@
-# Rowlight for Arch and Omarchy
+# Tablelamp for Arch and Omarchy
 
-The GitHub release includes `rowlight-bin` as a native `.pkg.tar.zst` package.
+New releases use `tablelamp-bin` as a native `.pkg.tar.zst` package.
+The published alpha.1 package retains its original `rowlight-bin` filename.
 It uses the same validated cloud executable as the Linux archive. Pacman manages
 its files and dependencies; it never runs the per-user installer or writes file
 default choices. Preferences retain their existing `parquetviewer` location.
 
-An AUR listing is not yet published. The recipe can be built locally and is ready
-for submission when a maintainer has an AUR account:
+An AUR listing is not yet published. The alpha.2 recipe requires the validated Tablelamp archive checksum before it
+can be built or submitted. It deliberately refuses the old archive checksum.
+Once the checksum is pinned:
 
 ```sh
 cd packaging/arch
@@ -14,7 +16,7 @@ makepkg
 makepkg --printsrcinfo > .SRCINFO
 ```
 
-`rowlight-bin` downloads a specific public release with a pinned SHA-256 checksum.
+`tablelamp-bin` downloads a specific public release with a pinned SHA-256 checksum.
 It does not require Rust. Check for an existing package before submitting a new
 one, follow the [AUR submission guidelines](https://wiki.archlinux.org/title/AUR_submission_guidelines),
 and maintain the recipe for future releases. Upload the recipe, `.SRCINFO` and

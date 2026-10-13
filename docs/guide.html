@@ -5,25 +5,33 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#171821">
-    <meta name="description" content="Open files, explore columns, inspect cells, filter data, and query with SQL in Rowlight.">
-    <title>User guide — Rowlight</title>
+    <meta name="description" content="Open files, explore columns, inspect cells, filter data, and query with SQL in Tablelamp.">
+    <meta property="og:title" content="User guide — Tablelamp">
+    <meta property="og:description" content="Open files, explore columns, inspect cells, filter data, and query with SQL in Tablelamp.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://etiennet.github.io/tablelamp/assets/social-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://etiennet.github.io/tablelamp/assets/social-preview.png">
+    <title>User guide — Tablelamp</title>
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="site.css?v=7b4fc6cb2a76">
     <link rel="stylesheet" href="guide.css?v=a4f3bb6a2e8c">
-    <script src="theme.js?v=44e3cad4eaca" defer></script>
+    <script src="theme.js?v=1984ee5b137d" defer></script>
 
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <nav class="nav container" aria-label="Main navigation">
-        <a class="brand" href="index.html" aria-label="Rowlight home"><img src="assets/icon.svg" width="36" height="36" alt="">Rowlight<span class="brand-dot">.</span></a>
+        <a class="brand" href="index.html" aria-label="Tablelamp home"><img src="assets/icon.svg" width="36" height="36" alt="">Tablelamp<span class="brand-dot">.</span></a>
         <div class="nav-links">
           <a href="index.html#explore">Explore</a>
           <a href="index.html#themes">Themes</a>
           <a href="guide.html" aria-current="location">Guide</a>
         </div>
-        <a class="button button-small" href="installation.html">Get Rowlight <span aria-hidden="true">↓</span></a>
+        <a class="button button-small" href="installation.html">Get Tablelamp <span aria-hidden="true">↓</span></a>
       </nav>
     </header>
     <main class="guide-layout container" id="main">
@@ -32,11 +40,14 @@
         <nav class="guide-toc" aria-label="On this page"><p class="eyebrow">On this page</p><ul><li><a href="#start-here">Start here</a></li><li><a href="#find-your-way-around">Find your way around</a></li><li><a href="#browse-and-sort">Browse and sort</a></li><li><a href="#focus-on-the-columns-you-need">Focus on the columns you need</a></li><li><a href="#understand-the-data">Understand the data</a></li><li><a href="#inspect-and-copy-cells">Inspect and copy cells</a></li><li><a href="#filter-the-file">Filter the file</a></li><li><a href="#folders-and-sql">Folders and SQL</a></li><li><a href="#make-the-view-your-own">Make the view your own</a></li><li><a href="#troubleshooting">Troubleshooting</a></li></ul></nav>
       </aside>
       <article class="guide-article" aria-labelledby="guide-title">
-        <header class="guide-heading"><p class="eyebrow">Rowlight / Documentation</p><h1 id="guide-title">User guide</h1></header>
+        <header class="guide-heading"><p class="eyebrow">Tablelamp / Documentation</p><h1 id="guide-title">User guide</h1></header>
         <details class="guide-mobile-toc"><summary>On this page</summary><nav aria-label="On this page"><ul><li><a href="#start-here">Start here</a></li><li><a href="#find-your-way-around">Find your way around</a></li><li><a href="#browse-and-sort">Browse and sort</a></li><li><a href="#focus-on-the-columns-you-need">Focus on the columns you need</a></li><li><a href="#understand-the-data">Understand the data</a></li><li><a href="#inspect-and-copy-cells">Inspect and copy cells</a></li><li><a href="#filter-the-file">Filter the file</a></li><li><a href="#folders-and-sql">Folders and SQL</a></li><li><a href="#make-the-view-your-own">Make the view your own</a></li><li><a href="#troubleshooting">Troubleshooting</a></li></ul></nav></details>
-        <div class="guide-content"><p>Open a file, understand its columns, and explore its rows. Rowlight is read only: sorting, filtering, and copying leave your source file unchanged.</p>
-<p><a href="installation.html">Install Rowlight</a> · <a href="formats.html">Supported formats</a> · <a href="keyboard-shortcuts.html">Keyboard shortcuts</a> · <a href="index.html">Back to the project</a></p>
+        <div class="guide-content"><p>Open a file, understand its columns, and explore its rows. Tablelamp is read only: sorting, filtering, and copying leave your source file unchanged.</p>
+<p><a href="installation.html">Install Tablelamp</a> · <a href="formats.html">Supported formats</a> · <a href="keyboard-shortcuts.html">Keyboard shortcuts</a> · <a href="index.html">Back to the project</a></p>
 <h2 id="start-here">Start here</h2>
+<p>No file handy? <a href="https://etiennet.github.io/tablelamp/demo/demo.parquet">Download the 10 KB demo dataset</a>.
+It has 1,000 synthetic rows; <a href="https://github.com/EtienneT/tablelamp/blob/main/docs/demo/README.md">sample queries and expected results</a>
+help you try paging, charts and SQL.</p>
 <ol>
 <li><strong>Open a file.</strong> Choose <strong>Open file…</strong> from the top-left menu, press <strong>Ctrl+O</strong> (<strong>Cmd+O</strong> on macOS), or drop a file onto the window.</li>
 <li><strong>Look at the headers.</strong> Each column shows its name, data type, null count, and a small distribution chart when its type supports one.</li>
@@ -102,7 +113,7 @@ Header charts describe the current page. For a broader view, choose <strong>File
 <h3 id="sort-a-column">Sort a column</h3>
 <p>Click a column name to cycle through <strong>ascending → descending → source order</strong>. Nulls sort last. Sorting applies to the <strong>loaded page</strong>; in <strong>All</strong> mode it applies to all loaded rows. With filters active, it sorts the loaded matching page.</p>
 <h3 id="show-all-rows">Show all rows</h3>
-<p>Choose <strong>All</strong> under <strong>Rows / page</strong> to load the complete file when it fits the memory budget. If Rowlight declines the load, choose a paged size and keep browsing. This choice is remembered, and the memory check runs again for every file. Folders and freshly executed SQL queries start paged when that preference is All; explicitly choose All afterward if needed.</p>
+<p>Choose <strong>All</strong> under <strong>Rows / page</strong> to load the complete file when it fits the memory budget. If Tablelamp declines the load, choose a paged size and keep browsing. This choice is remembered, and the memory check runs again for every file. Folders and freshly executed SQL queries start paged when that preference is All; explicitly choose All afterward if needed.</p>
 <p>For very large files, start with <strong>100</strong> or <strong>500</strong>. The <a href="formats.html#large-files-and-memory">large-file reference</a> explains the limits, including why a small compressed file can still need substantial memory.</p>
 <h2 id="focus-on-the-columns-you-need">Focus on the columns you need</h2>
 <p>Columns follow the order stored in the file. Hive partition columns follow the physical columns; SQL results follow the SELECT list.</p>
@@ -188,7 +199,7 @@ Header charts describe the current page. For a broader view, choose <strong>File
 <p>Type labels reflect the file's Polars schema: for example, <code>str</code> is text, <code>f64</code> is a floating-point number, <code>i64</code> is a signed integer, and <code>bool</code> is true/false.</p>
 <p><strong>The scope matters:</strong> page charts use the loaded rows, capped at the first <strong>1,000</strong> in All mode. Expanding a chart reuses that same sample. Sorting does not change it. Distinct counts are exact within the sample; they are not the file's total number of distinct values. See <a href="formats.html#charts-and-statistics">chart and statistics details</a> for precision and sampling limits.</p>
 <h3 id="get-a-broader-file-overview">Get a broader file overview</h3>
-<p>Choose <strong>File overview…</strong> from the menu. Rowlight reads up to <strong>1,000 rows</strong> across <strong>16 evenly spaced windows</strong>, including the beginning and end of a larger file. The overview shows sampled null percentages, distinct values, ranges or frequent categories, and expandable charts. Files with at most 1,000 rows are summarized completely.</p>
+<p>Choose <strong>File overview…</strong> from the menu. Tablelamp reads up to <strong>1,000 rows</strong> across <strong>16 evenly spaced windows</strong>, including the beginning and end of a larger file. The overview shows sampled null percentages, distinct values, ranges or frequent categories, and expandable charts. Files with at most 1,000 rows are summarized completely.</p>
 <p>The overview runs in the background and can be cancelled. Its sample describes the <strong>original, unfiltered source</strong>, even while the table has active filters or a SQL query. An evenly spaced sample can miss rare values or patterns; use it to orient yourself, not as an exact whole-file report.</p>
 <h3 id="see-the-files-metadata">See the file's metadata</h3>
 <p>Choose <strong>File details…</strong> to open a side drawer with the full source path, size, and complete schema in file order. Parquet details include its writer, compression, encodings, and row-group sizes; IPC details include record batches. This view uses metadata already read when opening the file.</p>
@@ -259,9 +270,9 @@ ORDER BY rows DESC
 <p>If a query fails, the editor reopens with your draft and a short explanation. Keep editing to correct it. <strong>Details</strong> shows the full error in a scrollable box; <strong>Copy details</strong> copies it for troubleshooting. Use single quotes for text values (<code>WHERE region = 'North'</code>); double quotes refer to column names.</p>
 <p>Large queries run in a separate, cancellable worker with memory and temporary-storage checks. CSV/TSV and remote Parquet require a full staging read for SQL. See <a href="formats.html#sql-mode">SQL behavior and limits</a> before querying a very large or remote source.</p>
 <h2 id="make-the-view-your-own">Make the view your own</h2>
-<p>Rowlight saves page size, plot visibility, the association-prompt decision, and window dimensions automatically. For the <strong>20 most recent sources</strong>, it also remembers the page, sorting, column widths and visibility, filters, and scroll position. SQL drafts, the last successful query, and its separate page/column view are remembered too. CSV/TSV options and the selected AWS profile are saved. Reopening a remembered source restores its view; saved filters are scanned again and active SQL queries are recomputed.</p>
+<p>Tablelamp saves page size, plot visibility, the association-prompt decision, and window dimensions automatically. For the <strong>20 most recent sources</strong>, it also remembers the page, sorting, column widths and visibility, filters, and scroll position. SQL drafts, the last successful query, and its separate page/column view are remembered too. CSV/TSV options and the selected AWS profile are saved. Reopening a remembered source restores its view; saved filters are scanned again and active SQL queries are recomputed.</p>
 <p>Use <strong>Recent files…</strong> to return to a source. <strong>Clear history</strong> removes remembered sources and their saved views; the current source stays out of history until you open another one. Starting the app without a file does not automatically reopen the last source.</p>
-<p>Choose <strong>☰ → Settings… → Appearance</strong> to select <strong>System</strong>, <strong>Light</strong>, or <strong>Dark</strong>. Your choice applies immediately and is remembered between launches. <strong>System</strong> is the default: on Linux with a usable Omarchy theme, it follows the current palette, including live changes. Elsewhere, including Windows and macOS, it follows the operating system’s light or dark appearance and updates while the app runs. Light and Dark use Rowlight’s built-in palettes. Rowlight does not modify your desktop theme. See the <a href="index.html#themes">theme gallery</a>.</p>
+<p>Choose <strong>☰ → Settings… → Appearance</strong> to select <strong>System</strong>, <strong>Light</strong>, or <strong>Dark</strong>. Your choice applies immediately and is remembered between launches. <strong>System</strong> is the default: on Linux with a usable Omarchy theme, it follows the current palette, including live changes. Elsewhere, including Windows and macOS, it follows the operating system’s light or dark appearance and updates while the app runs. Light and Dark use Tablelamp’s built-in palettes. Tablelamp does not modify your desktop theme. See the <a href="index.html#themes">theme gallery</a>.</p>
 <details>
 <summary>Where preferences live</summary>
 <div class="guide-table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
@@ -286,7 +297,7 @@ ORDER BY rows DESC
 </tr>
 </tbody>
 </table></div>
-<p>Close the app before backing up or resetting this file. Renaming it lets Rowlight start with defaults while preserving your backup. Settings use atomic replacement; invalid or older settings fall back to validated defaults. Resize and scroll updates are flushed on close. Fullscreen/maximized dimensions do not replace the remembered window size; your window manager controls placement.</p>
+<p>Close the app before backing up or resetting this file. Renaming it lets Tablelamp start with defaults while preserving your backup. Settings use atomic replacement; invalid or older settings fall back to validated defaults. Resize and scroll updates are flushed on close. Fullscreen/maximized dimensions do not replace the remembered window size; your window manager controls placement.</p>
 <p>Non-UTF-8 local paths still open but cannot be saved in JSON history. URLs with a query or fragment, including signed URLs, are excluded from history and saved views.</p>
 <p>Omarchy's current palette is read from <code>~/.local/state/omarchy/current/theme/colors.toml</code> and <code>theme.name</code>, with a legacy config-directory fallback.</p>
 </details>
@@ -341,12 +352,12 @@ ORDER BY rows DESC
 </tr>
 </tbody>
 </table></div>
-<p>For a reproducible problem, <a href="https://github.com/EtienneT/rowlight/issues">open an issue</a> with your OS, build version, format, steps, and error message. A small synthetic example is helpful; omit private data and credentials.</p>
+<p>For a reproducible problem, <a href="https://github.com/EtienneT/tablelamp/issues">open an issue</a> with your OS, build version, format, steps, and error message. A small synthetic example is helpful; omit private data and credentials.</p>
 <hr>
-<p><a href="installation.html">Installation</a> · <a href="formats.html">Formats and reading behavior</a> · <a href="keyboard-shortcuts.html">All shortcuts</a> · <a href="https://github.com/EtienneT/rowlight/blob/main/docs/development.md">Development</a></p></div>
-        <div class="guide-end"><a href="index.html">← Back to Rowlight</a><a href="https://github.com/EtienneT/rowlight/blob/main/docs/user-guide.md">Improve this page on GitHub ↗</a></div>
+<p><a href="installation.html">Installation</a> · <a href="formats.html">Formats and reading behavior</a> · <a href="keyboard-shortcuts.html">All shortcuts</a> · <a href="https://github.com/EtienneT/tablelamp/blob/main/docs/development.md">Development</a></p></div>
+        <div class="guide-end"><a href="index.html">← Back to Tablelamp</a><a href="https://github.com/EtienneT/tablelamp/blob/main/docs/user-guide.md">Improve this page on GitHub ↗</a></div>
       </article>
     </main>
-    <footer class="container footer"><div><a class="brand" href="index.html"><img src="assets/icon.svg" width="30" height="30" alt="">Rowlight<span class="brand-dot">.</span></a><p>A clearer view of what’s in your file.</p></div><nav aria-label="Footer navigation"><a href="https://github.com/EtienneT/rowlight">GitHub <span aria-hidden="true">↗</span></a><a href="https://github.com/EtienneT/rowlight/issues">Feedback</a><a href="https://github.com/EtienneT/rowlight/blob/main/LICENSE">MIT license</a></nav><p class="footer-note">No analytics. No accounts.<br>Just a little light.</p></footer>
+    <footer class="container footer"><div><a class="brand" href="index.html"><img src="assets/icon.svg" width="30" height="30" alt="">Tablelamp<span class="brand-dot">.</span></a><p>A clearer view of what’s in your file.</p></div><nav aria-label="Footer navigation"><a href="https://github.com/EtienneT/tablelamp">GitHub <span aria-hidden="true">↗</span></a><a href="https://github.com/EtienneT/tablelamp/issues">Feedback</a><a href="https://github.com/EtienneT/tablelamp/blob/main/LICENSE">MIT license</a></nav><p class="footer-note">No analytics. No accounts.<br>Just a little light.</p></footer>
   </body>
 </html>

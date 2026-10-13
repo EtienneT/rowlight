@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Rowlight
+Name=Tablelamp
 Comment=View tabular files, types and distributions
 Exec=parquetviewer %f
 Icon=com.parquetviewer.ParquetViewer

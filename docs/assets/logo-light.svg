@@ -1,16 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="480" height="144" viewBox="0 0 480 144" role="img" aria-labelledby="title">
-  <title id="title">Rowlight</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="528" height="144" viewBox="0 0 528 144" role="img" aria-labelledby="title">
+  <title id="title">Tablelamp</title>
   <g transform="translate(0 8)"><defs>
-    <linearGradient id="light" x1="28" y1="64" x2="104" y2="64" gradientUnits="userSpaceOnUse">
+    <linearGradient id="tablelamp-shade" x1="24" y1="40" x2="66" y2="40" gradientUnits="userSpaceOnUse">
       <stop stop-color="#F3B85A"/>
       <stop offset="1" stop-color="#FFE6B6"/>
     </linearGradient>
+    <linearGradient id="tablelamp-light" x1="58" y1="53" x2="83" y2="104" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3B85A" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#F3B85A" stop-opacity="0"/>
+    </linearGradient>
   </defs>
   <rect x="8" y="8" width="112" height="112" rx="28" fill="#182334"/>
-  <rect x="28" y="36" width="72" height="9" rx="4.5" fill="#586B85"/>
-  <rect x="28" y="59" width="72" height="10" rx="5" fill="url(#light)"/>
-  <rect x="28" y="83" width="52" height="9" rx="4.5" fill="#586B85"/>
-  <circle cx="100" cy="64" r="10" fill="#FFE6B6"/>
-</g>
-  <text x="151" y="94" fill="#182334" font-family="DejaVu Sans, Arial, sans-serif" font-size="64" font-weight="600" letter-spacing="-2.5">Rowlight</text>
+  <path d="M48 52h18l44 54H55Z" fill="url(#tablelamp-light)"/>
+  <path d="M44 49v46" fill="none" stroke="#8294AD" stroke-width="6" stroke-linecap="round"/>
+  <rect x="25" y="94" width="38" height="7" rx="3.5" fill="#8294AD"/>
+  <path d="M36 28h16a4 4 0 0 1 3.7 2.5l12.5 19a2.8 2.8 0 0 1-2.4 4.2H22.2a2.8 2.8 0 0 1-2.4-4.2l12.5-19A4 4 0 0 1 36 28Z" fill="url(#tablelamp-shade)"/>
+  <g>
+    <rect x="64" y="66" width="11" height="10" rx="2.5" fill="#F3B85A"/>
+    <rect x="80" y="66" width="11" height="10" rx="2.5" fill="#FFE6B6"/>
+    <rect x="96" y="66" width="11" height="10" rx="2.5" fill="#586B85"/>
+    <rect x="64" y="81" width="11" height="10" rx="2.5" fill="#586B85"/>
+    <rect x="80" y="81" width="11" height="10" rx="2.5" fill="#F3B85A"/>
+    <rect x="96" y="81" width="11" height="10" rx="2.5" fill="#FFE6B6"/>
+    <rect x="64" y="96" width="11" height="10" rx="2.5" fill="#586B85"/>
+    <rect x="80" y="96" width="11" height="10" rx="2.5" fill="#586B85"/>
+    <rect x="96" y="96" width="11" height="10" rx="2.5" fill="#586B85"/>
+  </g></g>
+  <text x="151" y="94" fill="#182334" font-family="DejaVu Sans, Arial, sans-serif" font-size="64" font-weight="600" letter-spacing="-2.5">Tablelamp</text>
 </svg>

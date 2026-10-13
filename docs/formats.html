@@ -5,25 +5,33 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#171821">
-    <meta name="description" content="Supported Rowlight data sources, paging, SQL, remote Parquet, sampling, and memory limits.">
-    <title>Formats &amp; limits — Rowlight</title>
+    <meta name="description" content="Supported Tablelamp data sources, paging, SQL, remote Parquet, sampling, and memory limits.">
+    <meta property="og:title" content="Formats &amp; limits — Tablelamp">
+    <meta property="og:description" content="Supported Tablelamp data sources, paging, SQL, remote Parquet, sampling, and memory limits.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://etiennet.github.io/tablelamp/assets/social-preview.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://etiennet.github.io/tablelamp/assets/social-preview.png">
+    <title>Formats &amp; limits — Tablelamp</title>
     <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="site.css?v=7b4fc6cb2a76">
     <link rel="stylesheet" href="guide.css?v=a4f3bb6a2e8c">
-    <script src="theme.js?v=44e3cad4eaca" defer></script>
+    <script src="theme.js?v=1984ee5b137d" defer></script>
 
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <nav class="nav container" aria-label="Main navigation">
-        <a class="brand" href="index.html" aria-label="Rowlight home"><img src="assets/icon.svg" width="36" height="36" alt="">Rowlight<span class="brand-dot">.</span></a>
+        <a class="brand" href="index.html" aria-label="Tablelamp home"><img src="assets/icon.svg" width="36" height="36" alt="">Tablelamp<span class="brand-dot">.</span></a>
         <div class="nav-links">
           <a href="index.html#explore">Explore</a>
           <a href="index.html#themes">Themes</a>
           <a href="guide.html" aria-current="location">Guide</a>
         </div>
-        <a class="button button-small" href="installation.html">Get Rowlight <span aria-hidden="true">↓</span></a>
+        <a class="button button-small" href="installation.html">Get Tablelamp <span aria-hidden="true">↓</span></a>
       </nav>
     </header>
     <main class="guide-layout container" id="main">
@@ -32,7 +40,7 @@
         <nav class="guide-toc" aria-label="On this page"><p class="eyebrow">On this page</p><ul><li><a href="#supported-sources">Supported sources</a></li><li><a href="#hive-parquet-folders">Hive Parquet folders</a></li><li><a href="#sql-mode">SQL mode</a></li><li><a href="#csv-and-tsv">CSV and TSV</a></li><li><a href="#remote-parquet">Remote Parquet</a></li><li><a href="#charts-and-statistics">Charts and statistics</a></li><li><a href="#filters">Filters</a></li><li><a href="#large-files-and-memory">Large files and memory</a></li></ul></nav>
       </aside>
       <article class="guide-article" aria-labelledby="guide-title">
-        <header class="guide-heading"><p class="eyebrow">Rowlight / Documentation</p><h1 id="guide-title">Formats &amp; limits</h1></header>
+        <header class="guide-heading"><p class="eyebrow">Tablelamp / Documentation</p><h1 id="guide-title">Formats &amp; limits</h1></header>
         <details class="guide-mobile-toc"><summary>On this page</summary><nav aria-label="On this page"><ul><li><a href="#supported-sources">Supported sources</a></li><li><a href="#hive-parquet-folders">Hive Parquet folders</a></li><li><a href="#sql-mode">SQL mode</a></li><li><a href="#csv-and-tsv">CSV and TSV</a></li><li><a href="#remote-parquet">Remote Parquet</a></li><li><a href="#charts-and-statistics">Charts and statistics</a></li><li><a href="#filters">Filters</a></li><li><a href="#large-files-and-memory">Large files and memory</a></li></ul></nav></details>
         <div class="guide-content"><p><a href="guide.html">User guide</a> · <a href="installation.html">Installation</a> · <a href="keyboard-shortcuts.html">Keyboard shortcuts</a></p>
 <h2 id="supported-sources">Supported sources</h2>
@@ -78,9 +86,9 @@
 </tr>
 </tbody>
 </table></div>
-<p>Rowlight opens one file, local Parquet folder, or remote object at a time. IPC streams, Feather v1, remote folders/CSV/IPC, Iceberg tables, and editing are not currently supported. See the <a href="https://github.com/EtienneT/rowlight/blob/main/docs/roadmap.md">roadmap</a> for planned work.</p>
+<p>Tablelamp opens one file, local Parquet folder, or remote object at a time. IPC streams, Feather v1, remote folders/CSV/IPC, Iceberg tables, and editing are not currently supported. See the <a href="https://github.com/EtienneT/tablelamp/blob/main/docs/roadmap.md">roadmap</a> for planned work.</p>
 <h2 id="hive-parquet-folders">Hive Parquet folders</h2>
-<p>Choose <strong>Open Parquet folder…</strong>, or pass a folder path to the executable. Rowlight recursively discovers Parquet files and adds virtual columns from Hive paths:</p>
+<p>Choose <strong>Open Parquet folder…</strong>, or pass a folder path to the executable. Tablelamp recursively discovers Parquet files and adds virtual columns from Hive paths:</p>
 <pre tabindex="0"><code class="language-text">events/
   year=2025/region=North/part-001.parquet
   year=2026/region=South/part-002.parquet
@@ -99,7 +107,7 @@ ORDER BY rows DESC
 <p>Parquet and Hive queries use lazy Polars scans with projection and predicate pushdown where supported. Local IPC uses a lazy scan. CSV/TSV and remote Parquet first stage the complete source into a private IPC file, preserving CSV settings and existing cloud credentials/range behavior; even a selective query on these sources can require a complete read. Remote folders and external SQL table functions are unsupported. See the <a href="https://docs.pola.rs/user-guide/sql/intro/">Polars SQL introduction</a> for syntax and functions.</p>
 <p>Each query runs in an isolated process. Results stream into an IPC file and are displayed in pages; a newly executed query starts paged when the saved choice is All. Paging an existing result reuses that file. Cancel or failure leaves the previous view usable. Query results are temporary snapshots and are recomputed on reopening a source; saved draft text is separate from the last successful query.</p>
 <p>The worker monitors resident memory against <strong>25% of available memory, capped at 1 GiB</strong>, and is stopped if it exceeds that budget. Input/result batches are checked as well. This is a periodic safeguard, not a hard allocation limit: some <a href="https://docs.pola.rs/user-guide/concepts/streaming/">streaming operations can still need substantial memory</a>. Narrow a query or add LIMIT when needed. Each staged input and result file is capped at <strong>2 GiB</strong>; total query scratch space, including Polars spills, is monitored against <strong>4 GiB</strong>.</p>
-<p>Scratch files live under the platform's per-user cache in <code>parquetviewer/queries</code>, and are removed when the result closes or execution fails/cancels. An abrupt crash can leave a temporary directory; close Rowlight before removing abandoned directories. Signed URLs and profile names are sent to the worker through a pipe, not a saved request file. Signed sources still have no saved history/query. SQL requires a UTF-8 source path.</p>
+<p>Scratch files live under the platform's per-user cache in <code>parquetviewer/queries</code>, and are removed when the result closes or execution fails/cancels. An abrupt crash can leave a temporary directory; close Tablelamp before removing abandoned directories. Signed URLs and profile names are sent to the worker through a pipe, not a saved request file. Signed sources still have no saved history/query. SQL requires a UTF-8 source path.</p>
 <h2 id="csv-and-tsv">CSV and TSV</h2>
 <p>Choose <strong>CSV / TSV options…</strong> from the menu before opening a source, or while viewing one. Select <strong>Save and apply</strong> to save the choices and reload the current CSV/TSV. Options are remembered per file and as defaults for new files.</p>
 <div class="guide-table-scroll" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
@@ -128,7 +136,7 @@ ORDER BY rows DESC
 </tr>
 </tbody>
 </table></div>
-<p>The inferred schema stays fixed across pages. If a later record conflicts with it, Rowlight reports the parse error instead of silently replacing the value with null. Use <strong>Read all columns as text</strong> for mixed-type columns.</p>
+<p>The inferred schema stays fixed across pages. If a later record conflicts with it, Tablelamp reports the parse error instead of silently replacing the value with null. Use <strong>Read all columns as text</strong> for mixed-type columns.</p>
 <p>The first open scans records to count rows and creates a temporary disk-backed checkpoint index. Later pages reuse it without rescanning the prefix. The index is discarded when the source closes and rebuilt on a later launch. Quoted newlines, escaped quotes, CRLF, and bare blank lines are handled; bare blank lines are skipped. Individual records over <strong>16 MiB</strong> and pages exceeding the buffer budget are rejected.</p>
 <h2 id="remote-parquet">Remote Parquet</h2>
 <p>Use a <strong>cloud</strong> build, then choose <strong>Open remote Parquet…</strong> from the menu. Enter one object URL and open it. An S3 profile can be selected in the same panel. You can also pass the URL to the executable:</p>
@@ -163,10 +171,10 @@ ORDER BY rows DESC
 <p>These are example locations; use your own object and existing provider configuration. Core builds explain that remote support is unavailable. <a href="installation.html#core-or-cloud">Build or install the cloud variant</a>.</p>
 <h3 id="credentials-and-saved-urls">Credentials and saved URLs</h3>
 <p>Credentials come from existing provider environment settings. S3 also reads standard shared AWS credentials/config, using the panel's profile or <code>AWS_PROFILE</code>, then <code>default</code>. Exported access credentials take precedence. SSO, role-assumption, or credential-process profiles require temporary credentials exported from your existing login.</p>
-<p>Azure/GCS use the environment and credential providers supported by the project's <code>object_store</code> dependency. Rowlight has no credential-entry form and does not store credential secrets.</p>
+<p>Azure/GCS use the environment and credential providers supported by the project's <code>object_store</code> dependency. Tablelamp has no credential-entry form and does not store credential secrets.</p>
 <p>URLs with a query or fragment, including signed URLs, are excluded from history and preferences. Window titles and transport errors omit secret query strings. Ordinary remote URLs without a query/fragment can be remembered.</p>
 <h3 id="transfers-and-cancellation">Transfers and cancellation</h3>
-<p>Rowlight requests the footer and required column-chunk byte ranges rather than eagerly downloading the whole object. The per-source in-memory range cache is capped at <strong>32 MiB</strong>; each request has a <strong>30-second timeout</strong>. Servers must support byte ranges and provide an ETag, version, or Last-Modified value so pages cannot silently mix object versions.</p>
+<p>Tablelamp requests the footer and required column-chunk byte ranges rather than eagerly downloading the whole object. The per-source in-memory range cache is capped at <strong>32 MiB</strong>; each request has a <strong>30-second timeout</strong>. Servers must support byte ranges and provide an ETag, version, or Last-Modified value so pages cannot silently mix object versions.</p>
 <p>Reopen a changed source to refresh its metadata and clear the cache. <strong>Cancel</strong> interrupts active network requests; decoding checks cancellation between chunks. Whole-file filters and SQL staging can fetch substantial data even though ordinary browsing uses range reads.</p>
 <h2 id="charts-and-statistics">Charts and statistics</h2>
 <p>Table charts use the loaded page, capped at its first <strong>1,000 source-order rows</strong>. In All mode this remains a sample. Expanded column details reuse exactly the same rows without another source read. Sorting changes displayed order but not the sample.</p>
@@ -262,9 +270,9 @@ ORDER BY rows DESC
 <p>The app retains one current page, with a brief overlap while its replacement loads. Both rows and columns are virtualized, so only the visible table area is rendered. Paging bounds the number of retained rows, <strong>not their byte size</strong>: wide schemas, large values, and compressed pages/row groups can still need significant memory.</p>
 <p><strong>All</strong> checks conservative source estimates and a bounded decoded sample before loading the complete dataframe. Its budget is <strong>25% of currently available memory, capped at 2 GiB</strong>, accounting for the retained page. Native Windows/macOS memory queries and detectable Linux cgroup v2 limits are respected. Unknown availability uses a <strong>64 MiB</strong> budget. A rejected load leaves the existing page usable, and the check runs again for every source.</p>
 <p>Rendering and summaries stay bounded in All mode, and large sorts run on the worker. The estimate reduces out-of-memory risk but cannot guarantee it: later oversized values, decoder allocations, malformed files, or another program consuming memory can exceed an estimate. Use paged mode for very large files.</p></div>
-        <div class="guide-end"><a href="index.html">← Back to Rowlight</a><a href="https://github.com/EtienneT/rowlight/blob/main/docs/formats.md">Improve this page on GitHub ↗</a></div>
+        <div class="guide-end"><a href="index.html">← Back to Tablelamp</a><a href="https://github.com/EtienneT/tablelamp/blob/main/docs/formats.md">Improve this page on GitHub ↗</a></div>
       </article>
     </main>
-    <footer class="container footer"><div><a class="brand" href="index.html"><img src="assets/icon.svg" width="30" height="30" alt="">Rowlight<span class="brand-dot">.</span></a><p>A clearer view of what’s in your file.</p></div><nav aria-label="Footer navigation"><a href="https://github.com/EtienneT/rowlight">GitHub <span aria-hidden="true">↗</span></a><a href="https://github.com/EtienneT/rowlight/issues">Feedback</a><a href="https://github.com/EtienneT/rowlight/blob/main/LICENSE">MIT license</a></nav><p class="footer-note">No analytics. No accounts.<br>Just a little light.</p></footer>
+    <footer class="container footer"><div><a class="brand" href="index.html"><img src="assets/icon.svg" width="30" height="30" alt="">Tablelamp<span class="brand-dot">.</span></a><p>A clearer view of what’s in your file.</p></div><nav aria-label="Footer navigation"><a href="https://github.com/EtienneT/tablelamp">GitHub <span aria-hidden="true">↗</span></a><a href="https://github.com/EtienneT/tablelamp/issues">Feedback</a><a href="https://github.com/EtienneT/tablelamp/blob/main/LICENSE">MIT license</a></nav><p class="footer-note">No analytics. No accounts.<br>Just a little light.</p></footer>
   </body>
 </html>

@@ -1,6 +1,6 @@
-# Contributing to Rowlight
+# Contributing to Tablelamp
 
-Rowlight does one job: help people understand a tabular file without changing it.
+Tablelamp does one job: help people understand a tabular file without changing it.
 Small fixes, clearer errors, accessibility improvements and format compatibility
 are welcome. Discuss larger features in an issue before implementing them.
 

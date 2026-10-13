@@ -697,7 +697,7 @@ impl Viewer {
             .as_ref()
             .map_or(0, |page| page.frame.estimated_size() as u64)
             .saturating_add((self.rows.len() as u64).saturating_mul(8));
-        window.set_window_title("Rowlight · Loading…");
+        window.set_window_title("Tablelamp · Loading…");
         cx.notify();
         self.start_progress_timer(cx);
         self.load_task = Some(cx.spawn_in(window, async move |this, cx| {
@@ -836,7 +836,7 @@ impl Viewer {
                             this.horizontal.set_offset(point(this.viewport_x, px(0.0)));
                         }
                         window.set_window_title(&format!(
-                            "{} · Rowlight",
+                            "{} · Tablelamp",
                             page.source.location.name()
                         ));
                         if changed_file || fresh || mode_changed || query_rebuilt {
@@ -934,7 +934,7 @@ impl Viewer {
                             this.show_panel(Panel::Sql, window, cx);
                             this.sql_input.update(cx, |input, cx| input.focus(window, cx));
                         }
-                        window.set_window_title("Rowlight");
+                        window.set_window_title("Tablelamp");
                     }
                 }
                 if let Some(location) = this.pending_source.take() {
@@ -2612,7 +2612,7 @@ impl Render for Viewer {
         let title = self
             .page
             .as_ref()
-            .map_or("Rowlight".to_owned(), |p| p.source.location.name());
+            .map_or("Tablelamp".to_owned(), |p| p.source.location.name());
         let root = div()
             .id("viewer")
             .key_context(
@@ -2754,7 +2754,7 @@ impl Render for Viewer {
                             .flex_1()
                             .min_w(px(250.0))
                             .text_sm()
-                            .child("Open .parquet files in Rowlight by default?"),
+                            .child("Open .parquet files in Tablelamp by default?"),
                     )
                     .child(
                         control(

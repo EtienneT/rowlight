@@ -1,8 +1,8 @@
-pkgbase = rowlight-bin
+pkgbase = tablelamp-bin
 	pkgdesc = Read-only desktop viewer for Parquet, Arrow IPC, CSV and TSV
-	pkgver = 0.1.0.alpha.1
+	pkgver = 0.1.0.alpha.2
 	pkgrel = 1
-	url = https://github.com/EtienneT/rowlight
+	url = https://github.com/EtienneT/tablelamp
 	arch = x86_64
 	license = MIT
 	depends = glibc>=2.39
@@ -17,11 +17,14 @@ pkgbase = rowlight-bin
 	depends = shared-mime-info
 	optdepends = vulkan-driver: a Vulkan driver suitable for your GPU
 	optdepends = ttf-dejavu: fonts for systems without an installed font family
-	provides = rowlight=0.1.0.alpha.1
+	provides = tablelamp=0.1.0.alpha.2
+	conflicts = tablelamp
 	conflicts = rowlight
+	conflicts = rowlight-bin
+	replaces = rowlight-bin
 	options = !strip
 	options = !debug
-	source = https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz
-	sha256sums = fe8cdba3f8dbb1cd1428736a6c8085a0f8348f65eaeef8b1c5f1b518699b5e35
+	source = https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-linux-x64-cloud.tar.gz
+	sha256sums = REPLACE_WITH_VALIDATED_TABLELAMP_ARCHIVE_SHA256
 
-pkgname = rowlight-bin
+pkgname = tablelamp-bin

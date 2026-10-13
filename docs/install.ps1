@@ -5,19 +5,20 @@ param([switch]$Check)
     param([switch]$CheckOnly)
     $ErrorActionPreference = 'Stop'
     $version = '0.1.0-alpha.1'
+    # Published alpha.1 retains its original release filename.
     $asset = "rowlight-$version-windows-x64-cloud-setup.exe"
-    $releaseUrl = "https://github.com/EtienneT/rowlight/releases/download/v$version"
+    $releaseUrl = "https://github.com/EtienneT/tablelamp/releases/download/v$version"
     if (-not $CheckOnly) {
         if ($env:OS -ne 'Windows_NT') { throw 'Official Windows downloads require Windows x64.' }
         $processor = Get-CimInstance Win32_Processor | Select-Object -First 1
         if ($processor.Architecture -ne 9) { throw 'Official Windows downloads require an x64 processor.' }
     }
-    $stage = Join-Path ([IO.Path]::GetTempPath()) ('rowlight-install-' + [guid]::NewGuid().ToString('N'))
+    $stage = Join-Path ([IO.Path]::GetTempPath()) ('tablelamp-install-' + [guid]::NewGuid().ToString('N'))
     $previousTls = [Net.ServicePointManager]::SecurityProtocol
     try {
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         [IO.Directory]::CreateDirectory($stage) | Out-Null
-        Write-Host "Downloading Rowlight $version..."
+        Write-Host "Downloading the published alpha $version..."
         $checksums = Join-Path $stage 'SHA256SUMS'
         $installer = Join-Path $stage $asset
         Invoke-WebRequest -UseBasicParsing -Uri "$releaseUrl/SHA256SUMS" -OutFile $checksums
@@ -33,7 +34,7 @@ param([switch]$Check)
             Write-Host 'Verification complete. Nothing was installed.'
             return
         }
-        Write-Host 'Opening the installer. Follow its steps, then open Rowlight from Start.'
+        Write-Host 'Opening the installer. Follow its steps, then open the app from Start (the published alpha is still named Rowlight).'
         $process = Start-Process -FilePath $installer -Wait -PassThru
         if ($process.ExitCode -ne 0) { throw "The installer ended with code $($process.ExitCode)." }
     }

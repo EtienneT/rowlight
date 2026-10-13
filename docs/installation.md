@@ -1,53 +1,60 @@
-# Install Rowlight
+# Install Tablelamp
 
-Choose your operating system, copy one command, and open Rowlight. The installer
+The published **0.1.0-alpha.1** build still uses the previous **Rowlight** name
+and icon. Tablelamp branding lands in the next release. The original download
+filenames are retained so checksums and upgrades keep working.
+
+Choose your operating system, copy one command, and open the app. The installer
 downloads **0.1.0-alpha.1** and checks its SHA-256 hash before running it.
 No Rust installation is needed.
+
+After installing, [download the demo dataset](https://etiennet.github.io/tablelamp/demo/demo.parquet)
+and open it in Tablelamp. [Try the sample queries](demo/README.md).
 
 ## Linux
 
 Paste this into your terminal:
 
 ```sh
-curl -fsSL https://etiennet.github.io/rowlight/install.sh | bash
+curl -fsSL https://etiennet.github.io/tablelamp/install.sh | bash
 ```
 
-When it finishes, open **Rowlight** from your application menu. On Omarchy / Arch,
+When it finishes, open the app from your application menu. On Omarchy / Arch,
 the command uses **pacman**, which asks for your password and confirmation. On
 other Linux desktops, it installs for your user account without sudo. An existing
-per-user Rowlight installation is updated in place.
+per-user Tablelamp installation is updated in place.
 
 **Requirements:** Linux x64, glibc 2.39+ (Ubuntu 24.04 or newer), Wayland or X11,
 and a working Vulkan graphics driver.
 
-[Review the install script](https://github.com/EtienneT/rowlight/blob/main/docs/install.sh)
-· [Download an archive instead](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz)
+[Review the install script](https://github.com/EtienneT/tablelamp/blob/main/docs/install.sh)
+· [Download an archive instead](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz)
 
 <details>
 <summary>Manual installation</summary>
 
 ### Omarchy / Arch
 
-Download the [Arch package](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst)
+Download the [Arch package](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst)
 and verify its checksum, then run this in the download folder:
 
 ```sh
 sudo pacman -U ./rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst
 ```
 
-Pacman installs Rowlight and resolves its declared dependencies. A Vulkan driver
+Pacman installs Tablelamp and resolves its declared dependencies. A Vulkan driver
 for your GPU is still required. The package adds Open With support and preserves
 existing file defaults. Follow Omarchy's normal process for system updates.
 
-An AUR listing is not available yet; `yay -S rowlight-bin` is not an installation
+An AUR listing is not available yet; `yay -S tablelamp-bin` is not an installation
 option. If you are switching from a per-user install to the Arch package, first
-run `./scripts/uninstall-linux.sh` from an extracted Rowlight archive. This avoids
+run `./scripts/uninstall-linux.sh` from an extracted Tablelamp archive. This avoids
 an older launcher or executable under `~/.local` taking precedence. Preferences
 are kept.
 
 ### Other Linux
 
-Download the [Linux archive](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz)
+Download the [Linux archive](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz)
 and verify its checksum. Extract it, then run this from the extracted folder:
 
 ```sh
@@ -86,9 +93,9 @@ For a per-user installation, download and extract the Linux archive, then run:
 ```
 
 Preferences are kept. The per-user uninstaller restores an older recorded Parquet
-default when Rowlight is still the default; other default choices are left alone.
+default when Tablelamp is still the default; other default choices are left alone.
 
-To make Rowlight the default for Parquet, accept its first-launch offer or choose
+To make Tablelamp the default for Parquet, accept its first-launch offer or choose
 **Associate Parquet files…** from the app menu. **No thanks** remembers your choice.
 The executable remains `parquetviewer`, and settings keep their existing identity.
 
@@ -99,30 +106,30 @@ The executable remains `parquetviewer`, and settings keep their existing identit
 Open **PowerShell** from Start and paste this command:
 
 ```powershell
-irm https://etiennet.github.io/rowlight/install.ps1 | iex
+irm https://etiennet.github.io/tablelamp/install.ps1 | iex
 ```
 
 The command downloads and checks the installer, then opens the setup wizard.
-Follow its steps and open **Rowlight** from Start. It installs for your account
+Follow its steps and open the app from Start. It installs for your account
 without an administrator prompt.
 
 **Requirements:** Windows 10 or later, x64, with a DirectX 11 graphics driver.
 This alpha is unsigned; Windows may show an unknown-publisher warning or block
 the installer under your security policy.
 
-[Review the install script](https://github.com/EtienneT/rowlight/blob/main/docs/install.ps1)
-· [Download the installer instead](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe)
+[Review the install script](https://github.com/EtienneT/tablelamp/blob/main/docs/install.ps1)
+· [Download the installer instead](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe)
 
 <details>
 <summary>Portable use, updates, and removal</summary>
 
-For portable use, download the [ZIP](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud.zip),
+For portable use, download the [ZIP](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud.zip),
 verify its checksum, choose **Extract All**, and run `parquetviewer.exe`. Keep the
 extracted files together. The ZIP does not add a Start menu entry.
 
 To update an installation, rerun the quick-install command when this page points
 to a newer release, or run that release's setup executable. For a portable update,
-close Rowlight and extract the newer ZIP into a new folder. Preferences are kept.
+close Tablelamp and extract the newer ZIP into a new folder. Preferences are kept.
 
 Remove the installed app through **Settings → Apps → Installed apps → Rowlight →
 Uninstall** (**Apps & features** on Windows 10). It removes registrations and
@@ -131,11 +138,11 @@ keeps preferences. Upgrades retain the original `Programs\Parquet Viewer` direct
 </details>
 
 <details>
-<summary>Make Rowlight the default for Parquet</summary>
+<summary>Make Tablelamp the default for Parquet</summary>
 
 Use **Choose in Windows Settings** in the first-launch offer, or **Associate
-Parquet files…** from the app menu. Choose Rowlight for `.parquet` and `.parq` in
-Default Apps. You can also right-click a file → **Open with → Choose another app
+Parquet files…** from the app menu. Choose the app for `.parquet` and `.parq` in Default Apps (listed as Rowlight
+in the published alpha). You can also right-click a file → **Open with → Choose another app
 → Always**. Windows owns the final default selection; installation preserves it.
 
 </details>
@@ -143,7 +150,7 @@ Default Apps. You can also right-click a file → **Open with → Choose another
 ## Download checksums
 
 The quick-install commands verify the downloaded package against the release's
-[SHA256SUMS](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/SHA256SUMS).
+[SHA256SUMS](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/SHA256SUMS).
 Checksums verify file integrity, not publisher identity. This alpha is unsigned.
 
 <details>
@@ -164,7 +171,7 @@ Get-FileHash .\rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe -Algorithm SHA
 
 Expect `OK` on Linux or an identical hash on Windows. If verification fails,
 download again before installing. GitHub's **Source code** archives are for
-building the project; use the packaged downloads to install Rowlight.
+building the project; use the packaged downloads to install Tablelamp.
 
 </details>
 
@@ -195,5 +202,5 @@ macOS is experimental community tooling, with no official downloads or
 quick-install command. Contributors can use the existing source and native
 packaging tools. Read [platform support](platforms.md) before relying on them.
 
-[Start using Rowlight](user-guide.md) · [Supported formats](formats.md)
+[Start using Tablelamp](user-guide.md) · [Supported formats](formats.md)
 · [Keyboard shortcuts](keyboard-shortcuts.md)

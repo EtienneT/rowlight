@@ -1,8 +1,16 @@
 # Changelog
 
-## 0.1.0-alpha.1 — Unreleased
+## 0.1.0-alpha.2 — Unreleased
 
-First Rowlight alpha for Linux x64 and Windows x64.
+- Rename the product to Tablelamp with a lamp-and-grid SVG icon; preserve application, executable and preference identities for upgrades.
+
+- Add verified quick-install commands, a small synthetic demo dataset and social preview.
+- Normalize Windows build paths and keep public validation records free of private test-session details.
+- Retain the existing read-only viewer behavior and Linux/Windows platform scope.
+
+## 0.1.0-alpha.1
+
+First public alpha for Linux x64 and Windows x64, published under the Rowlight name.
 
 - Read-only Parquet, Arrow IPC / Feather v2, CSV and TSV browsing.
 - Paged reads, original column order, typed columns and guarded All mode.

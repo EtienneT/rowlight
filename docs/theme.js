@@ -8,6 +8,7 @@
     "flexoki-light": "Flexoki Light",
   };
 
+  // Keep the existing preference key across the branding change.
   function setTheme(theme) {
     if (!Object.hasOwn(themes, theme)) return;
     document.documentElement.dataset.theme = theme;
@@ -17,7 +18,7 @@
     const screenshot = document.getElementById("theme-image");
     if (screenshot) {
       screenshot.src = `assets/${theme}.png`;
-      screenshot.alt = `Rowlight running on Linux in ${themes[theme]}, showing a synthetic Parquet file.`;
+      screenshot.alt = `Tablelamp running on Linux in ${themes[theme]}, showing a synthetic Parquet file.`;
       document.getElementById("theme-caption").textContent = themes[theme];
     }
     document.querySelector('meta[name="theme-color"]').content = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();

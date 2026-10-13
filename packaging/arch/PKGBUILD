@@ -1,25 +1,28 @@
-# Maintainer: Etienne Tremblay (https://github.com/EtienneT/rowlight)
-pkgname=rowlight-bin
-pkgver=0.1.0.alpha.1
-_version=0.1.0-alpha.1
+# Maintainer: Etienne Tremblay (https://github.com/EtienneT/tablelamp)
+pkgname=tablelamp-bin
+pkgver=0.1.0.alpha.2
+_version=0.1.0-alpha.2
 pkgrel=1
 pkgdesc='Read-only desktop viewer for Parquet, Arrow IPC, CSV and TSV'
 arch=('x86_64')
-url='https://github.com/EtienneT/rowlight'
+url='https://github.com/EtienneT/tablelamp'
 license=('MIT')
 depends=('glibc>=2.39' 'gcc-libs' 'fontconfig' 'libxcb' 'libxkbcommon-x11'
          'wayland' 'vulkan-icd-loader' 'xdg-utils' 'desktop-file-utils' 'shared-mime-info')
 optdepends=('vulkan-driver: a Vulkan driver suitable for your GPU'
             'ttf-dejavu: fonts for systems without an installed font family')
-provides=("rowlight=$pkgver")
-conflicts=('rowlight')
+provides=("tablelamp=$pkgver")
+conflicts=('tablelamp' 'rowlight' 'rowlight-bin')
+replaces=('rowlight-bin')
 # Retain the already stripped, validated executable exactly as released.
 options=('!strip' '!debug')
-source=("$url/releases/download/v$_version/rowlight-$_version-linux-x64-cloud.tar.gz")
-sha256sums=('fe8cdba3f8dbb1cd1428736a6c8085a0f8348f65eaeef8b1c5f1b518699b5e35')
+source=("$url/releases/download/v$_version/tablelamp-$_version-linux-x64-cloud.tar.gz")
+# Pin the new Tablelamp archive after native release validation. Alpha.1's
+# checksum belongs to a different archive and must not be reused.
+sha256sums=('REPLACE_WITH_VALIDATED_TABLELAMP_ARCHIVE_SHA256')
 
 package() {
-  local release="$srcdir/rowlight-$_version-linux-x64-cloud"
+  local release="$srcdir/tablelamp-$_version-linux-x64-cloud"
   install -Dm755 "$release/parquetviewer" "$pkgdir/usr/bin/parquetviewer"
   install -Dm644 "$release/packaging/linux/com.parquetviewer.ParquetViewer.desktop" \
     "$pkgdir/usr/share/applications/com.parquetviewer.ParquetViewer.desktop"

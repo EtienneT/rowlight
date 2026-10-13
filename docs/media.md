@@ -1,10 +1,10 @@
-# Rowlight media
+# Tablelamp media
 
 The README uses a vector logo, four captures of the running Linux application, and a short recording of its real controls. All displayed values come from the repeatable 50,000-row synthetic fixture in `examples/sample.rs`.
 
 ## Logo
 
-Three horizontal rows form the mark. The middle row lights up in warm amber, ending in a small point of light. The shape stays simple at icon sizes and connects directly to **Shed light on your data.**
+A warm amber table lamp illuminates a small grid of data on a rounded navy tile. The mark connects the Tablelamp name to rows and columns, and to **Shed light on your data.**
 
 - [Standalone mark](assets/icon.svg)
 - [Wordmark on a light background](assets/logo-light.svg)
@@ -16,7 +16,7 @@ The README selects the wordmark for GitHub's light or dark appearance. These are
 
 The theme gallery shows **Tokyo Night**, **Catppuccin**, **Gruvbox**, and **Flexoki Light**, using the stock Omarchy `colors.toml` palettes through gpui-omarchy. The same file, column widths, page size, and window size are used for every capture. These screenshots show Linux theme integration; they do not establish Windows or macOS runtime validation.
 
-The demo shows the table and distributions, an expanded numeric chart with statistics and a tooltip, cell inspection, next-page navigation, column search, and collapsed plot headers. The column-search and cell-inspector stills show the current side drawers; the older recording shows these tools as separate views. Additional stills are kept for documentation:
+The demo shows the table and distributions, an expanded numeric chart with statistics and a tooltip, cell inspection, next-page navigation, column search, and collapsed plot headers. The column-search and cell-inspector captures show the current side drawers. Additional stills are kept for documentation:
 
 - [Expanded column chart](assets/column-detail.png)
 - [Cell inspector](assets/cell-inspector.png)
@@ -39,7 +39,7 @@ python3 scripts/capture-readme.py \
   --themes-dir /path/to/omarchy/themes
 ```
 
-The script uses `cargo dev-build` and the existing cloud development feature set, reusing the normal incremental cache. It opens a private X11 display and sets `PARQUETVIEWER_SETTINGS_PATH` for its child app. `ROWLIGHT_PREVIEW_THEME` points to a copied Omarchy `current` directory; this preview override is compiled only in debug builds. Ordinary app startup follows the desktop theme.
+The script uses `cargo dev-build` and the existing cloud development feature set, reusing the normal incremental cache. It opens a private X11 display and sets `PARQUETVIEWER_SETTINGS_PATH` for its child app. `TABLELAMP_PREVIEW_THEME` points to a copied Omarchy `current` directory; this preview override is compiled only in debug builds. Ordinary app startup follows the desktop theme.
 
 The capture does not change the desktop theme, file associations, or production preferences. It owns and closes its preview/recording/display processes, including when a capture fails. Its pointer coordinates describe the fixed 1,400 × 860 capture layout and may need adjustment after UI layout changes.
 

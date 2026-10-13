@@ -23,27 +23,27 @@ import markdown
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
-REPO = "https://github.com/EtienneT/rowlight"
+REPO = "https://github.com/EtienneT/tablelamp"
 PAGES = {
     "user-guide.md": (
         "guide.html",
         "User guide",
-        "Open files, explore columns, inspect cells, filter data, and query with SQL in Rowlight.",
+        "Open files, explore columns, inspect cells, filter data, and query with SQL in Tablelamp.",
     ),
     "installation.md": (
         "installation.html",
         "Installation",
-        "Download and install Rowlight on Linux and Windows, verify checksums, and configure file associations.",
+        "Download and install Tablelamp on Linux and Windows, verify checksums, and configure file associations.",
     ),
     "formats.md": (
         "formats.html",
         "Formats & limits",
-        "Supported Rowlight data sources, paging, SQL, remote Parquet, sampling, and memory limits.",
+        "Supported Tablelamp data sources, paging, SQL, remote Parquet, sampling, and memory limits.",
     ),
     "keyboard-shortcuts.md": (
         "keyboard-shortcuts.html",
         "Keyboard shortcuts",
-        "Navigate, select, copy, inspect, and query data with Rowlight's keyboard shortcuts.",
+        "Navigate, select, copy, inspect, and query data with Tablelamp's keyboard shortcuts.",
     ),
 }
 

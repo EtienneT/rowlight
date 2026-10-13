@@ -22,7 +22,7 @@ def generate(tool):
     version = subprocess.check_output([tool, "--version"], text=True).strip()
     if version != "cargo-about 0.9.2":
         raise SystemExit(f"Expected cargo-about 0.9.2; got {version}")
-    with tempfile.TemporaryDirectory(prefix="rowlight-notices-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="tablelamp-notices-") as temporary:
         output = pathlib.Path(temporary) / "licenses.json"
         subprocess.run(
             [tool, "generate", "--locked", "--features", "cloud", "--fail",
@@ -33,16 +33,16 @@ def generate(tool):
 
     lock_hash = hashlib.sha256((ROOT / "Cargo.lock").read_bytes()).hexdigest()
     sections = ["""<!doctype html>
-<html lang="en"><meta charset="utf-8"><title>Rowlight third-party notices</title>
+<html lang="en"><meta charset="utf-8"><title>Tablelamp third-party notices</title>
 <style>body{font:16px system-ui;max-width:960px;margin:2rem auto;padding:0 1rem}
 pre{white-space:pre-wrap;overflow-wrap:anywhere}summary{cursor:pointer}
 @media(prefers-color-scheme:dark){body{background:#202328;color:#eee}a{color:#8ac}}</style>
-<h1>Rowlight third-party notices</h1>
+<h1>Tablelamp third-party notices</h1>
 <p>Generated with cargo-about 0.9.2 for the Linux x64 and Windows x64 cloud builds.
-Core downloads use a subset of these dependencies. Rowlight itself is MIT licensed.</p>
+Core downloads use a subset of these dependencies. Tablelamp itself is MIT licensed.</p>
 <p>Each dependency has a link to its exact published source archive. MPL-2.0
 components are unmodified; their source and license remain available through
-those links. No dependency license is replaced by Rowlight's MIT license.</p>
+those links. No dependency license is replaced by Tablelamp's MIT license.</p>
 """]
     sections.append(f"<!-- Cargo.lock SHA-256: {lock_hash} -->\n")
     crates = {}

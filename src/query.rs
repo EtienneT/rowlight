@@ -185,7 +185,7 @@ pub fn run_with_executable(
         .join("parquetviewer/queries");
     std::fs::create_dir_all(&cache)?;
     let scratch = tempfile::Builder::new()
-        .prefix("rowlight-query-")
+        .prefix("tablelamp-query-")
         .tempdir_in(cache)?;
     let job = Job {
         location: source.location.clone(),
@@ -321,7 +321,7 @@ fn scan(source: &Source, scratch: &Path, budget: u64, cancel: &Cancellation) -> 
             return ipc_scan(path);
         }
     }
-    // Preserve Rowlight's CSV options and remote range/credential behavior.
+    // Preserve Tablelamp's CSV options and remote range/credential behavior.
     // Only these sources need a bounded, private IPC staging file.
     let staged = scratch.join("input.ipc");
     let schema = source.read_slice(0, 0, cancel)?;

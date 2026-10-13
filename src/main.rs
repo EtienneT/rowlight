@@ -18,7 +18,7 @@ fn main() -> anyhow::Result<()> {
             } else {
                 "core"
             };
-            println!("Rowlight {} ({variant})", env!("CARGO_PKG_VERSION"));
+            println!("Tablelamp {} ({variant})", env!("CARGO_PKG_VERSION"));
             return Ok(());
         }
         Some(arg) if arg == OsStr::new("--query-worker") => {
@@ -31,7 +31,7 @@ fn main() -> anyhow::Result<()> {
         }
         Some(arg) if arg == OsStr::new("--help") || arg == OsStr::new("-h") => {
             println!(
-                "Rowlight\n\nUsage: parquetviewer [FILE|FOLDER|URL]\n\nOpen a file or Hive Parquet folder, or start without a path to use the file picker.\nCtrl/Cmd+O: open file · Ctrl/Cmd+Shift+O: open Parquet folder · Ctrl/Cmd+Shift+L: SQL query · Ctrl/Cmd+F: find column · Home/End: first/last loaded row · Page Up/Down: screenful · Ctrl/Cmd+Page Up/Down or Alt+Left/Right: previous/next page · Ctrl/Cmd+Home/End: file start/end · Ctrl/Cmd+G: go to page · F1: keyboard shortcuts · Esc: clear selection/back · Ctrl/Cmd+Q: quit"
+                "Tablelamp\n\nUsage: parquetviewer [FILE|FOLDER|URL]\n\nOpen a file or Hive Parquet folder, or start without a path to use the file picker.\nCtrl/Cmd+O: open file · Ctrl/Cmd+Shift+O: open Parquet folder · Ctrl/Cmd+Shift+L: SQL query · Ctrl/Cmd+F: find column · Home/End: first/last loaded row · Page Up/Down: screenful · Ctrl/Cmd+Page Up/Down or Alt+Left/Right: previous/next page · Ctrl/Cmd+Home/End: file start/end · Ctrl/Cmd+G: go to page · F1: keyboard shortcuts · Esc: clear selection/back · Ctrl/Cmd+Q: quit"
             );
             return Ok(());
         }
@@ -61,7 +61,7 @@ fn main() -> anyhow::Result<()> {
         theme::apply(settings.appearance, cx);
         // Documentation captures can preview a palette without changing the desktop.
         #[cfg(debug_assertions)]
-        if let Some(directory) = std::env::var_os("ROWLIGHT_PREVIEW_THEME") {
+        if let Some(directory) = std::env::var_os("TABLELAMP_PREVIEW_THEME") {
             match gpui_omarchy::Theme::from_current_dir(directory) {
                 Ok(theme) => theme::preview(theme, cx),
                 Err(error) => {
@@ -73,7 +73,7 @@ fn main() -> anyhow::Result<()> {
         }
         #[cfg(target_os = "macos")]
         cx.set_menus(vec![
-            Menu::new("Rowlight").items([MenuItem::action("Quit Rowlight", Quit)]),
+            Menu::new("Tablelamp").items([MenuItem::action("Quit Tablelamp", Quit)]),
             Menu::new("File").items([
                 MenuItem::action("Open file…", OpenFile),
                 MenuItem::action("Open Parquet folder…", viewer::OpenFolder),
@@ -142,7 +142,7 @@ fn main() -> anyhow::Result<()> {
                 cx,
             ))),
             titlebar: Some(TitlebarOptions {
-                title: Some("Rowlight".into()),
+                title: Some("Tablelamp".into()),
                 ..Default::default()
             }),
             app_id: Some("com.parquetviewer.ParquetViewer".into()),
@@ -166,7 +166,7 @@ fn main() -> anyhow::Result<()> {
                 .detach();
             }
             Err(error) => {
-                eprintln!("Cannot open Rowlight: {error:#}");
+                eprintln!("Cannot open Tablelamp: {error:#}");
                 cx.quit();
             }
         }

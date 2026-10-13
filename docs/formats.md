@@ -12,11 +12,11 @@
 | Local CSV / TSV (`.csv`, `.tsv`) | ✓ | ✓ | Configurable parsing; one indexing scan on open |
 | Remote Parquet | — | ✓ | S3, Azure, GCS, and HTTP(S), including signed GET URLs |
 
-Rowlight opens one file, local Parquet folder, or remote object at a time. IPC streams, Feather v1, remote folders/CSV/IPC, Iceberg tables, and editing are not currently supported. See the [roadmap](roadmap.md) for planned work.
+Tablelamp opens one file, local Parquet folder, or remote object at a time. IPC streams, Feather v1, remote folders/CSV/IPC, Iceberg tables, and editing are not currently supported. See the [roadmap](roadmap.md) for planned work.
 
 ## Hive Parquet folders
 
-Choose **Open Parquet folder…**, or pass a folder path to the executable. Rowlight recursively discovers Parquet files and adds virtual columns from Hive paths:
+Choose **Open Parquet folder…**, or pass a folder path to the executable. Tablelamp recursively discovers Parquet files and adds virtual columns from Hive paths:
 
 ```text
 events/
@@ -49,7 +49,7 @@ Each query runs in an isolated process. Results stream into an IPC file and are 
 
 The worker monitors resident memory against **25% of available memory, capped at 1 GiB**, and is stopped if it exceeds that budget. Input/result batches are checked as well. This is a periodic safeguard, not a hard allocation limit: some [streaming operations can still need substantial memory](https://docs.pola.rs/user-guide/concepts/streaming/). Narrow a query or add LIMIT when needed. Each staged input and result file is capped at **2 GiB**; total query scratch space, including Polars spills, is monitored against **4 GiB**.
 
-Scratch files live under the platform's per-user cache in `parquetviewer/queries`, and are removed when the result closes or execution fails/cancels. An abrupt crash can leave a temporary directory; close Rowlight before removing abandoned directories. Signed URLs and profile names are sent to the worker through a pipe, not a saved request file. Signed sources still have no saved history/query. SQL requires a UTF-8 source path.
+Scratch files live under the platform's per-user cache in `parquetviewer/queries`, and are removed when the result closes or execution fails/cancels. An abrupt crash can leave a temporary directory; close Tablelamp before removing abandoned directories. Signed URLs and profile names are sent to the worker through a pipe, not a saved request file. Signed sources still have no saved history/query. SQL requires a UTF-8 source path.
 
 ## CSV and TSV
 
@@ -62,7 +62,7 @@ Choose **CSV / TSV options…** from the menu before opening a source, or while 
 | Encoding | Strict UTF-8 or explicit replacement of invalid bytes. Other encodings are not guessed. |
 | Types | Infer from the first 1,000 records, or read every column as text. Date/time inference follows Polars. |
 
-The inferred schema stays fixed across pages. If a later record conflicts with it, Rowlight reports the parse error instead of silently replacing the value with null. Use **Read all columns as text** for mixed-type columns.
+The inferred schema stays fixed across pages. If a later record conflicts with it, Tablelamp reports the parse error instead of silently replacing the value with null. Use **Read all columns as text** for mixed-type columns.
 
 The first open scans records to count rows and creates a temporary disk-backed checkpoint index. Later pages reuse it without rescanning the prefix. The index is discarded when the source closes and rebuilt on a later launch. Quoted newlines, escaped quotes, CRLF, and bare blank lines are handled; bare blank lines are skipped. Individual records over **16 MiB** and pages exceeding the buffer budget are rejected.
 
@@ -87,13 +87,13 @@ These are example locations; use your own object and existing provider configura
 
 Credentials come from existing provider environment settings. S3 also reads standard shared AWS credentials/config, using the panel's profile or `AWS_PROFILE`, then `default`. Exported access credentials take precedence. SSO, role-assumption, or credential-process profiles require temporary credentials exported from your existing login.
 
-Azure/GCS use the environment and credential providers supported by the project's `object_store` dependency. Rowlight has no credential-entry form and does not store credential secrets.
+Azure/GCS use the environment and credential providers supported by the project's `object_store` dependency. Tablelamp has no credential-entry form and does not store credential secrets.
 
 URLs with a query or fragment, including signed URLs, are excluded from history and preferences. Window titles and transport errors omit secret query strings. Ordinary remote URLs without a query/fragment can be remembered.
 
 ### Transfers and cancellation
 
-Rowlight requests the footer and required column-chunk byte ranges rather than eagerly downloading the whole object. The per-source in-memory range cache is capped at **32 MiB**; each request has a **30-second timeout**. Servers must support byte ranges and provide an ETag, version, or Last-Modified value so pages cannot silently mix object versions.
+Tablelamp requests the footer and required column-chunk byte ranges rather than eagerly downloading the whole object. The per-source in-memory range cache is capped at **32 MiB**; each request has a **30-second timeout**. Servers must support byte ranges and provide an ETag, version, or Last-Modified value so pages cannot silently mix object versions.
 
 Reopen a changed source to refresh its metadata and clear the cache. **Cancel** interrupts active network requests; decoding checks cancellation between chunks. Whole-file filters and SQL staging can fetch substantial data even though ordinary browsing uses range reads.
 

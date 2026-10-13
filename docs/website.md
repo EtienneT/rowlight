@@ -1,4 +1,4 @@
-# Rowlight website
+# Tablelamp website
 
 The landing page lives in [index.html](index.html), with [site.css](site.css) and
 [site.js](site.js). It is plain static HTML, CSS, and JavaScript: no dependencies,
@@ -20,6 +20,8 @@ replace previously cached assets.
 `install.sh` and `install.ps1` download the pinned published release, verify its
 `SHA256SUMS`, and delegate to the existing native package/installer. Keep their
 version and filenames synchronized with the installation source and landing page.
+The published alpha.1 assets and archive roots retain their Rowlight filenames;
+new Tablelamp package names are used only after those downloads are published.
 Linux auto-selects pacman on Arch or a per-user archive elsewhere, retaining an
 existing per-user install. Windows opens the per-user setup wizard. Neither script
 builds the app or changes file defaults directly. `--check` (Bash) and `-Check`
@@ -66,13 +68,13 @@ links provide the other theme captures.
 ## GitHub Pages
 
 All local asset URLs are relative, so the same source can serve under the project
-path `https://etiennet.github.io/rowlight/` or a custom domain. `docs/.nojekyll`
+path `https://etiennet.github.io/tablelamp/` or a custom domain. `docs/.nojekyll`
 disables Jekyll processing. There is no custom domain configured in this change.
 
 [GitHub supports publishing from the `/docs` folder of a branch](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
 The publishing source is **main → /docs**, using **Deploy from a branch**.
 Pushes to `main` publish the source automatically. The public URL is
-<https://etiennet.github.io/rowlight/>. No custom build workflow is needed.
+<https://etiennet.github.io/tablelamp/>. No custom build workflow is needed.
 
 GitHub Pages still uses a GitHub Actions deployment run with branch publishing.
 The owner authorized website publication on 2026-10-13. This authorization covers
@@ -82,7 +84,7 @@ or dispatching application build/test workflows.
 
 ## Keep the page current
 
-- The page links to the published `v0.1.0-alpha.1` release and its Linux archive,
+- The page links to the published `v0.1.0-alpha.2` release and its Linux archive,
   Arch/Omarchy package, Windows installer, portable ZIP, and `SHA256SUMS`.
   Update these links and the release notice together when a new release ships.
   Keep Linux x64 and Windows x64 as the official downloads and retain requirements.
@@ -101,4 +103,4 @@ or dispatching application build/test workflows.
 
 The layout takes inspiration from [Strata](https://stratafiles.io/): introduce the
 product through a usable illustration, show its appearance, and give visitors a
-clear next step. Rowlight's copy, styling, demo code, and brand assets are its own.
+clear next step. Tablelamp's copy, styling, demo code, and brand assets are its own.

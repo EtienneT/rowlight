@@ -2,7 +2,7 @@
 
 [User guide](user-guide.md) · [Installation](installation.md) · [Formats](formats.md)
 
-Press **F1**, or choose **Keyboard shortcuts…** from the top-left menu, to see the reference inside Rowlight.
+Press **F1**, or choose **Keyboard shortcuts…** from the top-left menu, to see the reference inside Tablelamp.
 
 ## Everyday actions
 

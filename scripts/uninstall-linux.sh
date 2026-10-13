@@ -24,4 +24,4 @@ rm -f -- "$HOME/.local/bin/parquetviewer" \
 if [[ -d "$app_data_dir/mime" ]] && command -v update-mime-database >/dev/null; then update-mime-database "$app_data_dir/mime"; fi
 if [[ -d "$app_data_dir/applications" ]] && command -v update-desktop-database >/dev/null; then update-desktop-database "$app_data_dir/applications"; fi
 rmdir -- "$app_data_dir/parquetviewer" 2>/dev/null || true
-printf 'Removed the per-user Rowlight installation. Preferences were kept.\n'
+printf 'Removed the per-user Tablelamp installation. Preferences were kept.\n'

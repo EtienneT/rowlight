@@ -1,4 +1,4 @@
-# Working on Rowlight
+# Working on Tablelamp
 
 Keep the app simple and lightweight. Preserve bounded paging, original column order,
 and the existing GPUI Kit / Polars architecture.
@@ -34,15 +34,6 @@ so existing file associations and preferences continue to work.
   distribution and performance measurements.** Don't run them on each edit or
   hold development feedback until installers finish. Don't substitute a dev
   binary for the installed release app without the user's request.
-
-## Measured costs
-
-On 2026-10-07, this UI fix took 2.8 s to build incrementally on Linux, versus
-70.7 s for the optimized release build. Only the app was recompiled in both cases.
-The full cached workspace test run took 7.5 s and all-feature Clippy took 0.8 s.
-Windows took 18.3 s for the dev build and 15.0 s to compile and run the focused
-regression. These are observations for this change, not timing guarantees.
-See [development.md](docs/development.md) for commands and build details.
 
 GitHub Actions was disabled at the user's request to avoid paid minutes. Don't
 enable or dispatch workflows without an explicit request.

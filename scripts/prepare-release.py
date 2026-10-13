@@ -18,10 +18,10 @@ def digest(path):
 
 def prepare(windows_build_commit=None, exclude_untracked=()):
     version = tomllib.loads((ROOT / "Cargo.toml").read_text())["package"]["version"]
-    names = [f"rowlight-{version}-linux-x64-cloud.tar.gz",
-             f"rowlight-{version}-windows-x64-cloud.zip",
-             f"rowlight-{version}-windows-x64-cloud-setup.exe",
-             f"rowlight-bin-{version.replace('-', '.')}-1-x86_64.pkg.tar.zst"]
+    names = [f"tablelamp-{version}-linux-x64-cloud.tar.gz",
+             f"tablelamp-{version}-windows-x64-cloud.zip",
+             f"tablelamp-{version}-windows-x64-cloud-setup.exe",
+             f"tablelamp-bin-{version.replace('-', '.')}-1-x86_64.pkg.tar.zst"]
     for name in names:
         path = ROOT / "dist" / name
         if not path.is_file():

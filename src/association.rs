@@ -14,7 +14,7 @@ pub fn associate() -> Result<String> {
             .unwrap_or_else(|| "/usr/local/share:/usr/share".into());
         ensure!(
             desktop_registered(&data_home, std::env::split_paths(&data_dirs)),
-            "Install Rowlight first, then choose this action again."
+            "Install Tablelamp first, then choose this action again."
         );
         std::fs::create_dir_all(
             dirs::config_dir().context("Cannot find the configuration directory")?,
@@ -40,9 +40,9 @@ pub fn associate() -> Result<String> {
             actual.status.success()
                 && String::from_utf8_lossy(&actual.stdout).trim()
                     == "com.parquetviewer.ParquetViewer.desktop",
-            "The desktop did not accept the file default. Choose Rowlight in your file manager's Open With dialog."
+            "The desktop did not accept the file default. Choose Tablelamp in your file manager's Open With dialog."
         );
-        Ok("Parquet files now open in Rowlight.".into())
+        Ok("Parquet files now open in Tablelamp.".into())
     }
     #[cfg(target_os = "windows")]
     {
@@ -51,7 +51,7 @@ pub fn associate() -> Result<String> {
             .arg("ms-settings:defaultapps?registeredAppUser=Parquet%20Viewer")
             .spawn()
             .context("Cannot open Windows Default Apps")?;
-        Ok("In Windows Default Apps, select Rowlight for .parquet and .parq. On Windows 10, search for .parquet in Default Apps.".into())
+        Ok("In Windows Default Apps, select Tablelamp for .parquet and .parq. On Windows 10, search for .parquet in Default Apps.".into())
     }
     #[cfg(target_os = "macos")]
     {
@@ -72,10 +72,10 @@ pub fn associate() -> Result<String> {
             "macOS could not change the file default: {}",
             String::from_utf8_lossy(&output.stderr)
         );
-        Ok("Parquet files now open in Rowlight.".into())
+        Ok("Parquet files now open in Tablelamp.".into())
     }
     #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
-    anyhow::bail!("Choose Rowlight in your file manager's Open With dialog.");
+    anyhow::bail!("Choose Tablelamp in your file manager's Open With dialog.");
 }
 
 #[cfg(target_os = "linux")]
@@ -105,7 +105,7 @@ mod tests {
         let applications = system.join("applications");
         std::fs::create_dir_all(&applications).unwrap();
         let desktop = applications.join("com.parquetviewer.ParquetViewer.desktop");
-        std::fs::write(&desktop, "[Desktop Entry]\nName=Rowlight\n").unwrap();
+        std::fs::write(&desktop, "[Desktop Entry]\nName=Tablelamp\n").unwrap();
         assert!(desktop_registered(&user, std::iter::once(system)));
 
         std::fs::create_dir_all(user.join("applications")).unwrap();

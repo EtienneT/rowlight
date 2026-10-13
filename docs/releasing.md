@@ -4,19 +4,19 @@ Maintained downloads are Linux x64 and Windows x64, with cloud support included.
 macOS source tooling is experimental. GitHub Actions remains disabled; do not
 enable or dispatch it without the owner's explicit request.
 
-## Private preparation, public downloads
+## Local preparation, public downloads
 
-Build, test and prepare the release while the repository is private. A GitHub
-draft can hold the notes and downloads for review before publication. Private
-repository downloads require repository access; they are not a public install
-channel.
+The repository and alpha.1 downloads are public. Alpha.2 is the first release
+under the Tablelamp name; its native packages still need validation before
+publication. The website continues to link to alpha.1's original filenames
+until the new downloads exist.
 
-For the first public release, complete the history/license review and remaining
-[native release checks](../packaging/TESTING.md), make the repository public, then
-publish **v0.1.0-alpha.1** as a prerelease at the reviewed commit. Upload all four
-packages and `SHA256SUMS` before publishing. Update the
-README's installation section to link to that release. Creating releases and
-uploading locally built packages does not require GitHub Actions.
+Build, test and prepare packages locally. A GitHub draft can hold the notes and
+downloads for review before publication. Publish **v0.1.0-alpha.2** as a prerelease
+at the reviewed commit, with all four packages and `SHA256SUMS`. Then update the
+website installers, installation guide, landing page and README together to use
+the new version and Tablelamp filenames. Creating releases and uploading locally
+built packages does not require enabling the Native builds workflow.
 
 GitHub documents [draft and prerelease publication](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository).
 If immutable releases are enabled later, draft first: assets cannot be replaced

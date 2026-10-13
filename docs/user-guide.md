@@ -1,10 +1,14 @@
-# Rowlight user guide
+# Tablelamp user guide
 
-Open a file, understand its columns, and explore its rows. Rowlight is read only: sorting, filtering, and copying leave your source file unchanged.
+Open a file, understand its columns, and explore its rows. Tablelamp is read only: sorting, filtering, and copying leave your source file unchanged.
 
-[Install Rowlight](installation.md) · [Supported formats](formats.md) · [Keyboard shortcuts](keyboard-shortcuts.md) · [Back to the project](../README.md)
+[Install Tablelamp](installation.md) · [Supported formats](formats.md) · [Keyboard shortcuts](keyboard-shortcuts.md) · [Back to the project](../README.md)
 
 ## Start here
+
+No file handy? [Download the 10 KB demo dataset](https://etiennet.github.io/tablelamp/demo/demo.parquet).
+It has 1,000 synthetic rows; [sample queries and expected results](demo/README.md)
+help you try paging, charts and SQL.
 
 1. **Open a file.** Choose **Open file…** from the top-left menu, press **Ctrl+O** (**Cmd+O** on macOS), or drop a file onto the window.
 2. **Look at the headers.** Each column shows its name, data type, null count, and a small distribution chart when its type supports one.
@@ -51,7 +55,7 @@ Click a column name to cycle through **ascending → descending → source order
 
 ### Show all rows
 
-Choose **All** under **Rows / page** to load the complete file when it fits the memory budget. If Rowlight declines the load, choose a paged size and keep browsing. This choice is remembered, and the memory check runs again for every file. Folders and freshly executed SQL queries start paged when that preference is All; explicitly choose All afterward if needed.
+Choose **All** under **Rows / page** to load the complete file when it fits the memory budget. If Tablelamp declines the load, choose a paged size and keep browsing. This choice is remembered, and the memory check runs again for every file. Folders and freshly executed SQL queries start paged when that preference is All; explicitly choose All afterward if needed.
 
 For very large files, start with **100** or **500**. The [large-file reference](formats.md#large-files-and-memory) explains the limits, including why a small compressed file can still need substantial memory.
 
@@ -104,7 +108,7 @@ Type labels reflect the file's Polars schema: for example, `str` is text, `f64` 
 
 ### Get a broader file overview
 
-Choose **File overview…** from the menu. Rowlight reads up to **1,000 rows** across **16 evenly spaced windows**, including the beginning and end of a larger file. The overview shows sampled null percentages, distinct values, ranges or frequent categories, and expandable charts. Files with at most 1,000 rows are summarized completely.
+Choose **File overview…** from the menu. Tablelamp reads up to **1,000 rows** across **16 evenly spaced windows**, including the beginning and end of a larger file. The overview shows sampled null percentages, distinct values, ranges or frequent categories, and expandable charts. Files with at most 1,000 rows are summarized completely.
 
 The overview runs in the background and can be cancelled. Its sample describes the **original, unfiltered source**, even while the table has active filters or a SQL query. An evenly spaced sample can miss rare values or patterns; use it to orient yourself, not as an exact whole-file report.
 
@@ -190,11 +194,11 @@ Large queries run in a separate, cancellable worker with memory and temporary-st
 
 ## Make the view your own
 
-Rowlight saves page size, plot visibility, the association-prompt decision, and window dimensions automatically. For the **20 most recent sources**, it also remembers the page, sorting, column widths and visibility, filters, and scroll position. SQL drafts, the last successful query, and its separate page/column view are remembered too. CSV/TSV options and the selected AWS profile are saved. Reopening a remembered source restores its view; saved filters are scanned again and active SQL queries are recomputed.
+Tablelamp saves page size, plot visibility, the association-prompt decision, and window dimensions automatically. For the **20 most recent sources**, it also remembers the page, sorting, column widths and visibility, filters, and scroll position. SQL drafts, the last successful query, and its separate page/column view are remembered too. CSV/TSV options and the selected AWS profile are saved. Reopening a remembered source restores its view; saved filters are scanned again and active SQL queries are recomputed.
 
 Use **Recent files…** to return to a source. **Clear history** removes remembered sources and their saved views; the current source stays out of history until you open another one. Starting the app without a file does not automatically reopen the last source.
 
-Choose **☰ → Settings… → Appearance** to select **System**, **Light**, or **Dark**. Your choice applies immediately and is remembered between launches. **System** is the default: on Linux with a usable Omarchy theme, it follows the current palette, including live changes. Elsewhere, including Windows and macOS, it follows the operating system’s light or dark appearance and updates while the app runs. Light and Dark use Rowlight’s built-in palettes. Rowlight does not modify your desktop theme. See the [theme gallery](../README.md#your-omarchy-theme).
+Choose **☰ → Settings… → Appearance** to select **System**, **Light**, or **Dark**. Your choice applies immediately and is remembered between launches. **System** is the default: on Linux with a usable Omarchy theme, it follows the current palette, including live changes. Elsewhere, including Windows and macOS, it follows the operating system’s light or dark appearance and updates while the app runs. Light and Dark use Tablelamp’s built-in palettes. Tablelamp does not modify your desktop theme. See the [theme gallery](../README.md#your-omarchy-theme).
 
 <details>
 <summary>Where preferences live</summary>
@@ -205,7 +209,7 @@ Choose **☰ → Settings… → Appearance** to select **System**, **Light**, o
 | Windows | `%APPDATA%\parquetviewer\settings.json` |
 | macOS | `~/Library/Application Support/parquetviewer/settings.json` |
 
-Close the app before backing up or resetting this file. Renaming it lets Rowlight start with defaults while preserving your backup. Settings use atomic replacement; invalid or older settings fall back to validated defaults. Resize and scroll updates are flushed on close. Fullscreen/maximized dimensions do not replace the remembered window size; your window manager controls placement.
+Close the app before backing up or resetting this file. Renaming it lets Tablelamp start with defaults while preserving your backup. Settings use atomic replacement; invalid or older settings fall back to validated defaults. Resize and scroll updates are flushed on close. Fullscreen/maximized dimensions do not replace the remembered window size; your window manager controls placement.
 
 Non-UTF-8 local paths still open but cannot be saved in JSON history. URLs with a query or fragment, including signed URLs, are excluded from history and saved views.
 
@@ -228,7 +232,7 @@ Omarchy's current palette is read from `~/.local/state/omarchy/current/theme/col
 | A remote source will not open | Check that you have a cloud build, usable provider credentials, and a server supporting ranges and object-version checks. See [remote Parquet](formats.md#remote-parquet). |
 | The source changed while browsing | Reopen it to refresh metadata and the remote cache. Incompatible saved filters are cleared with a notice. |
 
-For a reproducible problem, [open an issue](https://github.com/EtienneT/rowlight/issues) with your OS, build version, format, steps, and error message. A small synthetic example is helpful; omit private data and credentials.
+For a reproducible problem, [open an issue](https://github.com/EtienneT/tablelamp/issues) with your OS, build version, format, steps, and error message. A small synthetic example is helpful; omit private data and credentials.
 
 ---
 

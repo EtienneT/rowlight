@@ -2,7 +2,7 @@
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
     <source media="(prefers-color-scheme: light)" srcset="docs/assets/logo-light.svg">
-    <img src="docs/assets/logo-light.svg" alt="Rowlight" width="360" height="108">
+    <img src="docs/assets/logo-light.svg" alt="Tablelamp" width="396" height="108">
   </picture>
 </p>
 
@@ -14,21 +14,24 @@
 </p>
 
 <p align="center">
-  <a href="https://etiennet.github.io/rowlight/guide.html">User guide</a> ·
-  <a href="https://github.com/EtienneT/rowlight/releases">Downloads</a> ·
+  <a href="https://etiennet.github.io/tablelamp/guide.html">User guide</a> ·
+  <a href="https://github.com/EtienneT/tablelamp/releases">Downloads</a> ·
   <a href="docs/development.md">Development</a> ·
-  <a href="https://etiennet.github.io/rowlight/">Website</a> ·
+  <a href="https://etiennet.github.io/tablelamp/">Website</a> ·
   <a href="CONTRIBUTING.md">Contribute</a> ·
   <a href="LICENSE">MIT license</a>
 </p>
 
-![Rowlight showing typed columns, distributions, and paged rows in Tokyo Night](docs/assets/tokyo-night.png)
+![Tablelamp showing typed columns, distributions, and paged rows in Tokyo Night](docs/assets/tokyo-night.png)
 
 ## A quick look
 
-![Rowlight demo: expand a chart, inspect a cell, page through rows, and collapse plots](docs/assets/rowlight-demo.gif)
+![Tablelamp demo: expand a chart, inspect a cell, page through rows, and collapse plots](docs/assets/tablelamp-demo.gif)
 
 Open a file, see its schema and distributions, and explore without changing the data.
+
+Try the [10 KB demo dataset](https://etiennet.github.io/tablelamp/demo/demo.parquet)
+and [sample queries](docs/demo/README.md). It contains 1,000 entirely synthetic rows.
 
 - **See the shape:** column types, nulls, distributions, and expanded charts.
 - **Explore:** sort the loaded page, filter or query the source with SQL, find columns, and inspect cells.
@@ -39,7 +42,7 @@ Plots summarize the displayed rows; **File overview** provides a bounded sample 
 
 ## Your Omarchy theme
 
-Rowlight follows the current Omarchy palette, including live theme changes. These are captures of the same synthetic file in the running Linux app.
+Tablelamp follows the current Omarchy palette, including live theme changes. These are captures of the same synthetic file in the running Linux app.
 
 | Tokyo Night | Catppuccin |
 | :---: | :---: |
@@ -49,28 +52,29 @@ Rowlight follows the current Omarchy palette, including live theme changes. Thes
 
 ## Install
 
-For a copyable install command, [choose your operating system on the website](https://etiennet.github.io/rowlight/installation.html).
+For a copyable install command, [choose your operating system on the website](https://etiennet.github.io/tablelamp/installation.html).
 
-Download [Rowlight 0.1.0-alpha.1](https://github.com/EtienneT/rowlight/releases/tag/v0.1.0-alpha.1).
-No Rust installation is needed.
+Download the [published alpha 0.1.0-alpha.1](https://github.com/EtienneT/tablelamp/releases/tag/v0.1.0-alpha.1).
+This build still uses the previous Rowlight name and icon. Tablelamp branding
+lands in the next release. No Rust installation is needed.
 
-- **Windows 10+ x64:** run the [installer](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe),
-  then open **Rowlight** from Start. A [portable ZIP](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud.zip) is also available.
-- **Omarchy / Arch x64:** download the [Arch package](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst),
+- **Windows 10+ x64:** run the [installer](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe),
+  then open the app from Start. A [portable ZIP](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud.zip) is also available.
+- **Omarchy / Arch x64:** download the [Arch package](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst),
   then install it with:
 
   ```sh
   sudo pacman -U ./rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst
   ```
 
-- **Other Linux x64:** download the [archive](https://github.com/EtienneT/rowlight/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz), extract it,
+- **Other Linux x64:** download the [archive](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz), extract it,
   and run this from the extracted folder:
 
   ```sh
   ./scripts/install-linux.sh
   ```
 
-  Open **Rowlight** from the application menu. Requires glibc 2.39+ (Ubuntu 24.04
+  Open the app from the application menu. Requires glibc 2.39+ (Ubuntu 24.04
   baseline), Wayland or X11, and Vulkan.
 
 The alpha is unsigned; Windows may show a publisher warning.

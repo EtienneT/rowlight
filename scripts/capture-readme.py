@@ -48,9 +48,9 @@ def main():
     assets.mkdir(parents=True, exist_ok=True)
     # Stable cloud/dev features reuse the ordinary incremental build cache.
     subprocess.run(["cargo", "dev-build"], cwd=ROOT, check=True)
-    source = work / "rowlight-demo.parquet"
+    source = work / "tablelamp-demo.parquet"
     if not source.exists():
-        subprocess.run(["cargo", "run", "--locked", "--example", "sample", "--", str(source), "50000"], cwd=ROOT, check=True)
+        subprocess.run(["cargo", "run", "--locked", "--example", "sample", "--features", "cloud", "--", str(source), "50000"], cwd=ROOT, check=True)
 
     display = next((f":{n}" for n in range(190, 220) if not Path(f"/tmp/.X{n}-lock").exists() and not Path(f"/tmp/.X11-unix/X{n}").exists()), None)
     if display is None:
@@ -93,7 +93,7 @@ def main():
             (current / "theme").mkdir(parents=True, exist_ok=True)
             shutil.copyfile(args.themes_dir / slug / "colors.toml", current / "theme/colors.toml")
             (current / "theme.name").write_text(title + "\n")
-            env["ROWLIGHT_PREVIEW_THEME"] = str(current)
+            env["TABLELAMP_PREVIEW_THEME"] = str(current)
             (work / "settings.json").write_text(json.dumps({
                 "association_prompted": True, "row_limit": {"mode": "paged", "rows": 500},
                 "show_plots": True, "window_width": 1400, "window_height": 860,
@@ -158,7 +158,7 @@ def main():
                 if recorder.returncode:
                     raise RuntimeError(f"Recording failed; see {work / 'recording.log'}")
                 recorder = None
-        run("ffmpeg", "-y", "-loglevel", "error", "-i", str(work / "demo.mp4"), "-filter_complex", "fps=8,scale=1000:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=none:diff_mode=rectangle", "-loop", "0", str(assets / "rowlight-demo.gif"))
+        run("ffmpeg", "-y", "-loglevel", "error", "-i", str(work / "demo.mp4"), "-filter_complex", "fps=8,scale=1000:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=none:diff_mode=rectangle", "-loop", "0", str(assets / "tablelamp-demo.gif"))
         print(f"Media written to {assets}")
     finally:
         stop(recorder)

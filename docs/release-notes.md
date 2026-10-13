@@ -1,4 +1,10 @@
-# Rowlight 0.1.0-alpha.1
+# Tablelamp 0.1.0-alpha.2
+
+This release is in preparation; published downloads remain at alpha.1.
+
+Tablelamp replaces the Rowlight name and introduces a lamp-and-grid icon.
+Executable, application, file association and preference identifiers are retained
+so existing installations continue to work.
 
 Shed light on your data. A small, read-only desktop viewer for Parquet, Arrow IPC
 / Feather v2, CSV and TSV, built with Rust, GPUI Kit and Polars.
@@ -9,10 +15,19 @@ cells, and browse large sources in pages. SQL mode queries the opened source as
 On Omarchy the app follows your palette; elsewhere it follows system light/dark
 appearance, with an explicit choice in Settings.
 
+This maintenance alpha adds quick-install commands, a 1,000-row synthetic demo
+and a social preview. Windows build paths are normalized, and public validation
+records report behavior and coverage without private test-environment details.
+Application behavior is unchanged from alpha.1.
+
+[Install Tablelamp](https://etiennet.github.io/tablelamp/installation.html) ·
+[Try the demo](https://etiennet.github.io/tablelamp/demo/demo.parquet) ·
+[Sample queries](https://github.com/EtienneT/tablelamp/blob/main/docs/demo/README.md)
+
 ## Downloads
 
 - **Omarchy / Arch x64:** native package; install using
-  `sudo pacman -U ./rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst`.
+  `sudo pacman -U ./tablelamp-bin-0.1.0.alpha.2-1-x86_64.pkg.tar.zst`.
   AUR publication is pending; future updates currently require downloading the
   newer package.
 - **Linux x64:** archive with a per-user installer; glibc 2.39+ (Ubuntu 24.04
@@ -42,8 +57,8 @@ not publisher identity.
   Some Windows desktop interactions, mixed-DPI displays and real cloud accounts
   still need manual validation; see the linked validation record.
 
-See [installation](https://github.com/EtienneT/rowlight/blob/main/docs/installation.md),
-the [user guide](https://github.com/EtienneT/rowlight/blob/main/docs/user-guide.md),
-and [validation evidence](https://github.com/EtienneT/rowlight/blob/main/packaging/TESTING.md).
+See [installation](https://github.com/EtienneT/tablelamp/blob/main/docs/installation.md),
+the [user guide](https://github.com/EtienneT/tablelamp/blob/main/docs/user-guide.md),
+and [validation evidence](https://github.com/EtienneT/tablelamp/blob/main/packaging/TESTING.md).
 Bug reports with small synthetic examples are welcome. Third-party license texts
 and source links are included in each download.

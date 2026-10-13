@@ -69,7 +69,7 @@ fn explain(error: &str) -> Explanation {
     }
     if lower.contains("permission denied") || lower.contains("access is denied") {
         return Explanation::new(
-            "Rowlight doesn't have permission to access this file or folder.",
+            "Tablelamp doesn't have permission to access this file or folder.",
             "Check its access permissions, then try opening it again.",
         );
     }
@@ -84,7 +84,7 @@ fn explain(error: &str) -> Explanation {
     }
     if lower.contains("timed out") || lower.contains("cannot reach remote object") {
         return Explanation::new(
-            "Rowlight couldn't reach the remote file.",
+            "Tablelamp couldn't reach the remote file.",
             "Check your connection and the file URL, then try again.",
         );
     }
@@ -99,7 +99,7 @@ fn explain(error: &str) -> Explanation {
     }
     if lower.contains("changed while") || lower.contains("remote object changed") {
         return Explanation::new(
-            "The source changed while Rowlight was reading it.",
+            "The source changed while Tablelamp was reading it.",
             "Reopen the file or folder to read its current version.",
         );
     }
@@ -278,7 +278,7 @@ mod tests {
             ),
             (
                 "Cannot open file: Permission denied (os error 13)",
-                "Rowlight doesn't have permission to access this file or folder.",
+                "Tablelamp doesn't have permission to access this file or folder.",
                 "permissions",
             ),
             (
@@ -288,7 +288,7 @@ mod tests {
             ),
             (
                 "Remote request timed out after 30 seconds",
-                "Rowlight couldn't reach the remote file.",
+                "Tablelamp couldn't reach the remote file.",
                 "connection",
             ),
             (

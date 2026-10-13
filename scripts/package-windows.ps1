@@ -11,7 +11,17 @@ try {
         # Keep the portable executable independent of the Visual C++ runtime.
         $previousFlags = $env:CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS
         try {
-            $env:CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS = "$previousFlags -C target-feature=+crt-static".Trim()
+            # Panic locations must not expose the release builder's local paths.
+            # Map both separators because rustc remapping is textual on Windows.
+            $remaps = @()
+            foreach ($entry in @(@($projectRoot, '/tablelamp'), @($env:CARGO_HOME, '/cargo'), @($env:RUSTUP_HOME, '/rustup'))) {
+                if ($entry[0]) {
+                    foreach ($prefix in @($entry[0], $entry[0].Replace('\', '/')) | Select-Object -Unique) {
+                        $remaps += '--remap-path-prefix="' + $prefix + '=' + $entry[1] + '"'
+                    }
+                }
+            }
+            $env:CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_RUSTFLAGS = "$previousFlags -C target-feature=+crt-static $($remaps -join ' ')".Trim()
             cargo build --locked --release --target x86_64-pc-windows-msvc --bin parquetviewer @featureArguments
             if ($LASTEXITCODE -ne 0) { throw 'Windows release build failed.' }
         } finally {
@@ -26,18 +36,18 @@ try {
     $version = ($metadata.packages | Where-Object name -eq 'parquetviewer').version
     $variant = if ($Cloud) { 'cloud' } else { 'core' }
     # PowerShell does not reliably wait for GUI-subsystem executables in a pipe.
-    # Explicit process waiting and redirection also work in noninteractive SSH.
+    # Wait explicitly and capture output for the GUI-subsystem executable.
     $versionOutput = Join-Path ([IO.Path]::GetTempPath()) ([IO.Path]::GetRandomFileName())
     $versionError = "$versionOutput.err"
     try {
         $process = Start-Process $binary -ArgumentList '--version' -Wait -PassThru -RedirectStandardOutput $versionOutput -RedirectStandardError $versionError
-        if ($process.ExitCode -ne 0 -or (Get-Content $versionOutput -Raw).Trim() -ne "Rowlight $version ($variant)") { throw 'Release executable version or feature set does not match.' }
+        if ($process.ExitCode -ne 0 -or (Get-Content $versionOutput -Raw).Trim() -ne "Tablelamp $version ($variant)") { throw 'Release executable version or feature set does not match.' }
     } finally {
         Remove-Item $versionOutput, $versionError -Force -ErrorAction SilentlyContinue
     }
     $licenseHash = (Get-Content 'packaging/licenses.lock.sha256' -Raw).Trim()
     if ((Get-FileHash Cargo.lock -Algorithm SHA256).Hash.ToLowerInvariant() -ne $licenseHash) { throw 'Regenerate third-party notices after changing Cargo.lock.' }
-    $name = "rowlight-$version-windows-x64$suffix"
+    $name = "tablelamp-$version-windows-x64$suffix"
     $stage = Join-Path $projectRoot 'dist/windows'
     if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
     New-Item -ItemType Directory -Force $stage | Out-Null

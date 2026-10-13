@@ -1,11 +1,11 @@
 # Security
 
-Rowlight is an early alpha. Security fixes target the latest released alpha;
+Tablelamp is an early alpha. Security fixes target the latest released alpha;
 older versions should be updated. Supported platforms are listed in
 [platforms.md](docs/platforms.md).
 
-Report vulnerabilities through [GitHub's private vulnerability reporting](https://github.com/EtienneT/rowlight/security/advisories/new).
-Include the Rowlight version, operating system, impact and reproduction steps
+Report vulnerabilities through [GitHub's private vulnerability reporting](https://github.com/EtienneT/tablelamp/security/advisories/new).
+Include the Tablelamp version, operating system, impact and reproduction steps
 using synthetic data where possible. Never include real cloud credentials,
 signed URLs or private datasets in a public issue.
 

@@ -1,6 +1,6 @@
 # Licenses and notices
 
-Rowlight's code is [MIT licensed](../LICENSE). Third-party code and assets keep
+Tablelamp's code is [MIT licensed](../LICENSE). Third-party code and assets keep
 their own licenses. Downloads include [THIRD_PARTY_NOTICES.html](../THIRD_PARTY_NOTICES.html),
 with complete license texts, copyright notices and links to exact crate source
 archives. Embedded Lucide and Feather icon attribution is included separately.

@@ -1,10 +1,10 @@
 name: Bug report
-description: Report a reproducible problem in Rowlight.
+description: Report a reproducible problem in Tablelamp.
 body:
   - type: input
     id: version
     attributes:
-      label: Rowlight version
+      label: Tablelamp version
       description: Run parquetviewer --version, or give the download filename.
     validations:
       required: true
