@@ -35,5 +35,7 @@ so existing file associations and preferences continue to work.
   hold development feedback until installers finish. Don't substitute a dev
   binary for the installed release app without the user's request.
 
-GitHub Actions was disabled at the user's request to avoid paid minutes. Don't
-enable or dispatch workflows without an explicit request.
+Native GitHub Actions checks are enabled for code and build-input changes in
+public repositories. Keep the standard Linux/Windows runners, path filters,
+draft-PR guard and manual-only release packaging. Don't switch to paid runners
+or dispatch release packaging without an explicit request.

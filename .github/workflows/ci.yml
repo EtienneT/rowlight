@@ -3,10 +3,40 @@ on:
   push:
     # Branch pushes with an open PR are covered by pull_request below.
     branches: [main]
-    paths-ignore:
-      - README.md
-      - 'docs/**'
+    # Build inputs only: website, documentation and repository housekeeping
+    # changes do not need another native build.
+    paths:
+      - '**/*.rs'
+      - '**/Cargo.toml'
+      - '**/Cargo.lock'
+      - '.cargo/**'
+      - 'rust-toolchain.toml'
+      - '.github/workflows/**'
+      - 'assets/**'
+      - 'packaging/**'
+      - '!packaging/**/*.md'
+      - '!packaging/**/*.txt'
+      - 'scripts/package-*'
+      - 'scripts/check-linux-abi.sh'
+      - 'scripts/generate-notices.py'
   pull_request:
+    branches: [main]
+    # Starting review runs the checks; returning to draft cancels an older run.
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+    paths:
+      - '**/*.rs'
+      - '**/Cargo.toml'
+      - '**/Cargo.lock'
+      - '.cargo/**'
+      - 'rust-toolchain.toml'
+      - '.github/workflows/**'
+      - 'assets/**'
+      - 'packaging/**'
+      - '!packaging/**/*.md'
+      - '!packaging/**/*.txt'
+      - 'scripts/package-*'
+      - 'scripts/check-linux-abi.sh'
+      - 'scripts/generate-notices.py'
   workflow_dispatch:
     inputs:
       packages:
@@ -21,7 +51,10 @@ permissions:
 jobs:
   check:
     # Never use private-repository minutes, even if this workflow is re-enabled.
-    if: ${{ github.event.repository.private == false }}
+    # Draft PRs wait until the author requests review.
+    if: >-
+      ${{ github.event.repository.private == false &&
+          (github.event_name != 'pull_request' || github.event.pull_request.draft == false) }}
     name: ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
     # Release builds are explicit and need more time than development checks.
