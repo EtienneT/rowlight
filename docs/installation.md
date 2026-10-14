@@ -1,11 +1,7 @@
 # Install Tablelamp
 
-The published **0.1.0-alpha.1** build still uses the previous **Rowlight** name
-and icon. Tablelamp branding lands in the next release. The original download
-filenames are retained so checksums and upgrades keep working.
-
 Choose your operating system, copy one command, and open the app. The installer
-downloads **0.1.0-alpha.1** and checks its SHA-256 hash before running it.
+downloads **Tablelamp 0.1.0-alpha.2** and checks its SHA-256 hash before running it.
 No Rust installation is needed.
 
 After installing, [download the demo dataset](https://etiennet.github.io/tablelamp/demo/demo.parquet)
@@ -28,18 +24,18 @@ per-user Tablelamp installation is updated in place.
 and a working Vulkan graphics driver.
 
 [Review the install script](https://github.com/EtienneT/tablelamp/blob/main/docs/install.sh)
-· [Download an archive instead](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz)
+· [Download an archive instead](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-linux-x64-cloud.tar.gz)
 
 <details>
 <summary>Manual installation</summary>
 
 ### Omarchy / Arch
 
-Download the [Arch package](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst)
+Download the [Arch package](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-bin-0.1.0.alpha.2-1-x86_64.pkg.tar.zst)
 and verify its checksum, then run this in the download folder:
 
 ```sh
-sudo pacman -U ./rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst
+sudo pacman -U ./tablelamp-bin-0.1.0.alpha.2-1-x86_64.pkg.tar.zst
 ```
 
 Pacman installs Tablelamp and resolves its declared dependencies. A Vulkan driver
@@ -54,7 +50,7 @@ are kept.
 
 ### Other Linux
 
-Download the [Linux archive](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz)
+Download the [Linux archive](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-linux-x64-cloud.tar.gz)
 and verify its checksum. Extract it, then run this from the extracted folder:
 
 ```sh
@@ -83,7 +79,7 @@ defaults are preserved.
 For an Arch installation, remove the package with:
 
 ```sh
-sudo pacman -R rowlight-bin
+sudo pacman -R tablelamp-bin
 ```
 
 For a per-user installation, download and extract the Linux archive, then run:
@@ -118,12 +114,12 @@ This alpha is unsigned; Windows may show an unknown-publisher warning or block
 the installer under your security policy.
 
 [Review the install script](https://github.com/EtienneT/tablelamp/blob/main/docs/install.ps1)
-· [Download the installer instead](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe)
+· [Download the installer instead](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-windows-x64-cloud-setup.exe)
 
 <details>
 <summary>Portable use, updates, and removal</summary>
 
-For portable use, download the [ZIP](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud.zip),
+For portable use, download the [ZIP](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-windows-x64-cloud.zip),
 verify its checksum, choose **Extract All**, and run `parquetviewer.exe`. Keep the
 extracted files together. The ZIP does not add a Start menu entry.
 
@@ -131,7 +127,7 @@ To update an installation, rerun the quick-install command when this page points
 to a newer release, or run that release's setup executable. For a portable update,
 close Tablelamp and extract the newer ZIP into a new folder. Preferences are kept.
 
-Remove the installed app through **Settings → Apps → Installed apps → Rowlight →
+Remove the installed app through **Settings → Apps → Installed apps → Tablelamp →
 Uninstall** (**Apps & features** on Windows 10). It removes registrations and
 keeps preferences. Upgrades retain the original `Programs\Parquet Viewer` directory.
 
@@ -141,8 +137,8 @@ keeps preferences. Upgrades retain the original `Programs\Parquet Viewer` direct
 <summary>Make Tablelamp the default for Parquet</summary>
 
 Use **Choose in Windows Settings** in the first-launch offer, or **Associate
-Parquet files…** from the app menu. Choose the app for `.parquet` and `.parq` in Default Apps (listed as Rowlight
-in the published alpha). You can also right-click a file → **Open with → Choose another app
+Parquet files…** from the app menu. Choose Tablelamp for `.parquet` and `.parq` in
+Default Apps. You can also right-click a file → **Open with → Choose another app
 → Always**. Windows owns the final default selection; installation preserves it.
 
 </details>
@@ -150,7 +146,7 @@ in the published alpha). You can also right-click a file → **Open with → Cho
 ## Download checksums
 
 The quick-install commands verify the downloaded package against the release's
-[SHA256SUMS](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/SHA256SUMS).
+[SHA256SUMS](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/SHA256SUMS).
 Checksums verify file integrity, not publisher identity. This alpha is unsigned.
 
 <details>
@@ -166,7 +162,7 @@ sha256sum --ignore-missing --check SHA256SUMS
 On Windows, compare this output with the matching line in `SHA256SUMS`:
 
 ```powershell
-Get-FileHash .\rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe -Algorithm SHA256
+Get-FileHash .\tablelamp-0.1.0-alpha.2-windows-x64-cloud-setup.exe -Algorithm SHA256
 ```
 
 Expect `OK` on Linux or an identical hash on Windows. If verification fails,

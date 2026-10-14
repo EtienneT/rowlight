@@ -2,10 +2,9 @@
 # Tablelamp website installer. Download a published package and verify its hash.
 set -euo pipefail
 
-version=0.1.0-alpha.1
-package_version=0.1.0.alpha.1
-# Published alpha.1 assets retain their original names and archive root.
-asset_prefix=rowlight
+version=0.1.0-alpha.2
+package_version=0.1.0.alpha.2
+asset_prefix=tablelamp
 release_url="https://github.com/EtienneT/tablelamp/releases/download/v$version"
 install_mode=auto
 check_only=false
@@ -75,4 +74,4 @@ else
   printf 'Installing for your user account…\n'
   bash "$extracted/scripts/install-linux.sh" --skip-build
 fi
-printf 'Open the app from your application menu (the published alpha is still named Rowlight).\n'
+printf 'Open Tablelamp from your application menu.\n'

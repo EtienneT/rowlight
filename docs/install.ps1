@@ -4,9 +4,8 @@ param([switch]$Check)
 & {
     param([switch]$CheckOnly)
     $ErrorActionPreference = 'Stop'
-    $version = '0.1.0-alpha.1'
-    # Published alpha.1 retains its original release filename.
-    $asset = "rowlight-$version-windows-x64-cloud-setup.exe"
+    $version = '0.1.0-alpha.2'
+    $asset = "tablelamp-$version-windows-x64-cloud-setup.exe"
     $releaseUrl = "https://github.com/EtienneT/tablelamp/releases/download/v$version"
     if (-not $CheckOnly) {
         if ($env:OS -ne 'Windows_NT') { throw 'Official Windows downloads require Windows x64.' }
@@ -34,7 +33,7 @@ param([switch]$Check)
             Write-Host 'Verification complete. Nothing was installed.'
             return
         }
-        Write-Host 'Opening the installer. Follow its steps, then open the app from Start (the published alpha is still named Rowlight).'
+        Write-Host 'Opening the installer. Follow its steps, then open Tablelamp from Start.'
         $process = Start-Process -FilePath $installer -Wait -PassThru
         if ($process.ExitCode -ne 0) { throw "The installer ended with code $($process.ExitCode)." }
     }

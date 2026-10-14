@@ -1,14 +1,12 @@
 # Tablelamp for Arch and Omarchy
 
-New releases use `tablelamp-bin` as a native `.pkg.tar.zst` package.
-The published alpha.1 package retains its original `rowlight-bin` filename.
+Install `tablelamp-bin` as a native `.pkg.tar.zst` package.
 It uses the same validated cloud executable as the Linux archive. Pacman manages
 its files and dependencies; it never runs the per-user installer or writes file
 default choices. Preferences retain their existing `parquetviewer` location.
 
-An AUR listing is not yet published. The alpha.2 recipe requires the validated Tablelamp archive checksum before it
-can be built or submitted. It deliberately refuses the old archive checksum.
-Once the checksum is pinned:
+An AUR listing is not yet published. The recipe pins the validated Tablelamp
+archive checksum. Build it with:
 
 ```sh
 cd packaging/arch

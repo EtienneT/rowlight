@@ -8,10 +8,11 @@ packages are unsigned. macOS is experimental community tooling.
 | Coverage | Linux x64 | Windows x64 |
 | --- | --- | --- |
 | Formatting, lint and application regressions | Passed | Passed |
-| Published package version, product identity and license notices | Passed | Passed |
+| Package version, product identity and license notices | Passed | Passed |
 | Installation, upgrade, removal and file-default preservation | Passed | Passed |
-| Paging, Hive folders and SQL worker | Passed | Passed |
-| Rendered desktop picker, charts, drag/drop and appearance | Passed | Pending |
+| Paging, Hive folders and SQL worker regressions | Passed | Passed |
+| Rendered package table, distributions and SQL | Passed | Pending |
+| Picker, drag/drop and live appearance changes in the release package | Not repeated | Pending |
 | Physical mixed-DPI displays | Not assessed | Pending |
 | Live S3, Azure and GCS accounts | Not assessed | Not assessed |
 
@@ -20,6 +21,26 @@ compatibility guard. The Arch package contains the same application executable.
 Windows packages include the static C runtime and preserve the legacy executable,
 application and settings identifiers. Versioned downloads, checksums and source
 provenance are attached to the GitHub prerelease.
+
+The release was checked on 2026-10-14. [Native builds](https://github.com/EtienneT/tablelamp/actions/runs/38634583215)
+passed formatting, core/cloud lint, workspace tests, Unicode-path data smoke tests
+and optimized cloud packaging on Linux x64 and Windows x64. The distributed
+Linux binary was built separately using the retained Ubuntu 24.04 cache, with
+the same application source and feature set, and passed the ABI guard.
+
+An isolated Ubuntu 24.04 runtime rendered the packaged Linux table and SQL
+result. A synthetic 100,000-row Hive folder opened with 500-row paging, and SQL
+returned the complete row count. Per-user installation, upgrade from alpha.1 and
+removal preserved file defaults and saved preferences. The Arch package uses the
+same binary and was checked with an isolated pacman installation and removal.
+
+[Windows package validation](https://github.com/EtienneT/tablelamp/actions/runs/38637678052)
+verified the exact portable ZIP and setup checksums, then installed alpha.1 and
+upgraded to Tablelamp on a clean native Windows runner. Installed startup,
+product branding, quoted file-open commands, all supported Open With entries,
+default and preference preservation, and uninstaller cleanup passed. Manual
+Windows desktop and physical mixed-DPI checks remain pending. Package scans
+found no private builder paths or test-environment names.
 
 Public records describe supported platforms, tested behavior and outstanding
 coverage. Keep hostnames, addresses, account names, machine paths, private logs,
@@ -78,3 +99,6 @@ The first Linux/Windows alpha is unsigned; disclose this in its release notes an
   Alpha.2 Tablelamp packages were not rebuilt or published in this source change.
   The Arch recipe requires a new validated archive checksum before packaging;
   Windows/macOS resource changes await native release checks.
+
+The source-only status above describes the 2026-10-13 rebrand. The 2026-10-14
+release checks at the top of this document cover the new Tablelamp downloads.

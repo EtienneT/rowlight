@@ -54,20 +54,19 @@ Tablelamp follows the current Omarchy palette, including live theme changes. The
 
 For a copyable install command, [choose your operating system on the website](https://etiennet.github.io/tablelamp/installation.html).
 
-Download the [published alpha 0.1.0-alpha.1](https://github.com/EtienneT/tablelamp/releases/tag/v0.1.0-alpha.1).
-This build still uses the previous Rowlight name and icon. Tablelamp branding
-lands in the next release. No Rust installation is needed.
+Download [Tablelamp 0.1.0-alpha.2](https://github.com/EtienneT/tablelamp/releases/tag/v0.1.0-alpha.2).
+No Rust installation is needed.
 
-- **Windows 10+ x64:** run the [installer](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe),
-  then open the app from Start. A [portable ZIP](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud.zip) is also available.
-- **Omarchy / Arch x64:** download the [Arch package](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst),
+- **Windows 10+ x64:** run the [installer](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-windows-x64-cloud-setup.exe),
+  then open the app from Start. A [portable ZIP](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-windows-x64-cloud.zip) is also available.
+- **Omarchy / Arch x64:** download the [Arch package](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-bin-0.1.0.alpha.2-1-x86_64.pkg.tar.zst),
   then install it with:
 
   ```sh
-  sudo pacman -U ./rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst
+  sudo pacman -U ./tablelamp-bin-0.1.0.alpha.2-1-x86_64.pkg.tar.zst
   ```
 
-- **Other Linux x64:** download the [archive](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz), extract it,
+- **Other Linux x64:** download the [archive](https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-linux-x64-cloud.tar.gz), extract it,
   and run this from the extracted folder:
 
   ```sh

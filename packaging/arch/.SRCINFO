@@ -25,6 +25,6 @@ pkgbase = tablelamp-bin
 	options = !strip
 	options = !debug
 	source = https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-linux-x64-cloud.tar.gz
-	sha256sums = REPLACE_WITH_VALIDATED_TABLELAMP_ARCHIVE_SHA256
+	sha256sums = 2346c542c41a9e8bec91ef404dfd3cb9777dacc58ca515880dd13949be1fe67d
 
 pkgname = tablelamp-bin

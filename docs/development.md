@@ -63,9 +63,9 @@ For native desktop validation, follow [the release checklist](../packaging/TESTI
 
 ## Continuous integration
 
-The [Native builds workflow](https://github.com/EtienneT/tablelamp/actions/workflows/ci.yml) uses standard GitHub-hosted runners for Linux x64 and Windows x64. macOS is outside the maintained matrix. These runner minutes are [free for public repositories](https://docs.github.com/en/actions/reference/runners/github-hosted-runners). The workflow skips every job while the repository is private, even if enabled. The workflow remains disabled at the owner's request; making the repository public does not authorize enabling or dispatching it. A maintainer can explicitly enable it later if wanted.
+The [Native builds workflow](https://github.com/EtienneT/tablelamp/actions/workflows/ci.yml) uses standard GitHub-hosted runners for Linux x64 and Windows x64. macOS is outside the maintained matrix. These runner minutes are [free for public repositories](https://docs.github.com/en/actions/reference/runners/github-hosted-runners). Checks are enabled for the public repository; the workflow skips every job while the repository is private.
 
-Once public and enabled, source pushes to `main` and pull requests run development-profile checks. README/guide-only pushes skip the matrix, and new commits cancel superseded runs. Core lint still checks code without cloud features; cloud/UI lint and all workspace tests use one feature set. Native dependency caches are kept after failures and saved only from `main`, so pull requests reuse them without creating a cache for every branch.
+Source pushes to `main` and non-draft pull requests run development-profile checks. README/guide-only pushes skip the matrix, and new commits cancel superseded runs. Core lint still checks code without cloud features; cloud/UI lint and all workspace tests use one feature set. Native dependency caches are kept after failures and saved only from `main`, so pull requests reuse them without creating a cache for every branch.
 
 Cargo parallelism is bounded for the [public runner hardware](https://docs.github.com/en/actions/reference/runners/github-hosted-runners):
 
@@ -76,13 +76,18 @@ Cargo parallelism is bounded for the [public runner hardware](https://docs.githu
 
 These are starting limits, not measured speedups. Check the first public runs for time and memory pressure before raising them further. Local builds retain the four-job default; `CARGO_BUILD_JOBS` can override it for a particular machine.
 
-Optimized packages are built only when a maintainer chooses **Run workflow → packages**. Leave that checkbox off for checks alone. Only after explicit approval to enable and use Actions, request packages with the GitHub CLI:
+Optimized packages are built only when a maintainer chooses **Run workflow → packages**. Leave that checkbox off for checks alone. After an explicit release request, build packages with the GitHub CLI:
 
 ```sh
 gh workflow run ci.yml --ref main -f packages=true
 ```
 
 Package runs check the code first, then build the cloud variant on each maintained platform. Core packaging remains an optional source-build choice. Uploaded packages expire after seven days. Routine checks have a 30-minute timeout per platform; package runs allow 90 minutes. The size-optimized release profile is unchanged.
+
+Windows package runs also test installation, upgrade from the first alpha,
+startup, removal, and preservation of file defaults and preferences on the clean
+runner. To validate existing packages without rebuilding them, manually run
+**Release package validation** with the originating Native builds run ID.
 
 Cold builds compile GPUI, Polars and their native dependencies separately on each OS/CPU. Caches reuse dependencies, but the application still needs compilation/linking after source changes. Thin LTO and single-codegen-unit release optimization also add time. Building two release variants on all four platforms for every push was the main avoidable cost of the original workflow.
 

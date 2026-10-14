@@ -20,8 +20,7 @@ replace previously cached assets.
 `install.sh` and `install.ps1` download the pinned published release, verify its
 `SHA256SUMS`, and delegate to the existing native package/installer. Keep their
 version and filenames synchronized with the installation source and landing page.
-The published alpha.1 assets and archive roots retain their Rowlight filenames;
-new Tablelamp package names are used only after those downloads are published.
+Downloads and archive roots use the Tablelamp name.
 Linux auto-selects pacman on Arch or a per-user archive elsewhere, retaining an
 existing per-user install. Windows opens the per-user setup wizard. Neither script
 builds the app or changes file defaults directly. `--check` (Bash) and `-Check`
@@ -59,7 +58,7 @@ The web illustration has 32 synthetic rows and eight rows per page. Visitors can
 sort the displayed page, inspect cells, expand distributions, and hide plots.
 It does not read local files or execute SQL. The theme picker changes the website
 and selects a real app screenshot; it remembers only the website palette in
-browser-local storage under `rowlight-site-theme`. Storage is optional.
+browser-local storage under its existing preference key. Storage is optional.
 
 Without JavaScript, the hero shows a real app screenshot and the content,
 documentation links, release links, and FAQ remain usable. Direct screenshot
@@ -78,9 +77,8 @@ Pushes to `main` publish the source automatically. The public URL is
 
 GitHub Pages still uses a GitHub Actions deployment run with branch publishing.
 The owner authorized website publication on 2026-10-13. This authorization covers
-Pages deployment; the existing **Native builds** workflow stays disabled.
-The repository's instructions still require explicit authorization for enabling
-or dispatching application build/test workflows.
+Pages deployment. **Native builds** also runs source checks on public repositories;
+release packaging remains manual and requires an explicit request.
 
 ## Keep the page current
 

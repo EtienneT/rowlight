@@ -42,11 +42,8 @@
       <article class="guide-article" aria-labelledby="guide-title">
         <header class="guide-heading"><p class="eyebrow">Tablelamp / Documentation</p><h1 id="guide-title">Installation</h1></header>
         <details class="guide-mobile-toc"><summary>On this page</summary><nav aria-label="On this page"><ul><li><a href="#linux">Linux</a></li><li><a href="#windows">Windows</a></li><li><a href="#download-checksums">Download checksums</a></li><li><a href="#included-in-the-download">Included in the download</a></li><li><a href="#try-from-source">Try from source</a></li><li><a href="#macos">macOS</a></li></ul></nav></details>
-        <div class="guide-content"><p>The published <strong>0.1.0-alpha.1</strong> build still uses the previous <strong>Rowlight</strong> name
-and icon. Tablelamp branding lands in the next release. The original download
-filenames are retained so checksums and upgrades keep working.</p>
-<p>Choose your operating system, copy one command, and open the app. The installer
-downloads <strong>0.1.0-alpha.1</strong> and checks its SHA-256 hash before running it.
+        <div class="guide-content"><p>Choose your operating system, copy one command, and open the app. The installer
+downloads <strong>Tablelamp 0.1.0-alpha.2</strong> and checks its SHA-256 hash before running it.
 No Rust installation is needed.</p>
 <p>After installing, <a href="https://etiennet.github.io/tablelamp/demo/demo.parquet">download the demo dataset</a>
 and open it in Tablelamp. <a href="https://github.com/EtienneT/tablelamp/blob/main/docs/demo/README.md">Try the sample queries</a>.</p>
@@ -61,13 +58,13 @@ per-user Tablelamp installation is updated in place.</p>
 <p><strong>Requirements:</strong> Linux x64, glibc 2.39+ (Ubuntu 24.04 or newer), Wayland or X11,
 and a working Vulkan graphics driver.</p>
 <p><a href="https://github.com/EtienneT/tablelamp/blob/main/docs/install.sh">Review the install script</a>
-· <a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz">Download an archive instead</a></p>
+· <a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-linux-x64-cloud.tar.gz">Download an archive instead</a></p>
 <details>
 <summary>Manual installation</summary>
 <h3 id="omarchy--arch">Omarchy / Arch</h3>
-<p>Download the <a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst">Arch package</a>
+<p>Download the <a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-bin-0.1.0.alpha.2-1-x86_64.pkg.tar.zst">Arch package</a>
 and verify its checksum, then run this in the download folder:</p>
-<pre tabindex="0"><code class="language-sh">sudo pacman -U ./rowlight-bin-0.1.0.alpha.1-1-x86_64.pkg.tar.zst
+<pre tabindex="0"><code class="language-sh">sudo pacman -U ./tablelamp-bin-0.1.0.alpha.2-1-x86_64.pkg.tar.zst
 </code></pre>
 <p>Pacman installs Tablelamp and resolves its declared dependencies. A Vulkan driver
 for your GPU is still required. The package adds Open With support and preserves
@@ -78,7 +75,7 @@ run <code>./scripts/uninstall-linux.sh</code> from an extracted Tablelamp archiv
 an older launcher or executable under <code>~/.local</code> taking precedence. Preferences
 are kept.</p>
 <h3 id="other-linux">Other Linux</h3>
-<p>Download the <a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-linux-x64-cloud.tar.gz">Linux archive</a>
+<p>Download the <a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-linux-x64-cloud.tar.gz">Linux archive</a>
 and verify its checksum. Extract it, then run this from the extracted folder:</p>
 <pre tabindex="0"><code class="language-sh">./scripts/install-linux.sh
 </code></pre>
@@ -95,7 +92,7 @@ folder. Keep the extracted files together.</p>
 release will have an updated command script. Your preferences and existing file
 defaults are preserved.</p>
 <p>For an Arch installation, remove the package with:</p>
-<pre tabindex="0"><code class="language-sh">sudo pacman -R rowlight-bin
+<pre tabindex="0"><code class="language-sh">sudo pacman -R tablelamp-bin
 </code></pre>
 <p>For a per-user installation, download and extract the Linux archive, then run:</p>
 <pre tabindex="0"><code class="language-sh">./scripts/uninstall-linux.sh
@@ -117,29 +114,29 @@ without an administrator prompt.</p>
 This alpha is unsigned; Windows may show an unknown-publisher warning or block
 the installer under your security policy.</p>
 <p><a href="https://github.com/EtienneT/tablelamp/blob/main/docs/install.ps1">Review the install script</a>
-· <a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe">Download the installer instead</a></p>
+· <a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-windows-x64-cloud-setup.exe">Download the installer instead</a></p>
 <details>
 <summary>Portable use, updates, and removal</summary>
-<p>For portable use, download the <a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/rowlight-0.1.0-alpha.1-windows-x64-cloud.zip">ZIP</a>,
+<p>For portable use, download the <a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/tablelamp-0.1.0-alpha.2-windows-x64-cloud.zip">ZIP</a>,
 verify its checksum, choose <strong>Extract All</strong>, and run <code>parquetviewer.exe</code>. Keep the
 extracted files together. The ZIP does not add a Start menu entry.</p>
 <p>To update an installation, rerun the quick-install command when this page points
 to a newer release, or run that release's setup executable. For a portable update,
 close Tablelamp and extract the newer ZIP into a new folder. Preferences are kept.</p>
-<p>Remove the installed app through <strong>Settings → Apps → Installed apps → Rowlight →
+<p>Remove the installed app through <strong>Settings → Apps → Installed apps → Tablelamp →
 Uninstall</strong> (<strong>Apps &amp; features</strong> on Windows 10). It removes registrations and
 keeps preferences. Upgrades retain the original <code>Programs\Parquet Viewer</code> directory.</p>
 </details>
 <details>
 <summary>Make Tablelamp the default for Parquet</summary>
 <p>Use <strong>Choose in Windows Settings</strong> in the first-launch offer, or <strong>Associate
-Parquet files…</strong> from the app menu. Choose the app for <code>.parquet</code> and <code>.parq</code> in Default Apps (listed as Rowlight
-in the published alpha). You can also right-click a file → <strong>Open with → Choose another app
+Parquet files…</strong> from the app menu. Choose Tablelamp for <code>.parquet</code> and <code>.parq</code> in
+Default Apps. You can also right-click a file → <strong>Open with → Choose another app
 → Always</strong>. Windows owns the final default selection; installation preserves it.</p>
 </details>
 </section><h2 id="download-checksums">Download checksums</h2>
 <p>The quick-install commands verify the downloaded package against the release's
-<a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.1/SHA256SUMS">SHA256SUMS</a>.
+<a href="https://github.com/EtienneT/tablelamp/releases/download/v0.1.0-alpha.2/SHA256SUMS">SHA256SUMS</a>.
 Checksums verify file integrity, not publisher identity. This alpha is unsigned.</p>
 <details>
 <summary>Verify a manually downloaded file</summary>
@@ -148,7 +145,7 @@ beside the package and checksum file:</p>
 <pre tabindex="0"><code class="language-sh">sha256sum --ignore-missing --check SHA256SUMS
 </code></pre>
 <p>On Windows, compare this output with the matching line in <code>SHA256SUMS</code>:</p>
-<pre tabindex="0"><code class="language-powershell">Get-FileHash .\rowlight-0.1.0-alpha.1-windows-x64-cloud-setup.exe -Algorithm SHA256
+<pre tabindex="0"><code class="language-powershell">Get-FileHash .\tablelamp-0.1.0-alpha.2-windows-x64-cloud-setup.exe -Algorithm SHA256
 </code></pre>
 <p>Expect <code>OK</code> on Linux or an identical hash on Windows. If verification fails,
 download again before installing. GitHub's <strong>Source code</strong> archives are for

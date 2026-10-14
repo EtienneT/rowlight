@@ -1,22 +1,21 @@
 # Prepare a release
 
 Maintained downloads are Linux x64 and Windows x64, with cloud support included.
-macOS source tooling is experimental. GitHub Actions remains disabled; do not
-enable or dispatch it without the owner's explicit request.
+macOS source tooling is experimental. Native GitHub Actions checks are enabled
+for public repositories; release packaging requires an explicit request.
 
 ## Local preparation, public downloads
 
-The repository and alpha.1 downloads are public. Alpha.2 is the first release
-under the Tablelamp name; its native packages still need validation before
-publication. The website continues to link to alpha.1's original filenames
-until the new downloads exist.
+The repository and downloads are public. Alpha.2 is the first release with
+Tablelamp branding. Validate native packages before publication, and keep the
+website linked to the existing downloads until the new packages are available.
 
 Build, test and prepare packages locally. A GitHub draft can hold the notes and
 downloads for review before publication. Publish **v0.1.0-alpha.2** as a prerelease
 at the reviewed commit, with all four packages and `SHA256SUMS`. Then update the
 website installers, installation guide, landing page and README together to use
-the new version and Tablelamp filenames. Creating releases and uploading locally
-built packages does not require enabling the Native builds workflow.
+the new version and Tablelamp filenames. The manual Native builds packaging run
+can build Linux and Windows downloads on standard GitHub-hosted runners.
 
 GitHub documents [draft and prerelease publication](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository).
 If immutable releases are enabled later, draft first: assets cannot be replaced
@@ -90,7 +89,7 @@ after publication. Publish a new version for corrected binaries.
 
 Create a tag at the reviewed commit, use the local release notes, attach the four
 validated downloads and SHA256SUMS, and mark the release as a prerelease. A GitHub
-draft can be reviewed before publication. Do not enable Actions as a side effect.
+draft can be reviewed before publication. Keep release packaging manual.
 Replace the README's alpha-preparation sentence with the actual release link.
 
 ## Distribution policy
@@ -124,6 +123,6 @@ it after the initial alpha rather than assuming it can sign the first release.
 When public, standard GitHub-hosted runners are
 [free](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
 [Larger runners are billed](https://docs.github.com/en/billing/reference/actions-runner-pricing).
-This does not change the owner's decision to keep Actions disabled.
+Use the standard Linux/Windows runners; paid runners require an explicit request.
 
 Mac signing/notarization is outside the current release scope.

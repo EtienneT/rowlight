@@ -17,9 +17,7 @@ replaces=('rowlight-bin')
 # Retain the already stripped, validated executable exactly as released.
 options=('!strip' '!debug')
 source=("$url/releases/download/v$_version/tablelamp-$_version-linux-x64-cloud.tar.gz")
-# Pin the new Tablelamp archive after native release validation. Alpha.1's
-# checksum belongs to a different archive and must not be reused.
-sha256sums=('REPLACE_WITH_VALIDATED_TABLELAMP_ARCHIVE_SHA256')
+sha256sums=('2346c542c41a9e8bec91ef404dfd3cb9777dacc58ca515880dd13949be1fe67d')
 
 package() {
   local release="$srcdir/tablelamp-$_version-linux-x64-cloud"

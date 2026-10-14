@@ -1,8 +1,6 @@
 # Tablelamp 0.1.0-alpha.2
 
-This release is in preparation; published downloads remain at alpha.1.
-
-Tablelamp replaces the Rowlight name and introduces a lamp-and-grid icon.
+This release introduces Tablelamp branding and a lamp-and-grid icon.
 Executable, application, file association and preference identifiers are retained
 so existing installations continue to work.
 
