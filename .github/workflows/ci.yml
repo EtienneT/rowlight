@@ -120,6 +120,10 @@ jobs:
         shell: pwsh
         run: |
           ./scripts/package-windows.ps1 -Cloud
+      - name: Windows installation and legacy upgrade smoke test
+        if: github.event_name == 'workflow_dispatch' && inputs.packages && runner.os == 'Windows'
+        shell: pwsh
+        run: ./scripts/package-windows-smoke.ps1
       - name: Upload native packages
         if: github.event_name == 'workflow_dispatch' && inputs.packages
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0

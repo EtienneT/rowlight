@@ -8,6 +8,10 @@ community tooling, excluded from official downloads and required CI. Preserve
 legacy executable, application and settings identifiers when updating branding
 so existing file associations and preferences continue to work.
 
+Commits are authorized for completed work requested in this repository; do not
+ask for separate commit approval. Requested releases also authorize pushing the
+reviewed changes and publishing the validated release.
+
 ## Fast development loop
 
 - **Use development builds while implementing changes.** Use `cargo dev -- FILE`
