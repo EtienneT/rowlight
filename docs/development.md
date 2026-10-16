@@ -88,6 +88,9 @@ Windows package runs also test installation, upgrade from the first alpha,
 startup, removal, and preservation of file defaults and preferences on the clean
 runner. To validate existing packages without rebuilding them, manually run
 **Release package validation** with the originating Native builds run ID.
+For installer-only changes, enable **rebuild_installer** to compile the current
+Inno Setup recipe against that run's existing application binary. This runs no
+Cargo build and provides a tested installer preview as a workflow artifact.
 
 Cold builds compile GPUI, Polars and their native dependencies separately on each OS/CPU. Caches reuse dependencies, but the application still needs compilation/linking after source changes. Thin LTO and single-codegen-unit release optimization also add time. Building two release variants on all four platforms for every push was the main avoidable cost of the original workflow.
 

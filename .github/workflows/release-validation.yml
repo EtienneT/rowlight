@@ -6,6 +6,10 @@ on:
         description: Native builds run containing the Windows cloud packages
         type: string
         required: true
+      rebuild_installer:
+        description: Test the current installer recipe with the existing application binary
+        type: boolean
+        default: false
 permissions:
   contents: read
   actions: read
@@ -36,6 +40,23 @@ jobs:
           $archives = @(Get-ChildItem dist -Filter '*-windows-x64-cloud.zip')
           if ($archives.Count -ne 1) { throw 'Expected one Windows cloud ZIP.' }
           Expand-Archive $archives[0].FullName -DestinationPath dist/windows
+      - name: Compile the current installer recipe
+        if: inputs.rebuild_installer
+        shell: pwsh
+        run: |
+          $version = ((Get-Content Cargo.toml -Raw) | Select-String '(?m)^version = "([^"]+)"').Matches[0].Groups[1].Value
+          $compiler = Get-Command ISCC.exe -ErrorAction SilentlyContinue
+          $iscc = if ($compiler) { $compiler.Source } else { Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6/ISCC.exe' }
+          & $iscc "/DAppVersion=$version" '/DPackageSuffix=-cloud' 'packaging/windows/parquetviewer.iss'
+          if ($LASTEXITCODE -ne 0) { throw 'Windows installer compilation failed.' }
       - name: Installation, legacy upgrade and removal
         shell: pwsh
         run: ./scripts/package-windows-smoke.ps1
+      - name: Upload the tested installer preview
+        if: inputs.rebuild_installer
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: tablelamp-windows-installer-preview
+          path: dist/*-windows-x64-cloud-setup.exe
+          if-no-files-found: error
+          retention-days: 7

@@ -129,7 +129,11 @@ close Tablelamp and extract the newer ZIP into a new folder. Preferences are kep
 
 Remove the installed app through **Settings → Apps → Installed apps → Tablelamp →
 Uninstall** (**Apps & features** on Windows 10). It removes registrations and
-keeps preferences. Upgrades retain the original `Programs\Parquet Viewer` directory.
+keeps preferences. New installers default to `%LOCALAPPDATA%\Programs\Tablelamp`
+for fresh installations. Upgrades keep the previously chosen folder, including
+the original `Programs\Parquet Viewer` directory, so existing shortcuts and file
+associations continue to work. The published alpha.2 installer still defaults to
+the original folder for fresh installations.
 
 </details>
 

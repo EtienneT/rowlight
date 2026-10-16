@@ -9,7 +9,8 @@
 AppId=com.parquetviewer.ParquetViewer
 AppName=Tablelamp
 AppVersion={#AppVersion}
-DefaultDirName={localappdata}\Programs\Parquet Viewer
+DefaultDirName={localappdata}\Programs\Tablelamp
+UsePreviousAppDir=yes
 DefaultGroupName=Tablelamp
 PrivilegesRequired=lowest
 MinVersion=10.0
@@ -44,7 +45,7 @@ Root: HKCU; Subkey: "Software\ParquetViewer\Capabilities"; ValueType: string; Va
 Root: HKCU; Subkey: "Software\ParquetViewer\Capabilities\FileAssociations"; ValueType: string; ValueName: ".parquet"; ValueData: "ParquetViewer.Parquet"
 Root: HKCU; Subkey: "Software\ParquetViewer\Capabilities\FileAssociations"; ValueType: string; ValueName: ".parq"; ValueData: "ParquetViewer.Parquet"
 Root: HKCU; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "Parquet Viewer"; ValueData: "Software\ParquetViewer\Capabilities"; Flags: uninsdeletevalue
-; Preserve legacy registration identity, install directory and AppId for upgrades.
+; Preserve legacy registration identity and AppId for upgrades.
 
 Root: HKCU; Subkey: "Software\Classes\.ipc\OpenWithProgids"; ValueType: string; ValueName: "ParquetViewer.Parquet"; ValueData: ""; Flags: uninsdeletevalue
 Root: HKCU; Subkey: "Software\ParquetViewer\Capabilities\FileAssociations"; ValueType: string; ValueName: ".ipc"; ValueData: "ParquetViewer.Parquet"
